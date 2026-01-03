@@ -33,10 +33,35 @@
 
         <div class="card">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1">
               <p class="text-sm text-gray-600">Ticket Promedio Hoy</p>
               <p class="text-2xl font-bold text-gray-900">L {{ formatNumber(dashboardStore.stats.today.average) }}</p>
-              <p class="text-xs text-gray-500 mt-1">Efectivo: L {{ formatNumber(dashboardStore.stats.today.cash) }}</p>
+              <div class="mt-2 text-xs text-gray-500 space-y-0.5">
+                <div class="flex justify-between items-center">
+                  <span>💵 Efectivo:</span>
+                  <span class="font-medium">L {{ formatNumber(dashboardStore.stats.today.cash || 0) }}</span>
+                </div>
+                <div v-if="(dashboardStore.stats.today.card || 0) > 0" class="flex justify-between items-center">
+                  <span>💳 Tarjeta:</span>
+                  <span class="font-medium">L {{ formatNumber(dashboardStore.stats.today.card) }}</span>
+                </div>
+                <div v-if="(dashboardStore.stats.today.credit || 0) > 0" class="flex justify-between items-center">
+                  <span>🏦 Crédito:</span>
+                  <span class="font-medium text-blue-600">L {{ formatNumber(dashboardStore.stats.today.credit) }}</span>
+                </div>
+                <div v-if="(dashboardStore.stats.today.transfer || 0) > 0" class="flex justify-between items-center">
+                  <span>🔄 Transferencia:</span>
+                  <span class="font-medium">L {{ formatNumber(dashboardStore.stats.today.transfer) }}</span>
+                </div>
+                <div v-if="(dashboardStore.stats.today.qr || 0) > 0" class="flex justify-between items-center">
+                  <span>📱 QR:</span>
+                  <span class="font-medium">L {{ formatNumber(dashboardStore.stats.today.qr) }}</span>
+                </div>
+                <div v-if="(dashboardStore.stats.today.other || 0) > 0" class="flex justify-between items-center">
+                  <span>📝 Otros:</span>
+                  <span class="font-medium">L {{ formatNumber(dashboardStore.stats.today.other) }}</span>
+                </div>
+              </div>
             </div>
             <div class="bg-green-100 rounded-full p-3">
               <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

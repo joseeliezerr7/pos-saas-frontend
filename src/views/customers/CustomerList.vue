@@ -47,6 +47,8 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">RTN</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grupo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lealtad</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Crédito</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
@@ -66,6 +68,48 @@
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 {{ customer.email || '-' }}
+              </td>
+              <td class="px-6 py-4">
+                <div v-if="customer.customer_group" class="flex items-center">
+                  <div
+                    class="w-2 h-2 rounded-full mr-2"
+                    :style="{ backgroundColor: customer.customer_group.color }"
+                  ></div>
+                  <span class="text-xs text-gray-700">{{ customer.customer_group.name }}</span>
+                </div>
+                <span v-else class="text-xs text-gray-500">Sin grupo</span>
+              </td>
+              <td class="px-6 py-4">
+                <div v-if="customer.loyalty" class="flex flex-col space-y-1">
+                  <div class="flex items-center space-x-2">
+                    <div
+                      v-if="customer.loyalty.current_tier"
+                      class="w-3 h-3 rounded-full"
+                      :style="{ backgroundColor: customer.loyalty.current_tier.color }"
+                    ></div>
+                    <span class="text-xs font-medium text-gray-900">
+                      {{ customer.loyalty.current_tier?.name || 'Sin Nivel' }}
+                    </span>
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    {{ customer.loyalty.points || 0 }} pts
+                  </div>
+                  <button
+                    @click="openLoyaltyModal(customer)"
+                    class="text-xs text-blue-600 hover:text-blue-800 underline text-left"
+                  >
+                    Ver detalles
+                  </button>
+                </div>
+                <div v-else class="flex flex-col">
+                  <span class="text-xs text-gray-400 mb-1">No inscrito</span>
+                  <button
+                    @click="openLoyaltyModal(customer)"
+                    class="text-xs text-blue-600 hover:text-blue-800 underline text-left"
+                  >
+                    Inscribir
+                  </button>
+                </div>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 <div>Límite: L {{ formatNumber(customer.credit_limit) }}</div>
@@ -174,6 +218,23 @@
             </div>
 
             <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Grupo de Cliente</label>
+              <select
+                v-model="form.customer_group_id"
+                class="input w-full"
+              >
+                <option :value="null">Sin grupo</option>
+                <option
+                  v-for="group in customerGroupStore.groups"
+                  :key="group.id"
+                  :value="group.id"
+                >
+                  {{ group.name }}
+                </option>
+              </select>
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Límite de Crédito (L)</label>
               <input
                 v-model.number="form.credit_limit"
@@ -228,21 +289,54 @@
         </div>
       </div>
     </div>
+
+    <!-- Loyalty Modal -->
+    <div v-if="showLoyaltyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-lg max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">
+            Programa de Lealtad - {{ selectedCustomer?.name }}
+          </h2>
+          <button
+            @click="closeLoyaltyModal"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <CustomerLoyaltyPanel
+          v-if="selectedCustomer"
+          :customer-id="selectedCustomer.id"
+          :show-actions="true"
+          @enrolled="handleEnrolled"
+          @points-redeemed="handlePointsRedeemed"
+          @points-adjusted="handlePointsAdjusted"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useCustomerStore } from '@/stores/customer'
+import { useCustomerGroupStore } from '@/stores/customerGroup'
+import CustomerLoyaltyPanel from '@/components/loyalty/CustomerLoyaltyPanel.vue'
 
 const customerStore = useCustomerStore()
+const customerGroupStore = useCustomerGroupStore()
 
 const searchQuery = ref('')
 const filterStatus = ref('')
 const showModal = ref(false)
 const showDeleteModal = ref(false)
+const showLoyaltyModal = ref(false)
 const editingCustomer = ref(null)
 const customerToDelete = ref(null)
+const selectedCustomer = ref(null)
 
 const form = ref({
   name: '',
@@ -250,12 +344,14 @@ const form = ref({
   phone: '',
   email: '',
   address: '',
+  customer_group_id: null,
   credit_limit: 0,
   is_active: true
 })
 
 onMounted(() => {
   loadCustomers()
+  customerGroupStore.fetchGroups()
 })
 
 function loadCustomers() {
@@ -298,6 +394,7 @@ function openCreateModal() {
     phone: '',
     email: '',
     address: '',
+    customer_group_id: null,
     credit_limit: 0,
     is_active: true
   }
@@ -312,6 +409,7 @@ function openEditModal(customer) {
     phone: customer.phone || '',
     email: customer.email || '',
     address: customer.address || '',
+    customer_group_id: customer.customer_group_id || null,
     credit_limit: customer.credit_limit || 0,
     is_active: customer.is_active
   }
@@ -355,6 +453,38 @@ async function handleDelete() {
 
 function formatNumber(value) {
   return parseFloat(value || 0).toFixed(2)
+}
+
+// Loyalty modal functions
+function openLoyaltyModal(customer) {
+  selectedCustomer.value = customer
+  showLoyaltyModal.value = true
+}
+
+function closeLoyaltyModal() {
+  showLoyaltyModal.value = false
+  selectedCustomer.value = null
+}
+
+function handleEnrolled() {
+  // Customer was enrolled successfully
+  console.log('Customer enrolled in loyalty program')
+  // Reload customers to show updated loyalty status
+  loadCustomers()
+}
+
+function handlePointsRedeemed() {
+  // Points were redeemed successfully
+  console.log('Points redeemed successfully')
+  // Reload customers to show updated points
+  loadCustomers()
+}
+
+function handlePointsAdjusted() {
+  // Points were adjusted successfully
+  console.log('Points adjusted successfully')
+  // Reload customers to show updated points
+  loadCustomers()
 }
 </script>
 

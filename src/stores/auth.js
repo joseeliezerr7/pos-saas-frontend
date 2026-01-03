@@ -4,7 +4,9 @@ import authService from '@/services/authService'
 import { toast } from 'vue3-toastify'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
+  // Initialize from localStorage
+  const storedUser = localStorage.getItem('user')
+  const user = ref(storedUser ? JSON.parse(storedUser) : null)
   const token = ref(localStorage.getItem('access_token') || null)
 
   const isAuthenticated = computed(() => !!token.value)
@@ -14,6 +16,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(credentials) {
     try {
+      // Clear old data first
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('user')
+
       const response = await authService.login(credentials)
       const data = response.data.data
 
@@ -21,6 +27,14 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data.user
 
       localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+
+      console.log('[Auth] User logged in:', {
+        id: data.user.id,
+        email: data.user.email,
+        roles: data.user.roles,
+        company_active: data.user.company?.is_active
+      })
 
       toast.success(response.data.message || 'Inicio de sesión exitoso')
       return true
@@ -85,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
 
     localStorage.removeItem('access_token')
+    localStorage.removeItem('user')
 
     toast.info('Sesión cerrada')
   }

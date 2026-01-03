@@ -206,6 +206,19 @@
           </div>
 
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sucursal</label>
+            <select v-model="form.branch_id" class="input w-full">
+              <option :value="null">Sin asignar (Todas las sucursales)</option>
+              <option v-for="branch in branchStore.branches" :key="branch.id" :value="branch.id">
+                {{ branch.name }}
+              </option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              Los administradores pueden acceder a todas las sucursales. Los demás usuarios solo a la asignada.
+            </p>
+          </div>
+
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
             <select v-model="form.status" class="input w-full">
               <option value="active">Activo</option>
@@ -253,10 +266,12 @@
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRoleStore } from '@/stores/role'
+import { useBranchStore } from '@/stores/branch'
 import { usePermissions } from '@/composables/usePermissions'
 
 const userStore = useUserStore()
 const roleStore = useRoleStore()
+const branchStore = useBranchStore()
 const { can } = usePermissions()
 
 const searchQuery = ref('')
@@ -273,12 +288,14 @@ const form = ref({
   password: '',
   password_confirmation: '',
   role_ids: [],
+  branch_id: null,
   status: 'active'
 })
 
 onMounted(() => {
   loadUsers()
   roleStore.fetchRoles({ per_page: 100 })
+  branchStore.fetchBranches({ per_page: 100 })
 })
 
 function loadUsers() {
@@ -325,6 +342,7 @@ function openCreateModal() {
     password: '',
     password_confirmation: '',
     role_ids: [],
+    branch_id: null,
     status: 'active'
   }
   showModal.value = true
@@ -338,6 +356,7 @@ function openEditModal(user) {
     password: '',
     password_confirmation: '',
     role_ids: user.roles ? user.roles.map(r => r.id) : [],
+    branch_id: user.branch_id,
     status: user.status
   }
   showModal.value = true

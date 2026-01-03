@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
 import router from '@/router'
 import { toast } from 'vue3-toastify'
 
@@ -15,9 +16,32 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const authStore = useAuthStore()
+    const tenantStore = useTenantStore()
+
+    // Add Authorization header
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`
     }
+
+    // Add Tenant headers for multi-tenancy support
+    // Backend uses these headers for additional validation and tenant identification
+    if (authStore.isAuthenticated && authStore.user) {
+      // X-Company-ID: ID de la empresa del usuario autenticado
+      if (authStore.user.company_id) {
+        config.headers['X-Company-ID'] = authStore.user.company_id
+      }
+
+      // X-Tenant-ID: ID del tenant desde el store (puede diferir en caso de multi-tenant user)
+      if (tenantStore.tenantId) {
+        config.headers['X-Tenant-ID'] = tenantStore.tenantId
+      }
+
+      // X-Branch-ID: Sucursal del usuario (opcional, útil para filtros)
+      if (authStore.user.branch_id) {
+        config.headers['X-Branch-ID'] = authStore.user.branch_id
+      }
+    }
+
     return config
   },
   (error) => {

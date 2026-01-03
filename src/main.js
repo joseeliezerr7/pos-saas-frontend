@@ -6,6 +6,9 @@ import './assets/css/tailwind.css'
 import Vue3Toastify from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
+// PWA Support
+import './pwa'
+
 const app = createApp(App)
 
 app.use(createPinia())

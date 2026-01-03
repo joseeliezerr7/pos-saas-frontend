@@ -113,6 +113,10 @@
                     <span>Forma de Pago:</span>
                     <span class="uppercase">{{ getPaymentMethodLabel(sale.payment_method) }}</span>
                   </div>
+                  <div class="flex justify-between mb-1" v-if="sale.transaction_reference">
+                    <span>Ref. Transacción:</span>
+                    <span class="font-mono text-xs">{{ sale.transaction_reference }}</span>
+                  </div>
                   <div class="flex justify-between mb-1">
                     <span>Monto Pagado:</span>
                     <span>L {{ formatMoney(sale.amount_paid) }}</span>
@@ -120,6 +124,21 @@
                   <div class="flex justify-between mb-1" v-if="sale.amount_change > 0">
                     <span>Cambio:</span>
                     <span>L {{ formatMoney(sale.amount_change) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LOYALTY POINTS -->
+              <div v-if="sale.loyalty && sale.loyalty.points_earned > 0" class="border-b border-dashed border-gray-400 pb-2 mb-2 bg-blue-50 p-2 rounded">
+                <div class="text-xs text-center">
+                  <div class="font-bold text-blue-700 mb-1">🎁 PUNTOS DE LEALTAD 🎁</div>
+                  <div class="flex justify-between mb-1">
+                    <span>Puntos Ganados:</span>
+                    <span class="font-semibold text-green-600">+{{ sale.loyalty.points_earned }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Total de Puntos:</span>
+                    <span class="font-semibold text-blue-700">{{ sale.loyalty.new_balance }}</span>
                   </div>
                 </div>
               </div>

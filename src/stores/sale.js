@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import saleService from '@/services/saleService'
+import customerGroupService from '@/services/customerGroupService'
 import { toast } from 'vue3-toastify'
 
 export const useSaleStore = defineStore('sale', () => {
@@ -19,6 +20,7 @@ export const useSaleStore = defineStore('sale', () => {
   const customer = ref(null)
   const discount = ref(0)
   const notes = ref('')
+  const groupPrices = ref([])
 
   async function fetchSales(params = {}) {
     loading.value = true
@@ -54,7 +56,10 @@ export const useSaleStore = defineStore('sale', () => {
     try {
       const response = await saleService.create(saleData)
       toast.success('Venta creada exitosamente')
-      return response.data.data
+      return {
+        ...response.data.data,
+        loyalty: response.data.loyalty
+      }
     } catch (error) {
       const message = error.response?.data?.error?.message || 'Error al crear la venta'
       toast.error(message)
@@ -89,10 +94,17 @@ export const useSaleStore = defineStore('sale', () => {
       // Apply tax only if product is taxed
       const taxRate = product.tax_type === 'exempt' ? 0 : (product.tax_rate || 0)
 
+      // Check if customer has a group with special price for this product
+      let finalPrice = product.price
+      const specialPrice = groupPrices.value.find(gp => gp.product_id === product.id)
+      if (specialPrice) {
+        finalPrice = specialPrice.price
+      }
+
       cartItems.value.push({
         product: { ...product },
         quantity: quantity,
-        price: product.price,
+        price: finalPrice,
         discount: 0,
         tax_rate: taxRate
       })
@@ -124,10 +136,24 @@ export const useSaleStore = defineStore('sale', () => {
     customer.value = null
     discount.value = 0
     notes.value = ''
+    groupPrices.value = []
   }
 
-  function setCustomer(customerData) {
+  async function setCustomer(customerData) {
     customer.value = customerData
+
+    // Load special prices if customer has a group
+    if (customerData && customerData.customer_group_id) {
+      try {
+        const response = await customerGroupService.getPrices(customerData.customer_group_id)
+        groupPrices.value = response.data || []
+      } catch (error) {
+        console.error('Error loading group prices:', error)
+        groupPrices.value = []
+      }
+    } else {
+      groupPrices.value = []
+    }
   }
 
   function getCartTotal() {
@@ -165,6 +191,7 @@ export const useSaleStore = defineStore('sale', () => {
     customer,
     discount,
     notes,
+    groupPrices,
     fetchSales,
     fetchSaleById,
     createSale,

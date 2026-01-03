@@ -188,6 +188,10 @@
             <p class="text-sm text-gray-500">Método de Pago</p>
             <p class="font-medium">{{ getPaymentMethodLabel(selectedSale.payment_method) }}</p>
           </div>
+          <div v-if="selectedSale.transaction_reference">
+            <p class="text-sm text-gray-500">Ref. Transacción</p>
+            <p class="font-medium font-mono text-sm">{{ selectedSale.transaction_reference }}</p>
+          </div>
           <div>
             <p class="text-sm text-gray-500">Vendedor</p>
             <p class="font-medium">{{ selectedSale.user?.name || 'N/A' }}</p>

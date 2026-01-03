@@ -17,13 +17,13 @@ export const useBrandStore = defineStore('brand', () => {
     loading.value = true
     try {
       const response = await brandService.getAll(params)
-      const data = response.data.data
 
-      brands.value = data.data
+      brands.value = response.data.data
       pagination.value = {
-        current_page: data.current_page,
-        per_page: data.per_page,
-        total: data.total
+        current_page: response.data.meta.current_page,
+        last_page: response.data.meta.last_page,
+        per_page: response.data.meta.per_page,
+        total: response.data.meta.total
       }
     } catch (error) {
       toast.error('Error al cargar marcas')
