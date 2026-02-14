@@ -18,7 +18,20 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+    @apply btn text-white font-semibold shadow-lg;
+    background: linear-gradient(135deg, #1E88E5 0%, #6A5AE0 100%);
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #1976D2 0%, #5648C7 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px 0 rgba(30, 136, 229, 0.39);
+  }
+
+  .btn-primary:active {
+    background: linear-gradient(135deg, #1565C0 0%, #4527a0 100%);
+    transform: translateY(0);
   }
 
   .btn-secondary {
@@ -82,5 +95,14 @@
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-500;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

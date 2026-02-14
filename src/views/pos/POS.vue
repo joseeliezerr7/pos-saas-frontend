@@ -1,77 +1,120 @@
 <template>
   <div class="h-full flex flex-col bg-gray-50">
     <!-- Header -->
-    <div class="bg-white shadow-sm px-6 py-5 flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <h1 class="text-2xl font-bold text-gray-900">Punto de Venta</h1>
-        <span v-if="authStore.currentUser" class="text-base text-gray-600">
-          Cajero: {{ authStore.currentUser.name }}
+    <div class="bg-white shadow-sm px-3 md:px-6 py-3 md:py-5 flex items-center justify-between">
+      <div class="flex items-center space-x-2 md:space-x-4">
+        <h1 class="text-lg md:text-2xl font-bold text-gray-900">POS</h1>
+        <span v-if="authStore.currentUser" class="text-sm md:text-base text-gray-600 hidden sm:inline">
+          {{ authStore.currentUser.name }}
         </span>
       </div>
-      <div class="flex items-center space-x-3">
-        <button @click="clearSale" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-base">
-          Nueva Venta
+      <div class="flex items-center space-x-2 md:space-x-3">
+        <!-- Mobile toggle button -->
+        <button
+          @click="mobileView = mobileView === 'products' ? 'cart' : 'products'"
+          class="md:hidden px-3 py-2 bg-primary-600 text-white rounded-lg font-medium text-sm relative"
+        >
+          <span v-if="mobileView === 'products'">
+            🛒 ({{ saleStore.cartItems.length }})
+          </span>
+          <span v-else>📦 Productos</span>
         </button>
-        <router-link to="/dashboard" class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium text-base">
+        <button @click="clearSale" class="px-3 md:px-6 py-2 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm md:text-base">
+          Nueva
+        </button>
+        <router-link to="/dashboard" class="px-3 md:px-6 py-2 md:py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium text-sm md:text-base">
           Salir
         </router-link>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
       <!-- Products Section -->
-      <div class="flex-1 flex flex-col overflow-hidden">
+      <div class="flex-1 flex flex-col overflow-hidden" :class="{ 'hidden md:flex': mobileView === 'cart' }">
         <!-- Search Bar -->
-        <div class="p-5 bg-white border-b">
+        <div class="p-3 md:p-5 bg-white border-b">
           <input
             v-model="searchQuery"
             @input="searchProducts"
             type="text"
-            placeholder="Buscar productos por nombre, SKU o código de barras..."
-            class="w-full px-5 py-4 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            placeholder="Buscar productos..."
+            class="w-full px-3 md:px-5 py-3 md:py-4 text-base md:text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
             autofocus
           />
         </div>
 
+        <!-- Categories Bar -->
+        <div v-if="categoryStore.categories.length > 0" class="bg-white border-b px-3 md:px-5 py-2 md:py-3">
+          <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button
+              @click="selectCategory(null)"
+              :class="[
+                'flex-shrink-0 px-4 py-2 rounded-full font-semibold text-sm transition-all touch-manipulation active:scale-95',
+                !selectedCategory
+                  ? 'bg-primary-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              Todas
+            </button>
+            <button
+              v-for="category in categoryStore.categories"
+              :key="category.id"
+              @click="selectCategory(category.id)"
+              :class="[
+                'flex-shrink-0 px-4 py-2 rounded-full font-semibold text-sm transition-all touch-manipulation active:scale-95',
+                selectedCategory === category.id
+                  ? 'bg-primary-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              {{ category.name }}
+            </button>
+          </div>
+        </div>
+
         <!-- Product Grid -->
-        <div class="flex-1 overflow-y-auto p-5">
+        <div class="flex-1 overflow-y-auto p-3 md:p-5">
           <div v-if="productStore.loading" class="text-center py-12">
             <p class="text-gray-500 text-lg">Cargando productos...</p>
           </div>
           <div v-else-if="productStore.products.length === 0" class="text-center py-12">
             <p class="text-gray-500 text-lg">No se encontraron productos</p>
           </div>
-          <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
             <button
               v-for="product in productStore.products"
               :key="product.id"
               @click="addProductToCart(product)"
-              class="bg-white rounded-xl shadow-md border-2 border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-105 transition-all active:scale-95 touch-manipulation"
+              class="bg-white rounded-lg md:rounded-xl shadow-md border-2 border-gray-200 p-2 md:p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-105 transition-all active:scale-95 touch-manipulation"
             >
-              <div v-if="product.image" class="h-36 mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
+              <div v-if="product.image" class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
                 <img :src="getImageUrl(product.image)" :alt="product.name" class="max-h-full max-w-full object-contain" @error="handleImageError" />
               </div>
-              <div v-else class="h-36 mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
-                <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div v-else class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
+                <svg class="w-10 md:w-20 h-10 md:h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <h3 class="font-semibold text-gray-900 text-base mb-2 line-clamp-2 min-h-[3rem]">{{ product.name }}</h3>
-              <div v-if="product.total_stock !== undefined" class="text-xs text-gray-500 mb-2">
+              <h3 class="font-semibold text-gray-900 text-xs md:text-base mb-1 md:mb-2 line-clamp-2 min-h-[2rem] md:min-h-[3rem]">{{ product.name }}</h3>
+              <div v-if="product.manage_stock === false" class="text-[10px] md:text-xs text-blue-500 mb-1 md:mb-2">
+                Disponible
+              </div>
+              <div v-else-if="product.total_stock !== undefined" class="text-[10px] md:text-xs text-gray-500 mb-1 md:mb-2">
                 Stock: <span :class="product.total_stock > 0 ? 'text-green-600' : 'text-red-600'">{{ product.total_stock }}</span>
               </div>
-              <p class="text-2xl font-bold text-primary-600">L {{ formatMoney(product.price) }}</p>
+              <p class="text-base md:text-2xl font-bold text-primary-600">L {{ formatMoney(product.price) }}</p>
             </button>
           </div>
         </div>
       </div>
 
       <!-- Cart Section -->
-      <div class="w-[28rem] bg-white border-l flex flex-col">
+      <div class="w-full md:w-[28rem] bg-white border-l flex flex-col" :class="{ 'hidden md:flex': mobileView === 'products' }">
         <!-- Customer Selection -->
-        <div class="p-5 border-b">
-          <label class="block text-base font-semibold text-gray-700 mb-3">Cliente</label>
+        <div class="p-3 md:p-5 border-b">
+          <label class="block text-sm md:text-base font-semibold text-gray-700 mb-2 md:mb-3">Cliente</label>
           <div class="flex space-x-2">
             <input
               v-model="customerSearchQuery"
@@ -218,8 +261,8 @@
         </div>
 
         <!-- Cart Items -->
-        <div class="flex-1 overflow-y-auto p-5">
-          <h3 class="font-bold text-lg text-gray-900 mb-4">Carrito ({{ saleStore.cartItems.length }})</h3>
+        <div class="flex-1 overflow-y-auto p-3 md:p-5">
+          <h3 class="font-bold text-base md:text-lg text-gray-900 mb-3 md:mb-4">Carrito ({{ saleStore.cartItems.length }})</h3>
 
           <div v-if="saleStore.cartItems.length === 0" class="text-center py-12">
             <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +343,7 @@
         </div>
 
         <!-- Cart Summary -->
-        <div class="border-t-2 p-5 bg-gray-50">
+        <div class="border-t-2 p-3 md:p-5 bg-gray-50">
           <div class="space-y-3 mb-5">
             <div class="flex justify-between text-base">
               <span class="font-medium text-gray-600">Subtotal:</span>
@@ -476,6 +519,15 @@
             </div>
           </div>
 
+          <!-- Order Number Toggle -->
+          <label class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+            <input type="checkbox" v-model="assignOrderNumber" class="w-5 h-5 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
+            <div>
+              <span class="text-sm font-semibold text-blue-800">Asignar No. de Orden</span>
+              <span class="text-xs text-blue-600 block">Para restaurantes, pollerías, etc.</span>
+            </div>
+          </label>
+
           <!-- Complete Sale Button -->
           <button
             @click="completeSale"
@@ -561,6 +613,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
+import { useCategoryStore } from '@/stores/category'
 import { useCustomerStore } from '@/stores/customer'
 import { useSaleStore } from '@/stores/sale'
 import { usePromotionStore } from '@/stores/promotion'
@@ -574,6 +627,7 @@ import cashRegisterService from '@/services/cashRegisterService'
 
 const authStore = useAuthStore()
 const productStore = useProductStore()
+const categoryStore = useCategoryStore()
 const customerStore = useCustomerStore()
 const saleStore = useSaleStore()
 const promotionStore = usePromotionStore()
@@ -582,12 +636,15 @@ const giftCardStore = useGiftCardStore()
 const { can } = usePermissions()
 
 const searchQuery = ref('')
+const selectedCategory = ref(null)
 const customerSearchQuery = ref('')
+const mobileView = ref('products') // 'products' or 'cart' for mobile toggle
 const customerSearchResults = ref([])
 const paymentMethod = ref('cash')
 const transactionReference = ref('')
 const amountPaid = ref(0)
 const overrideCreditLimit = ref(false)
+const assignOrderNumber = ref(false)
 const showCustomerModal = ref(false)
 const showInvoiceTicket = ref(false)
 const completedSale = ref({})
@@ -623,7 +680,8 @@ const companyData = computed(() => ({
   address: authStore.currentUser?.company?.address || 'Tegucigalpa, Honduras',
   city: authStore.currentUser?.company?.city || 'Tegucigalpa',
   phone: authStore.currentUser?.company?.phone || '+504 0000-0000',
-  email: authStore.currentUser?.company?.email || 'info@empresa.hn'
+  email: authStore.currentUser?.company?.email || 'info@empresa.hn',
+  logo_url: authStore.currentUser?.company?.logo_url || null
 }))
 
 const caiData = ref(null) // Will be fetched from backend in future
@@ -656,6 +714,7 @@ const creditAvailable = computed(() => {
 
 onMounted(async () => {
   await checkCashRegister()
+  loadCategories()
   loadProducts()
 })
 
@@ -694,17 +753,35 @@ async function checkCashRegister() {
   }
 }
 
+async function loadCategories() {
+  await categoryStore.fetchCategories({ per_page: 100 })
+}
+
 async function loadProducts() {
-  await productStore.fetchProducts({ per_page: 50, is_active: true })
+  const params = { per_page: 50, is_active: true }
+  if (selectedCategory.value) {
+    params.category_id = selectedCategory.value
+  }
+  await productStore.fetchProducts(params)
+}
+
+function selectCategory(categoryId) {
+  selectedCategory.value = categoryId
+  searchQuery.value = ''
+  loadProducts()
 }
 
 async function searchProducts() {
   if (searchQuery.value.length >= 2) {
-    await productStore.fetchProducts({
+    const params = {
       search: searchQuery.value,
       per_page: 50,
       is_active: true
-    })
+    }
+    if (selectedCategory.value) {
+      params.category_id = selectedCategory.value
+    }
+    await productStore.fetchProducts(params)
   } else if (searchQuery.value.length === 0) {
     await loadProducts()
   }
@@ -788,7 +865,8 @@ async function completeSale() {
     amount_paid: paymentMethod.value === 'cash' ? amountPaid.value : cartTotals.value.total,
     amount_change: paymentMethod.value === 'cash' ? (amountPaid.value - cartTotals.value.total) : 0,
     notes: saleStore.notes,
-    override_credit_limit: paymentMethod.value === 'credit' ? overrideCreditLimit.value : false
+    override_credit_limit: paymentMethod.value === 'credit' ? overrideCreditLimit.value : false,
+    assign_order_number: assignOrderNumber.value
   }
 
   try {
@@ -897,6 +975,7 @@ function clearSale() {
   amountPaid.value = 0
   overrideCreditLimit.value = false
   searchQuery.value = ''
+  selectedCategory.value = null
   couponCode.value = ''
   appliedPromotion.value = null
   availableAutoPromotions.value = []
