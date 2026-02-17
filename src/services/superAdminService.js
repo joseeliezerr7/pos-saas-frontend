@@ -79,10 +79,47 @@ export default {
   },
 
   /**
-   * Obtener todos los planes disponibles
+   * Obtener todos los planes disponibles (para super admin incluye inactivos)
    * @returns {Promise}
    */
   getPlans() {
-    return api.get('/plans')
+    return api.get('/super-admin/plans')
+  },
+
+  /**
+   * Crear un nuevo plan
+   * @param {Object} planData - Datos del plan
+   * @returns {Promise}
+   */
+  createPlan(planData) {
+    return api.post('/super-admin/plans', planData)
+  },
+
+  /**
+   * Actualizar un plan existente
+   * @param {Number} planId - ID del plan
+   * @param {Object} planData - Datos actualizados
+   * @returns {Promise}
+   */
+  updatePlan(planId, planData) {
+    return api.put(`/super-admin/plans/${planId}`, planData)
+  },
+
+  /**
+   * Eliminar un plan
+   * @param {Number} planId - ID del plan
+   * @returns {Promise}
+   */
+  deletePlan(planId) {
+    return api.delete(`/super-admin/plans/${planId}`)
+  },
+
+  /**
+   * Activar/Desactivar un plan
+   * @param {Number} planId - ID del plan
+   * @returns {Promise}
+   */
+  togglePlanStatus(planId) {
+    return api.post(`/super-admin/plans/${planId}/toggle-status`)
   }
 }

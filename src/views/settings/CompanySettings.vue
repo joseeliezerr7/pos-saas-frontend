@@ -26,7 +26,7 @@
           <div class="flex flex-col items-center">
             <!-- Logo Preview -->
             <div class="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4 bg-gray-50">
-              <img v-if="company?.logo" :src="getLogoUrl(company.logo)" alt="Logo" class="max-w-full max-h-full object-contain p-2" />
+              <img v-if="companyLogoUrl" :src="companyLogoUrl" alt="Logo" class="max-w-full max-h-full object-contain p-2" @error="logoError = true" />
               <div v-else class="text-center text-gray-400">
                 <svg class="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -138,6 +138,58 @@
             </div>
           </form>
         </div>
+
+        <!-- POS Configuration -->
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Configuración del POS</h2>
+
+          <div class="space-y-4">
+            <label class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+              <input type="checkbox" v-model="form.settings.enable_order_numbers" class="w-5 h-5 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
+              <div>
+                <span class="text-sm font-semibold text-blue-800">Habilitar No. de Orden</span>
+                <span class="text-xs text-blue-600 block">Muestra la opción de asignar número de orden en el POS (útil para restaurantes, pollerías, etc.)</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Kitchen Display System (KDS) Configuration -->
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Pantalla de Cocina (KDS)</h2>
+
+          <div class="space-y-4">
+            <label class="flex items-center gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors">
+              <input type="checkbox" v-model="form.settings.enable_kds" class="w-5 h-5 rounded border-orange-300 text-orange-600 focus:ring-orange-500">
+              <div>
+                <span class="text-sm font-semibold text-orange-800">Habilitar Pantalla de Cocina</span>
+                <span class="text-xs text-orange-600 block">Activa el sistema KDS para que la cocina vea y gestione los pedidos en tiempo real</span>
+              </div>
+            </label>
+
+            <div v-if="form.settings.enable_kds" class="space-y-4 pl-4 border-l-2 border-orange-200 ml-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tiempo de alerta (minutos)</label>
+                <input
+                  v-model.number="form.settings.kds_alert_minutes"
+                  type="number"
+                  min="1"
+                  max="120"
+                  class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <p class="text-xs text-gray-500 mt-1">Los pedidos que superen este tiempo se resaltaran en rojo</p>
+              </div>
+
+              <label class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                <input type="checkbox" v-model="form.settings.kds_sound" class="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <div>
+                  <span class="text-sm font-semibold text-gray-800">Sonido de notificacion</span>
+                  <span class="text-xs text-gray-600 block">Reproduce un sonido cuando llega un nuevo pedido a la cocina</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -160,18 +212,41 @@ const form = ref({
   phone: '',
   email: '',
   website: '',
-  address: ''
+  address: '',
+  settings: {
+    enable_order_numbers: false,
+    enable_kds: false,
+    kds_alert_minutes: 15,
+    kds_sound: true
+  }
 })
 
 const company = computed(() => settingsStore.companySettings)
+const logoError = ref(false)
+
+const companyLogoUrl = computed(() => {
+  if (logoError.value) return null
+  const c = company.value
+  if (!c) return null
+  if (c.logo_url) return c.logo_url
+  if (c.logo) return getLogoUrl(c.logo)
+  return null
+})
 
 onMounted(async () => {
   await loadSettings()
 })
 
+function parseSettings(raw) {
+  if (!raw) return {}
+  if (typeof raw === 'object') return raw
+  try { return JSON.parse(raw) } catch { return {} }
+}
+
 async function loadSettings() {
   try {
     const data = await settingsStore.fetchCompanySettings()
+    const s = parseSettings(data.settings)
     form.value = {
       name: data.name || '',
       legal_name: data.legal_name || '',
@@ -179,7 +254,14 @@ async function loadSettings() {
       phone: data.phone || '',
       email: data.email || '',
       website: data.website || '',
-      address: data.address || ''
+      address: data.address || '',
+      settings: {
+        ...s,
+        enable_order_numbers: s.enable_order_numbers || false,
+        enable_kds: s.enable_kds || false,
+        kds_alert_minutes: s.kds_alert_minutes ?? 15,
+        kds_sound: s.kds_sound ?? true
+      }
     }
   } catch (error) {
     console.error('Error loading settings:', error)
@@ -208,6 +290,8 @@ async function handleLogoUpload(event) {
 
   try {
     await settingsStore.uploadLogo(file)
+    logoError.value = false
+    await loadSettings()
     successMessage.value = 'Logo actualizado exitosamente'
     toast.success('Logo subido correctamente')
   } catch (error) {

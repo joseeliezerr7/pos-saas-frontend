@@ -13,18 +13,24 @@
 
     <!-- Search and Filters -->
     <div class="card">
-      <div class="flex gap-4">
+      <div class="flex flex-wrap gap-4">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Buscar clientes por nombre, RTN, teléfono o email..."
-          class="input flex-1"
+          class="input flex-1 min-w-[200px]"
           @input="handleSearch"
         />
         <select v-model="filterStatus" @change="handleFilterChange" class="input">
           <option value="">Todos los estados</option>
           <option value="1">Activos</option>
           <option value="0">Inactivos</option>
+        </select>
+        <select v-model="filterTag" @change="handleFilterChange" class="input">
+          <option value="">Todos los tags</option>
+          <option v-for="tag in tagStore.tags" :key="tag.id" :value="tag.id">
+            {{ tag.name }}
+          </option>
         </select>
       </div>
     </div>
@@ -48,6 +54,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grupo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tags</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lealtad</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Crédito</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
@@ -78,6 +85,19 @@
                   <span class="text-xs text-gray-700">{{ customer.customer_group.name }}</span>
                 </div>
                 <span v-else class="text-xs text-gray-500">Sin grupo</span>
+              </td>
+              <td class="px-6 py-4">
+                <div v-if="customer.tags && customer.tags.length > 0" class="flex flex-wrap gap-1">
+                  <span
+                    v-for="tag in customer.tags"
+                    :key="tag.id"
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                    :style="{ backgroundColor: tag.color }"
+                  >
+                    {{ tag.name }}
+                  </span>
+                </div>
+                <span v-else class="text-xs text-gray-400">-</span>
               </td>
               <td class="px-6 py-4">
                 <div v-if="customer.loyalty" class="flex flex-col space-y-1">
@@ -234,6 +254,33 @@
               </select>
             </div>
 
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+              <div class="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg min-h-[60px]">
+                <label
+                  v-for="tag in tagStore.tags"
+                  :key="tag.id"
+                  class="inline-flex items-center px-3 py-1.5 rounded-full text-sm cursor-pointer transition-all"
+                  :class="form.tag_ids.includes(tag.id)
+                    ? 'text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                  :style="form.tag_ids.includes(tag.id) ? { backgroundColor: tag.color } : {}"
+                >
+                  <input
+                    type="checkbox"
+                    :value="tag.id"
+                    v-model="form.tag_ids"
+                    class="sr-only"
+                  />
+                  <span>{{ tag.name }}</span>
+                </label>
+                <span v-if="tagStore.tags.length === 0" class="text-gray-400 text-sm">
+                  No hay tags disponibles
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Selecciona los tags que aplican a este cliente</p>
+            </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Límite de Crédito (L)</label>
               <input
@@ -324,13 +371,16 @@
 import { ref, onMounted } from 'vue'
 import { useCustomerStore } from '@/stores/customer'
 import { useCustomerGroupStore } from '@/stores/customerGroup'
+import { useCustomerTagStore } from '@/stores/customerTag'
 import CustomerLoyaltyPanel from '@/components/loyalty/CustomerLoyaltyPanel.vue'
 
 const customerStore = useCustomerStore()
 const customerGroupStore = useCustomerGroupStore()
+const tagStore = useCustomerTagStore()
 
 const searchQuery = ref('')
 const filterStatus = ref('')
+const filterTag = ref('')
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const showLoyaltyModal = ref(false)
@@ -346,12 +396,14 @@ const form = ref({
   address: '',
   customer_group_id: null,
   credit_limit: 0,
-  is_active: true
+  is_active: true,
+  tag_ids: []
 })
 
 onMounted(() => {
   loadCustomers()
   customerGroupStore.fetchGroups()
+  tagStore.fetchTags()
 })
 
 function loadCustomers() {
@@ -366,6 +418,10 @@ function loadCustomers() {
 
   if (filterStatus.value !== '') {
     params.is_active = filterStatus.value
+  }
+
+  if (filterTag.value !== '') {
+    params.tag_id = filterTag.value
   }
 
   customerStore.fetchCustomers(params)
@@ -396,7 +452,8 @@ function openCreateModal() {
     address: '',
     customer_group_id: null,
     credit_limit: 0,
-    is_active: true
+    is_active: true,
+    tag_ids: []
   }
   showModal.value = true
 }
@@ -411,7 +468,8 @@ function openEditModal(customer) {
     address: customer.address || '',
     customer_group_id: customer.customer_group_id || null,
     credit_limit: customer.credit_limit || 0,
-    is_active: customer.is_active
+    is_active: customer.is_active,
+    tag_ids: customer.tags ? customer.tags.map(t => t.id) : []
   }
   showModal.value = true
 }

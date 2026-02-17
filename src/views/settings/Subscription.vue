@@ -1,5 +1,19 @@
 <template>
   <div>
+    <!-- Subscription Warning Alert -->
+    <div v-if="showWarning" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-start">
+        <svg class="w-6 h-6 text-red-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <h3 class="text-lg font-semibold text-red-800">Atención: Suscripción Inactiva</h3>
+          <p class="text-red-700 mt-1">{{ warningMessage }}</p>
+          <p class="text-red-600 text-sm mt-2">Para continuar usando el sistema, por favor renueva tu suscripción o contacta al administrador.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <loading-spinner v-if="settingsStore.loading && !company" text="Cargando suscripción..." />
 
@@ -165,16 +179,32 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
+const route = useRoute()
+const router = useRouter()
 const settingsStore = useSettingsStore()
 
 const company = computed(() => settingsStore.companySettings)
 const subscription = computed(() => company.value?.subscription)
 const plan = computed(() => company.value?.plan)
 
+// Warning state from router query
+const showWarning = ref(false)
+const warningMessage = ref('')
+
 onMounted(async () => {
+  // Check for warning from router
+  if (route.query.warning) {
+    showWarning.value = true
+    warningMessage.value = route.query.message || 'Tu suscripción requiere atención.'
+
+    // Clear query params without reloading
+    router.replace({ name: 'settings-subscription' })
+  }
+
   await loadSubscription()
 })
 

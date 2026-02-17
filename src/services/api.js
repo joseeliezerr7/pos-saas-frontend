@@ -49,6 +49,21 @@ api.interceptors.request.use(
   }
 )
 
+// Flag to prevent multiple refresh attempts
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
@@ -59,22 +74,54 @@ api.interceptors.response.use(
     const originalRequest = error.config
 
     // Handle 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
-      try {
-        // Try to refresh token
-        const refreshed = await authStore.refreshAccessToken()
-
-        if (refreshed) {
-          // Retry original request
-          return api(originalRequest)
-        }
-      } catch (refreshError) {
-        // Refresh failed, redirect to login
+    if (error.response?.status === 401) {
+      // Don't retry refresh endpoint to avoid infinite loop
+      if (originalRequest.url?.includes('/auth/refresh')) {
         authStore.logout()
         router.push({ name: 'login' })
-        return Promise.reject(refreshError)
+        return Promise.reject(error)
+      }
+
+      if (!originalRequest._retry) {
+        if (isRefreshing) {
+          // If already refreshing, queue this request
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject })
+          }).then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return api(originalRequest)
+          }).catch(err => {
+            return Promise.reject(err)
+          })
+        }
+
+        originalRequest._retry = true
+        isRefreshing = true
+
+        try {
+          // Try to refresh token
+          const refreshed = await authStore.refreshAccessToken()
+
+          if (refreshed) {
+            processQueue(null, authStore.token)
+            originalRequest.headers.Authorization = `Bearer ${authStore.token}`
+            return api(originalRequest)
+          } else {
+            // Refresh returned false - logout and redirect
+            processQueue(new Error('Refresh failed'), null)
+            authStore.logout()
+            router.push({ name: 'login' })
+            return Promise.reject(error)
+          }
+        } catch (refreshError) {
+          // Refresh failed, redirect to login
+          processQueue(refreshError, null)
+          authStore.logout()
+          router.push({ name: 'login' })
+          return Promise.reject(refreshError)
+        } finally {
+          isRefreshing = false
+        }
       }
     }
 

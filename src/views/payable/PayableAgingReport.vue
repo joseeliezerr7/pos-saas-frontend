@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">Reporte de Antigüedad de Saldos</h1>
-        <p class="text-gray-600 mt-1">Análisis de cuentas por cobrar por tiempo de vencimiento</p>
+        <h1 class="text-2xl font-bold text-gray-800">Reporte de Antigüedad de Cuentas por Pagar</h1>
+        <p class="text-gray-600 mt-1">Análisis de deudas con proveedores por tiempo de vencimiento</p>
       </div>
       <button
         @click="exportReport"
@@ -21,12 +21,12 @@
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
       <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-sm font-medium opacity-90">Total por Cobrar</h3>
+          <h3 class="text-sm font-medium opacity-90">Total por Pagar</h3>
           <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <p class="text-3xl font-bold">L {{ formatCurrency(totalReceivable) }}</p>
+        <p class="text-3xl font-bold">L {{ formatCurrency(totalPayable) }}</p>
         <p class="text-sm opacity-80 mt-1">{{ totalCount }} facturas</p>
       </div>
 
@@ -97,7 +97,7 @@
 
     <!-- Chart Visualization -->
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">Distribución de Saldos por Antigüedad</h2>
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Distribución de Deudas por Antigüedad</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Pie Chart -->
         <div class="flex items-center justify-center">
@@ -110,10 +110,10 @@
       </div>
     </div>
 
-    <!-- Detailed Breakdown by Customer -->
+    <!-- Detailed Breakdown by Supplier -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
       <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-800">Desglose por Cliente</h2>
+        <h2 class="text-lg font-semibold text-gray-800">Desglose por Proveedor</h2>
       </div>
 
       <div v-if="loading" class="p-8 text-center">
@@ -121,7 +121,7 @@
         <p class="text-gray-600 mt-2">Cargando reporte...</p>
       </div>
 
-      <div v-else-if="customerBreakdown.length === 0" class="p-8 text-center">
+      <div v-else-if="supplierBreakdown.length === 0" class="p-8 text-center">
         <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
@@ -132,7 +132,7 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Cliente
+              Proveedor
             </th>
             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               Facturas
@@ -152,53 +152,39 @@
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Total
             </th>
-            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Acciones
-            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="customer in customerBreakdown" :key="customer.id" class="hover:bg-gray-50">
+          <tr v-for="supplier in supplierBreakdown" :key="supplier.id" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ customer.name }}</div>
-              <div class="text-sm text-gray-500">{{ customer.rtn || 'N/A' }}</div>
+              <div class="text-sm font-medium text-gray-900">{{ supplier.name }}</div>
+              <div class="text-sm text-gray-500">{{ supplier.rtn || 'N/A' }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-              {{ customer.invoice_count }}
+              {{ supplier.invoice_count }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-              <span :class="customer.current > 0 ? 'font-medium text-green-600' : 'text-gray-400'">
-                L {{ formatCurrency(customer.current) }}
+              <span :class="supplier.current > 0 ? 'font-medium text-green-600' : 'text-gray-400'">
+                L {{ formatCurrency(supplier.current) }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-              <span :class="customer.days_1_30 > 0 ? 'font-medium text-yellow-600' : 'text-gray-400'">
-                L {{ formatCurrency(customer.days_1_30) }}
+              <span :class="supplier.days_1_30 > 0 ? 'font-medium text-yellow-600' : 'text-gray-400'">
+                L {{ formatCurrency(supplier.days_1_30) }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-              <span :class="customer.days_31_60 > 0 ? 'font-medium text-orange-600' : 'text-gray-400'">
-                L {{ formatCurrency(customer.days_31_60) }}
+              <span :class="supplier.days_31_60 > 0 ? 'font-medium text-orange-600' : 'text-gray-400'">
+                L {{ formatCurrency(supplier.days_31_60) }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-              <span :class="customer.days_over_60 > 0 ? 'font-medium text-red-600' : 'text-gray-400'">
-                L {{ formatCurrency(customer.days_over_60) }}
+              <span :class="supplier.days_over_60 > 0 ? 'font-medium text-red-600' : 'text-gray-400'">
+                L {{ formatCurrency(supplier.days_over_60) }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-gray-900">
-              L {{ formatCurrency(customer.total) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-              <button
-                @click="viewCustomerStatement(customer.id)"
-                class="text-blue-600 hover:text-blue-800"
-                title="Ver estado de cuenta"
-              >
-                <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </button>
+              L {{ formatCurrency(supplier.total) }}
             </td>
           </tr>
         </tbody>
@@ -218,9 +204,8 @@
               L {{ formatCurrency(agingData['60_plus_days']?.amount || 0) }}
             </td>
             <td class="px-6 py-4 text-right text-sm font-bold text-gray-900">
-              L {{ formatCurrency(totalReceivable) }}
+              L {{ formatCurrency(totalPayable) }}
             </td>
-            <td></td>
           </tr>
         </tfoot>
       </table>
@@ -230,15 +215,13 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCreditStore } from '@/stores/credit'
+import { usePayableStore } from '@/stores/payable'
 import { toast } from 'vue3-toastify'
 import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
 
-const router = useRouter()
-const creditStore = useCreditStore()
+const payableStore = usePayableStore()
 
 const loading = ref(false)
 const pieChartCanvas = ref(null)
@@ -246,27 +229,19 @@ const barChartCanvas = ref(null)
 let pieChart = null
 let barChart = null
 
-const agingData = computed(() => creditStore.agingReport?.aging_buckets || {})
-const customerBreakdown = computed(() => {
-  // Agrupar datos por cliente
-  const customers = {}
-
-  const bucketMap = {
-    'current': 'current',
-    '1_30_days': 'days_1_30',
-    '31_60_days': 'days_31_60',
-    '60_plus_days': 'days_over_60'
-  }
+const agingData = computed(() => payableStore.agingReport?.aging_buckets || {})
+const supplierBreakdown = computed(() => {
+  // Group data by supplier
+  const suppliers = {}
 
   Object.keys(agingData.value).forEach(bucket => {
-    if (agingData.value[bucket]?.sales) {
-      agingData.value[bucket].sales.forEach(sale => {
-        const customerId = sale.customer_id || sale.customer_name
-        if (!customers[customerId]) {
-          customers[customerId] = {
-            id: customerId,
-            name: sale.customer_name || sale.customer?.name || 'N/A',
-            rtn: sale.customer?.rtn || '',
+    if (agingData.value[bucket]?.payables) {
+      agingData.value[bucket].payables.forEach(payable => {
+        const supplierName = payable.supplier_name
+        if (!suppliers[supplierName]) {
+          suppliers[supplierName] = {
+            name: supplierName,
+            rtn: '',
             current: 0,
             days_1_30: 0,
             days_31_60: 0,
@@ -276,20 +251,27 @@ const customerBreakdown = computed(() => {
           }
         }
 
+        const bucketMap = {
+          'current': 'current',
+          '1_30_days': 'days_1_30',
+          '31_60_days': 'days_31_60',
+          '60_plus_days': 'days_over_60'
+        }
+
         const field = bucketMap[bucket]
         if (field) {
-          customers[customerId][field] += Number(sale.balance_due || 0)
+          suppliers[supplierName][field] += Number(payable.balance_due || 0)
         }
-        customers[customerId].total += Number(sale.balance_due || 0)
-        customers[customerId].invoice_count++
+        suppliers[supplierName].total += Number(payable.balance_due || 0)
+        suppliers[supplierName].invoice_count++
       })
     }
   })
 
-  return Object.values(customers).sort((a, b) => b.total - a.total)
+  return Object.values(suppliers).sort((a, b) => b.total - a.total)
 })
 
-const totalReceivable = computed(() => {
+const totalPayable = computed(() => {
   return (agingData.value.current?.amount || 0) +
          (agingData.value['1_30_days']?.amount || 0) +
          (agingData.value['31_60_days']?.amount || 0) +
@@ -312,7 +294,7 @@ onMounted(async () => {
 const loadAgingReport = async () => {
   loading.value = true
   try {
-    await creditStore.fetchAgingReport()
+    await payableStore.fetchAgingReport()
   } catch (error) {
     toast.error('Error al cargar el reporte de antigüedad')
   } finally {
@@ -409,13 +391,8 @@ const renderCharts = () => {
   }
 }
 
-const viewCustomerStatement = (customerId) => {
-  router.push({ name: 'credit-customer-statement', params: { customerId } })
-}
-
 const exportReport = () => {
   toast.info('Funcionalidad de exportación en desarrollo')
-  // TODO: Implementar exportación a Excel
 }
 
 const formatCurrency = (amount) => {
@@ -424,8 +401,8 @@ const formatCurrency = (amount) => {
 }
 
 const getPercentage = (amount) => {
-  if (!totalReceivable.value || !amount) return 0
-  return Math.round((amount / totalReceivable.value) * 100)
+  if (!totalPayable.value || !amount) return 0
+  return Math.round((amount / totalPayable.value) * 100)
 }
 </script>
 

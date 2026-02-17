@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
 import { usePermissions } from '@/composables/usePermissions'
-import { getCurrentTenantSlug } from '@/utils/tenant'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -308,6 +307,34 @@ const router = createRouter({
           ]
         },
         {
+          path: 'payable',
+          component: () => import('@/views/payable/index.vue'),
+          redirect: '/payable/dashboard',
+          meta: { permissions: ['view_payable', 'view_purchases'] },
+          children: [
+            {
+              path: 'dashboard',
+              name: 'payable-dashboard',
+              component: () => import('@/views/payable/PayableDashboard.vue')
+            },
+            {
+              path: 'payments',
+              name: 'payable-payments',
+              component: () => import('@/views/payable/SupplierPaymentsIndex.vue')
+            },
+            {
+              path: 'accounts-payable',
+              name: 'payable-accounts-payable',
+              component: () => import('@/views/payable/AccountsPayable.vue')
+            },
+            {
+              path: 'aging-report',
+              name: 'payable-aging-report',
+              component: () => import('@/views/payable/PayableAgingReport.vue')
+            }
+          ]
+        },
+        {
           path: 'reports',
           component: () => import('@/views/reports/index.vue'),
           redirect: '/reports',
@@ -389,6 +416,90 @@ const router = createRouter({
               meta: { permissions: ['import_products', 'export_data'] }
             }
           ]
+        },
+        // E-commerce Routes (Plan Empresarial)
+        {
+          path: 'ecommerce',
+          component: () => import('@/views/ecommerce/index.vue'),
+          meta: { permission: 'access_ecommerce' },
+          children: [
+            {
+              path: '',
+              name: 'ecommerce-dashboard',
+              component: () => import('@/views/ecommerce/EcommerceDashboard.vue')
+            },
+            {
+              path: 'settings',
+              name: 'ecommerce-settings',
+              component: () => import('@/views/ecommerce/EcommerceSettings.vue'),
+              meta: { permission: 'configure_ecommerce' }
+            },
+            {
+              path: 'orders',
+              name: 'ecommerce-orders',
+              component: () => import('@/views/ecommerce/EcommerceOrders.vue'),
+              meta: { permission: 'view_ecommerce_orders' }
+            },
+            {
+              path: 'orders/:id',
+              name: 'ecommerce-order-detail',
+              component: () => import('@/views/ecommerce/EcommerceOrderDetail.vue'),
+              meta: { permission: 'view_ecommerce_orders' }
+            },
+            {
+              path: 'customers',
+              name: 'ecommerce-customers',
+              component: () => import('@/views/ecommerce/EcommerceCustomers.vue'),
+              meta: { permission: 'view_ecommerce_customers' }
+            },
+            {
+              path: 'customers/:id',
+              name: 'ecommerce-customer-detail',
+              component: () => import('@/views/ecommerce/EcommerceCustomerDetail.vue'),
+              meta: { permission: 'view_ecommerce_customers' }
+            },
+            {
+              path: 'catalog',
+              name: 'ecommerce-catalog',
+              component: () => import('@/views/ecommerce/EcommerceCatalog.vue'),
+              meta: { permission: 'manage_ecommerce_products' }
+            }
+          ]
+        }
+      ]
+    },
+    // Kitchen Display System (KDS) - Full screen, no sidebar
+    {
+      path: '/kitchen',
+      name: 'kitchen-display',
+      component: () => import('@/views/kitchen/KitchenDisplay.vue'),
+      meta: { requiresAuth: true, title: 'Pantalla de Cocina' }
+    },
+    // Public Store Routes (No auth required)
+    {
+      path: '/store/:storeSlug',
+      component: () => import('@/layouts/StoreLayout.vue'),
+      meta: { public: true },
+      children: [
+        {
+          path: '',
+          name: 'store-catalog',
+          component: () => import('@/views/store/StoreCatalog.vue')
+        },
+        {
+          path: 'product/:productId',
+          name: 'store-product',
+          component: () => import('@/views/store/StoreProductDetail.vue')
+        },
+        {
+          path: 'cart',
+          name: 'store-cart',
+          component: () => import('@/views/store/StoreCart.vue')
+        },
+        {
+          path: 'checkout',
+          name: 'store-checkout',
+          component: () => import('@/views/store/StoreCheckout.vue')
         }
       ]
     },
@@ -412,6 +523,11 @@ const router = createRouter({
           path: 'tenants/:id',
           name: 'super-admin-tenant-details',
           component: () => import('@/views/super-admin/TenantDetails.vue')
+        },
+        {
+          path: 'plans',
+          name: 'super-admin-plans',
+          component: () => import('@/views/super-admin/PlansList.vue')
         }
       ]
     },
@@ -427,6 +543,12 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const tenantStore = useTenantStore()
+
+  // Allow public routes without authentication
+  if (to.meta.public) {
+    next()
+    return
+  }
 
   // Check authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
@@ -462,64 +584,67 @@ router.beforeEach(async (to, from, next) => {
       tenantStore.setTenant(authStore.user.company)
     }
 
-    // Skip tenant validation for Super Admin
-    if (!isSuperAdmin) {
-      // Validate tenant slug from domain matches user's company
-      const domainTenantSlug = getCurrentTenantSlug()
-      if (domainTenantSlug && domainTenantSlug !== 'default') {
-        // In production with subdomains, validate the domain matches user's company
-        if (tenantStore.currentTenant?.slug &&
-            domainTenantSlug !== tenantStore.currentTenant.slug) {
-          console.error('[Router] Tenant mismatch detected!')
-          console.error('Domain tenant:', domainTenantSlug)
-          console.error('User tenant:', tenantStore.currentTenant.slug)
-
-          // Logout user and redirect to login
-          authStore.logout()
-          next({
-            name: 'login',
-            query: {
-              error: 'tenant_mismatch',
-              message: 'No tienes acceso a esta empresa'
-            }
-          })
-          return
+    // Validate company is active (for all users except Super Admin)
+    if (!isSuperAdmin && authStore.user?.company && !authStore.user.company.is_active) {
+      console.warn('[Router] Company is not active')
+      next({
+        name: 'dashboard',
+        query: {
+          warning: 'company_inactive',
+          message: 'Tu empresa está inactiva. Contacta al administrador.'
         }
+      })
+      return
+    }
+
+    // Validate subscription status (for all users except Super Admin)
+    if (!isSuperAdmin && authStore.user?.company?.subscription) {
+      const subscription = authStore.user.company.subscription
+      const subscriptionStatus = subscription.status
+
+      // Allow access to subscription settings page even if subscription is inactive
+      if (to.name === 'settings-subscription') {
+        next()
+        return
       }
 
-      // Validate user belongs to the current tenant
-      if (tenantStore.tenantId && authStore.user?.company_id) {
-        if (tenantStore.tenantId !== authStore.user.company_id) {
-          console.error('[Router] User does not belong to current tenant')
+      // Check if subscription is not active
+      if (!['active', 'trial'].includes(subscriptionStatus)) {
+        console.warn('[Router] Subscription is not active:', subscriptionStatus)
 
-          // Clear tenant and logout
-          tenantStore.clearTenant()
-          authStore.logout()
-          next({
-            name: 'login',
-            query: {
-              error: 'unauthorized_tenant',
-              message: 'Acceso no autorizado a esta empresa'
-            }
-          })
-          return
+        const statusMessages = {
+          expired: 'Tu suscripción ha expirado. Por favor, renueva tu plan.',
+          canceled: 'Tu suscripción ha sido cancelada.',
+          suspended: 'Tu suscripción está suspendida. Contacta al administrador.'
         }
-      }
 
-      // Validate company is active
-      if (authStore.user?.company && !authStore.user.company.is_active) {
-        console.warn('[Router] Company is not active')
         next({
-          name: 'dashboard',
+          name: 'settings-subscription',
           query: {
-            warning: 'company_inactive',
-            message: 'Tu empresa está inactiva. Contacta al administrador.'
+            warning: 'subscription_inactive',
+            message: statusMessages[subscriptionStatus] || 'Tu suscripción no está activa.'
           }
         })
         return
       }
-    } else {
-      console.log('[Router] Super Admin detected - skipping tenant validation')
+
+      // Check if subscription is expired by date
+      if (subscription.expires_at) {
+        const expiresAt = new Date(subscription.expires_at)
+        const now = new Date()
+
+        if (expiresAt < now) {
+          console.warn('[Router] Subscription has expired by date')
+          next({
+            name: 'settings-subscription',
+            query: {
+              warning: 'subscription_expired',
+              message: 'Tu suscripción ha expirado. Por favor, renueva tu plan.'
+            }
+          })
+          return
+        }
+      }
     }
   }
 

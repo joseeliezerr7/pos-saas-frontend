@@ -6,8 +6,8 @@
         <!-- Company Logo -->
         <div class="tenant-logo">
           <img
-            v-if="currentTenant?.logo"
-            :src="currentTenant.logo"
+            v-if="tenantLogoUrl"
+            :src="tenantLogoUrl"
             :alt="currentTenant.name"
             class="w-8 h-8 rounded-md object-cover"
           />
@@ -138,6 +138,17 @@ const showDetails = ref(false)
 // Computed
 const currentTenant = computed(() => tenantStore.currentTenant)
 const currentBranch = computed(() => authStore.user?.branch)
+
+const tenantLogoUrl = computed(() => {
+  const tenant = currentTenant.value
+  if (!tenant) return null
+  if (tenant.logo_url) return tenant.logo_url
+  if (tenant.logo) {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+    return `${apiUrl.replace('/api', '')}/storage/${tenant.logo}`
+  }
+  return null
+})
 
 const tenantInitials = computed(() => {
   if (!currentTenant.value?.name) return 'N/A'

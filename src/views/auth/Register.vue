@@ -74,9 +74,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const tenantStore = useTenantStore()
 
 const form = ref({
   company_name: '',
@@ -91,11 +93,17 @@ const loading = ref(false)
 
 async function handleRegister() {
   loading.value = true
-  const success = await authStore.register(form.value)
+  const result = await authStore.register(form.value)
   loading.value = false
 
-  if (success) {
-    router.push({ name: 'dashboard' })
+  if (result) {
+    // Initialize tenant store with the new company
+    if (authStore.user?.company) {
+      tenantStore.setTenant(authStore.user.company)
+    }
+
+    // Redirect to dashboard
+    window.location.href = '/dashboard'
   }
 }
 </script>

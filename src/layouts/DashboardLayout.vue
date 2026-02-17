@@ -18,8 +18,14 @@
     >
       <!-- Logo -->
       <div class="h-16 flex items-center justify-between px-4 border-b border-gray-800 flex-shrink-0">
-        <h1 v-if="sidebarOpen || mobileMenuOpen" class="text-xl font-bold text-white">POS SaaS</h1>
-        <h1 v-else class="text-xl font-bold text-white">PS</h1>
+        <template v-if="sidebarOpen || mobileMenuOpen">
+          <img v-if="companyLogoUrl" :src="companyLogoUrl" alt="Logo" class="h-10 max-w-[140px] object-contain" />
+          <h1 v-else class="text-xl font-bold text-white">{{ authStore.currentUser?.company?.name || 'POS SaaS' }}</h1>
+        </template>
+        <template v-else>
+          <img v-if="companyLogoUrl" :src="companyLogoUrl" alt="Logo" class="h-8 w-8 object-contain" />
+          <h1 v-else class="text-xl font-bold text-white">PS</h1>
+        </template>
         <button
           @click="sidebarOpen = !sidebarOpen"
           class="hidden md:block text-gray-400 hover:text-white focus:outline-none"
@@ -55,6 +61,15 @@
           </svg>
           <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">Punto de Venta</span>
         </router-link>
+
+        <!-- Kitchen Display (KDS) -->
+        <a v-if="isKdsEnabled" href="/kitchen" target="_blank" class="sidebar-link">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+          </svg>
+          <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">Pantalla Cocina</span>
+        </a>
 
         <!-- Catálogo Section -->
         <div class="mt-4">
@@ -202,6 +217,44 @@
           </transition>
         </div>
 
+        <!-- Cuentas por Pagar Section -->
+        <div class="mt-2">
+          <button @click="toggleSection('cuentasPorPagar')"
+                  class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">Cuentas por Pagar</span>
+            </div>
+            <svg v-if="sidebarOpen || mobileMenuOpen" class="w-4 h-4 transition-transform duration-200"
+                 :class="{ 'rotate-180': expandedSections.cuentasPorPagar }"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <transition name="slide">
+            <div v-if="expandedSections.cuentasPorPagar && (sidebarOpen || mobileMenuOpen)" class="ml-4 space-y-1">
+              <router-link v-if="can('view_payable') || can('view_purchases')" to="/payable/dashboard" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Dashboard
+              </router-link>
+              <router-link v-if="can('view_payable') || can('view_purchases')" to="/payable/payments" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Pagos a Proveedores
+              </router-link>
+              <router-link v-if="can('view_payable') || can('view_purchases')" to="/payable/accounts-payable" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Cuentas por Pagar
+              </router-link>
+              <router-link v-if="can('view_payable') || can('view_purchases')" to="/payable/aging-report" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Reporte de Antigüedad
+              </router-link>
+            </div>
+          </transition>
+        </div>
+
         <!-- Inventario Section -->
         <div class="mt-2">
           <button @click="toggleSection('inventario')"
@@ -257,6 +310,48 @@
               <router-link v-if="can('view_expenses')" to="/expenses" class="sidebar-sublink">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
                 Gastos
+              </router-link>
+            </div>
+          </transition>
+        </div>
+
+        <!-- E-commerce Section (Solo Plan Empresarial) -->
+        <div v-if="can('access_ecommerce')" class="mt-2">
+          <button @click="toggleSection('ecommerce')"
+                  class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">E-commerce</span>
+            </div>
+            <svg v-if="sidebarOpen || mobileMenuOpen" class="w-4 h-4 transition-transform duration-200"
+                 :class="{ 'rotate-180': expandedSections.ecommerce }"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <transition name="slide">
+            <div v-if="expandedSections.ecommerce && (sidebarOpen || mobileMenuOpen)" class="ml-4 space-y-1">
+              <router-link to="/ecommerce" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Dashboard
+              </router-link>
+              <router-link v-if="can('view_ecommerce_orders')" to="/ecommerce/orders" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Pedidos
+              </router-link>
+              <router-link v-if="can('view_ecommerce_customers')" to="/ecommerce/customers" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Clientes Online
+              </router-link>
+              <router-link v-if="can('manage_ecommerce_products')" to="/ecommerce/catalog" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Catálogo
+              </router-link>
+              <router-link v-if="can('configure_ecommerce')" to="/ecommerce/settings" class="sidebar-sublink">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
+                Configuración
               </router-link>
             </div>
           </transition>
@@ -325,6 +420,12 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
             <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">Gestión de Clientes</span>
+          </router-link>
+          <router-link to="/super-admin/plans" class="sidebar-link">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span v-if="sidebarOpen || mobileMenuOpen" class="ml-3">Gestión de Planes</span>
           </router-link>
         </div>
       </nav>
@@ -427,6 +528,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
+import { useSettingsStore } from '@/stores/settings'
 import { usePermissions } from '@/composables/usePermissions'
 import { storeToRefs } from 'pinia'
 
@@ -434,6 +536,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
+const settingsStore = useSettingsStore()
 const { can } = usePermissions()
 const { unreadCount } = storeToRefs(notificationStore)
 
@@ -443,21 +546,42 @@ const expandedSections = ref({
   catalogo: false,
   ventas: false,
   credito: false,
+  cuentasPorPagar: false,
   inventario: false,
   caja: false,
+  ecommerce: false,
   administracion: false
 })
 
 const user = computed(() => authStore.currentUser)
+
+const companyLogoUrl = computed(() => {
+  const company = authStore.currentUser?.company
+  if (company?.logo_url) return company.logo_url
+  if (company?.logo) {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+    return `${apiUrl.replace('/api', '')}/storage/${company.logo}`
+  }
+  return null
+})
 
 const isSuperAdmin = computed(() => {
   return authStore.user?.is_super_admin ||
          authStore.user?.roles?.includes('super_admin')
 })
 
-// Fetch notifications on mount and periodically
+const isKdsEnabled = computed(() => {
+  const s = settingsStore.companySettings?.settings
+  if (!s) return false
+  const parsed = typeof s === 'string' ? (() => { try { return JSON.parse(s) } catch { return {} } })() : s
+  return parsed?.enable_kds === true
+})
+
+// Refresh user data and notifications on mount
 onMounted(() => {
+  authStore.fetchUser()
   notificationStore.fetchNotifications()
+  settingsStore.fetchCompanySettings()
 
   // Refresh notifications every 30 seconds
   setInterval(() => {
@@ -498,9 +622,22 @@ const pageTitle = computed(() => {
     'credit-accounts-receivable': 'Cuentas por Cobrar',
     'credit-aging-report': 'Reporte de Antigüedad',
     'credit-customer-statement': 'Estado de Cuenta',
+    'payable-dashboard': 'Dashboard Cuentas por Pagar',
+    'payable-payments': 'Pagos a Proveedores',
+    'payable-accounts-payable': 'Cuentas por Pagar',
+    'payable-aging-report': 'Antigüedad Cuentas por Pagar',
     'super-admin-dashboard': 'Dashboard Global',
     'super-admin-tenants': 'Gestión de Clientes',
-    'super-admin-tenant-details': 'Detalles del Cliente'
+    'super-admin-tenant-details': 'Detalles del Cliente',
+    'super-admin-plans': 'Gestión de Planes',
+    'ecommerce-dashboard': 'E-commerce Dashboard',
+    'ecommerce-orders': 'Pedidos Online',
+    'ecommerce-order-detail': 'Detalle de Pedido',
+    'ecommerce-customers': 'Clientes Online',
+    'ecommerce-customer-detail': 'Detalle de Cliente',
+    'ecommerce-catalog': 'Catálogo E-commerce',
+    'ecommerce-settings': 'Configuración de Tienda',
+    'kitchen-display': 'Pantalla de Cocina'
   }
   return titles[route.name] || 'POS SaaS'
 })

@@ -54,6 +54,7 @@ export const useTenantStore = defineStore('tenant', () => {
       rtn: tenant.rtn,
       slug: tenant.slug || tenant.name.toLowerCase().replace(/\s+/g, '-'),
       logo: tenant.logo,
+      logo_url: tenant.logo_url || null,
       phone: tenant.phone,
       email: tenant.email,
       address: tenant.address,

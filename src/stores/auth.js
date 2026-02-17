@@ -75,6 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authService.me()
       user.value = response.data.data
+      localStorage.setItem('user', JSON.stringify(response.data.data))
     } catch (error) {
       console.error('Error fetching user:', error)
       logout()

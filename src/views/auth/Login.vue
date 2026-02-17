@@ -121,6 +121,19 @@ onMounted(() => {
     // Clear query params
     router.replace({ name: 'login' })
   }
+
+  // Check for subscription warning messages
+  if (route.query.warning) {
+    const warningMessages = {
+      subscription_inactive: 'Tu suscripción no está activa.',
+      subscription_expired: 'Tu suscripción ha expirado.',
+      no_subscription: 'No tienes una suscripción activa.'
+    }
+    errorMessage.value = route.query.message || warningMessages[route.query.warning] || 'Hay un problema con tu suscripción.'
+
+    // Clear query params
+    router.replace({ name: 'login' })
+  }
 })
 
 async function handleLogin() {
@@ -134,22 +147,6 @@ async function handleLogin() {
       // Initialize tenant from user's company
       if (authStore.user?.company) {
         tenantStore.setTenant(authStore.user.company)
-
-        // Skip tenant validation for Super Admin
-        const isSuperAdmin = authStore.user?.is_super_admin || authStore.user?.roles?.includes('super_admin')
-
-        // Validate tenant slug matches domain (if not local and not super admin)
-        if (!isSuperAdmin && tenantFromDomain.value && !tenantFromDomain.value.isLocal) {
-          const userTenantSlug = authStore.user.company.slug ||
-                                 authStore.user.company.name.toLowerCase().replace(/\s+/g, '-')
-
-          if (tenantFromDomain.value.slug !== userTenantSlug) {
-            errorMessage.value = `Esta cuenta no pertenece a ${tenantFromDomain.value.slug}. Por favor usa una cuenta válida o accede desde el dominio correcto.`
-            authStore.logout()
-            loading.value = false
-            return
-          }
-        }
       }
 
       // Redirect to dashboard - using window.location for clean reload

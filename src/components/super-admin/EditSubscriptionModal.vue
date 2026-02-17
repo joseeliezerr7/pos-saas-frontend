@@ -46,7 +46,7 @@
           <select v-model="form.plan_id" required class="input">
             <option value="">Selecciona un plan</option>
             <option v-for="plan in plans" :key="plan.id" :value="plan.id">
-              {{ plan.name }} - L {{ formatCurrency(plan.monthly_price) }}/mes
+              {{ plan.name }} - L {{ formatCurrency(plan.price_monthly || plan.monthly_price || plan.price || 0) }}/mes
             </option>
           </select>
           <p v-if="selectedPlan" class="mt-2 text-sm text-gray-600">

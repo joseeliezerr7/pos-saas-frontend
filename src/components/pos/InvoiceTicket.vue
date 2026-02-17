@@ -21,6 +21,7 @@
             <div id="ticket-content" class="ticket-80mm bg-white">
               <!-- 1. ENCABEZADO -->
               <div class="text-center border-b border-dashed border-gray-400 pb-2 mb-2">
+                <img v-if="company.logo_url" :src="company.logo_url" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />
                 <div class="font-bold text-sm">{{ company.legal_name || company.name }}</div>
                 <div class="text-xs">{{ company.address }}</div>
                 <div class="text-xs">{{ company.city || 'Honduras' }}, C.A.</div>
@@ -38,6 +39,12 @@
                 <div class="text-xs">{{ formatDateTime(sale.sold_at || new Date()) }}</div>
                 <div class="text-xs" v-if="sale.cash_opening">Caja: {{ sale.cash_opening.cash_register?.name }}</div>
                 <div class="text-xs" v-if="sale.user">Vendedor: {{ sale.user.name }}</div>
+              </div>
+
+              <!-- NÚMERO DE ORDEN -->
+              <div v-if="sale.order_number" class="text-center border-b border-dashed border-gray-400 pb-2 mb-2">
+                <div class="text-xs text-gray-600">ORDEN No.</div>
+                <div class="font-bold" style="font-size:28px;line-height:1.2;">{{ sale.order_number }}</div>
               </div>
 
               <!-- 3. DATOS DEL CLIENTE -->
@@ -111,7 +118,7 @@
                 <div class="text-xs">
                   <div class="flex justify-between mb-1">
                     <span>Forma de Pago:</span>
-                    <span class="uppercase">{{ getPaymentMethodLabel(sale.payment_method) }}</span>
+                    <span style="text-transform:uppercase;">{{ getPaymentMethodLabel(sale.payment_method) }}</span>
                   </div>
                   <div class="flex justify-between mb-1" v-if="sale.transaction_reference">
                     <span>Ref. Transacción:</span>
@@ -131,7 +138,7 @@
               <!-- LOYALTY POINTS -->
               <div v-if="sale.loyalty && sale.loyalty.points_earned > 0" class="border-b border-dashed border-gray-400 pb-2 mb-2 bg-blue-50 p-2 rounded">
                 <div class="text-xs text-center">
-                  <div class="font-bold text-blue-700 mb-1">🎁 PUNTOS DE LEALTAD 🎁</div>
+                  <div class="font-bold text-blue-700 mb-1">PUNTOS DE LEALTAD</div>
                   <div class="flex justify-between mb-1">
                     <span>Puntos Ganados:</span>
                     <span class="font-semibold text-green-600">+{{ sale.loyalty.points_earned }}</span>
@@ -165,6 +172,7 @@
             <!-- Action Buttons -->
             <div class="flex space-x-3 mt-6">
               <button @click="printTicket"
+                      data-shortcut="print-invoice"
                       class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center justify-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -211,6 +219,9 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+// Helper to normalize tax_rate to integer for comparison
+const normalizeTaxRate = (rate) => Math.round(parseFloat(rate) || 0)
+
 // Computed: Tax Summary
 const taxSummary = computed(() => {
   const summary = {
@@ -221,13 +232,14 @@ const taxSummary = computed(() => {
 
   if (props.sale.details) {
     props.sale.details.forEach(item => {
-      const itemTotal = item.subtotal || (item.quantity * item.price)
+      const itemTotal = parseFloat(item.subtotal) || (item.quantity * item.price)
+      const rate = normalizeTaxRate(item.tax_rate)
 
-      if (item.tax_rate === 0) {
+      if (rate === 0) {
         summary.exempt += itemTotal
-      } else if (item.tax_rate === 15) {
+      } else if (rate === 15) {
         summary.taxable15 += itemTotal
-      } else if (item.tax_rate === 18) {
+      } else if (rate === 18) {
         summary.taxable18 += itemTotal
       }
     })
@@ -238,7 +250,7 @@ const taxSummary = computed(() => {
 
 // Computed: Total in Words
 const totalInWords = computed(() => {
-  const total = props.sale.total || 0
+  const total = parseFloat(props.sale.total) || 0
   const integerPart = Math.floor(total)
   const decimalPart = Math.round((total - integerPart) * 100)
 
@@ -274,9 +286,10 @@ const formatDate = (date) => {
 }
 
 const getTaxLabel = (taxRate) => {
-  if (taxRate === 0) return 'E - Exento'
-  if (taxRate === 15) return 'G - Gravado 15%'
-  if (taxRate === 18) return 'G - Gravado 18%'
+  const rate = normalizeTaxRate(taxRate)
+  if (rate === 0) return 'E - Exento'
+  if (rate === 15) return 'G - Gravado 15%'
+  if (rate === 18) return 'G - Gravado 18%'
   return ''
 }
 
@@ -286,6 +299,7 @@ const getPaymentMethodLabel = (method) => {
     card: 'Tarjeta',
     transfer: 'Transferencia',
     qr: 'Código QR',
+    credit: 'Crédito',
     check: 'Cheque',
     other: 'Otro'
   }
@@ -293,7 +307,6 @@ const getPaymentMethodLabel = (method) => {
 }
 
 const numberToWords = (num) => {
-  // Simplified Spanish number to words conversion
   const units = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE']
   const tens = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA']
   const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS']
@@ -303,7 +316,6 @@ const numberToWords = (num) => {
 
   let result = ''
 
-  // Thousands
   if (num >= 1000) {
     const thousands = Math.floor(num / 1000)
     if (thousands === 1) {
@@ -314,13 +326,11 @@ const numberToWords = (num) => {
     num %= 1000
   }
 
-  // Hundreds
   if (num >= 100) {
     result += hundreds[Math.floor(num / 100)] + ' '
     num %= 100
   }
 
-  // Tens and units
   if (num >= 10) {
     result += tens[Math.floor(num / 10)] + ' '
     num %= 10
@@ -333,172 +343,148 @@ const numberToWords = (num) => {
   return result.trim()
 }
 
+// Generate self-contained print HTML from data (not innerHTML copy)
 const printTicket = () => {
-  const content = document.getElementById('ticket-content')
-  if (!content) return
+  const s = props.sale
+  const c = props.company
+  const caiInfo = props.cai
+  const fm = (v) => parseFloat(v || 0).toFixed(2)
+
+  // Build items HTML
+  const itemsHtml = (s.details || []).map(item => {
+    const rate = normalizeTaxRate(item.tax_rate)
+    let taxLabel = ''
+    if (rate === 0) taxLabel = 'E - Exento'
+    else if (rate === 15) taxLabel = 'G - Gravado 15%'
+    else if (rate === 18) taxLabel = 'G - Gravado 18%'
+    const productName = item.product?.name || item.product_name || ''
+    const sku = item.product?.sku || ''
+
+    return `<tr style="border-bottom:1px solid #ddd;">
+      <td style="padding:4px 2px;">
+        <div>${productName}</div>
+        ${sku ? `<div style="color:#666;font-size:9px;">Código: ${sku}</div>` : ''}
+        ${taxLabel ? `<div style="color:#666;font-size:9px;">${taxLabel}</div>` : ''}
+      </td>
+      <td style="text-align:center;padding:4px 2px;">${item.quantity}</td>
+      <td style="text-align:right;padding:4px 2px;">L ${fm(item.price)}</td>
+      <td style="text-align:right;padding:4px 2px;">L ${fm(item.subtotal)}</td>
+    </tr>`
+  }).join('')
+
+  // Tax summary from computed
+  const ts = taxSummary.value
+
+  // Loyalty section
+  let loyaltyHtml = ''
+  if (s.loyalty && s.loyalty.points_earned > 0) {
+    loyaltyHtml = `
+    <div style="border-bottom:1px dashed #999;padding-bottom:8px;margin-bottom:8px;background:#eff6ff;padding:8px;border-radius:4px;">
+      <div style="font-size:9px;text-align:center;">
+        <div style="font-weight:bold;color:#1d4ed8;margin-bottom:4px;">PUNTOS DE LEALTAD</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Puntos Ganados:</span><span style="font-weight:600;color:#16a34a;">+${s.loyalty.points_earned}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>Total de Puntos:</span><span style="font-weight:600;color:#1d4ed8;">${s.loyalty.new_balance}</span></div>
+      </div>
+    </div>`
+  }
 
   const printWindow = window.open('', '_blank')
-  const scriptTag = 'script'
+  printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Factura ${s.sale_number || props.invoiceNumber}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  @page{size:80mm auto;margin:0;}
+  @media print{body{width:80mm;}}
+  body{font-family:'Courier New',monospace;font-size:10px;line-height:1.4;color:#000;background:#fff;width:80mm;padding:5mm;}
+  .sep{border-bottom:1px dashed #999;padding-bottom:8px;margin-bottom:8px;}
+  .sep-solid{border-top:1px solid #999;border-bottom:1px solid #999;padding:8px 0;margin-bottom:8px;}
+  .flex{display:flex;justify-content:space-between;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:4px 2px;font-size:10px;}
+</style></head><body>
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Factura ${props.sale.sale_number || props.invoiceNumber}</title>
-      <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
+<!-- 1. ENCABEZADO -->
+<div style="text-align:center;" class="sep">
+  ${c.logo_url ? `<img src="${c.logo_url}" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />` : ''}
+  <div style="font-weight:bold;font-size:11px;">${c.legal_name || c.name}</div>
+  <div style="font-size:9px;">${c.address || ''}</div>
+  <div style="font-size:9px;">${c.city || 'Honduras'}, C.A.</div>
+  <div style="font-size:9px;">Tel: ${c.phone || ''}</div>
+  <div style="font-size:9px;">Email: ${c.email || ''}</div>
+  <div style="font-size:9px;font-weight:600;margin-top:4px;">RTN: ${c.rtn || ''}</div>
+  ${caiInfo ? `<div style="font-size:9px;">CAI: ${caiInfo.cai_number}</div>` : ''}
+  ${s.branch ? `<div style="font-size:9px;">Sucursal: ${s.branch.name}</div>` : ''}
+</div>
 
-        @page {
-          size: 80mm auto;
-          margin: 0;
-        }
+<!-- 2. DATOS DEL DOCUMENTO -->
+<div style="text-align:center;" class="sep">
+  <div style="font-weight:bold;font-size:11px;">FACTURA</div>
+  <div style="font-size:9px;">No. ${s.sale_number || props.invoiceNumber}</div>
+  <div style="font-size:9px;">${formatDateTime(s.sold_at || new Date())}</div>
+  ${s.cash_opening ? `<div style="font-size:9px;">Caja: ${s.cash_opening.cash_register?.name || ''}</div>` : ''}
+  ${s.user ? `<div style="font-size:9px;">Vendedor: ${s.user.name}</div>` : ''}
+</div>
 
-        @media print {
-          body {
-            width: 80mm;
-          }
-        }
+<!-- NÚMERO DE ORDEN -->
+${s.order_number ? `<div style="text-align:center;border-bottom:1px dashed #999;padding-bottom:8px;margin-bottom:8px;">
+  <div style="font-size:9px;color:#666;">ORDEN No.</div>
+  <div style="font-weight:bold;font-size:28px;line-height:1.2;">${s.order_number}</div>
+</div>` : ''}
 
-        body {
-          font-family: 'Courier New', monospace;
-          font-size: 10px;
-          line-height: 1.4;
-          color: #000;
-          background: white;
-          width: 80mm;
-          padding: 5mm;
-        }
+<!-- 3. DATOS DEL CLIENTE -->
+<div class="sep">
+  <div style="font-size:9px;"><span style="font-weight:600;">Cliente:</span> ${s.customer_name || 'Consumidor Final'}</div>
+  ${s.customer_rtn ? `<div style="font-size:9px;"><span style="font-weight:600;">RTN:</span> ${s.customer_rtn}</div>` : ''}
+</div>
 
-        .ticket-80mm {
-          width: 100%;
-        }
+<!-- 4. DETALLE DE PRODUCTOS -->
+<table style="margin-bottom:8px;">
+  <thead><tr style="border-bottom:1px solid #999;">
+    <th style="text-align:left;padding:4px 2px;">Descripción</th>
+    <th style="text-align:center;padding:4px 2px;width:12mm;">Cant</th>
+    <th style="text-align:right;padding:4px 2px;width:16mm;">Precio</th>
+    <th style="text-align:right;padding:4px 2px;width:16mm;">Total</th>
+  </tr></thead>
+  <tbody>${itemsHtml}</tbody>
+</table>
 
-        .text-center {
-          text-align: center;
-        }
+<!-- 5. RESUMEN DE IMPUESTOS -->
+<div class="sep-solid">
+  <div class="flex" style="margin-bottom:4px;"><span>Importe Exento:</span><span>L ${fm(ts.exempt)}</span></div>
+  <div class="flex" style="margin-bottom:4px;"><span>Importe Gravado 15%:</span><span>L ${fm(ts.taxable15)}</span></div>
+  <div class="flex" style="margin-bottom:4px;"><span>Subtotal:</span><span>L ${fm(s.subtotal)}</span></div>
+  <div class="flex" style="margin-bottom:4px;"><span>ISV 15%:</span><span>L ${fm(s.tax)}</span></div>
+  ${parseFloat(s.discount) > 0 ? `<div class="flex" style="margin-bottom:4px;"><span>Descuento:</span><span>- L ${fm(s.discount)}</span></div>` : ''}
+</div>
 
-        .text-left {
-          text-align: left;
-        }
+<!-- 6. TOTALES DE PAGO -->
+<div class="sep">
+  <div class="flex" style="font-weight:bold;font-size:11px;margin-bottom:8px;"><span>TOTAL A PAGAR:</span><span>L ${fm(s.total)}</span></div>
+  <div style="font-size:9px;">
+    <div class="flex" style="margin-bottom:4px;"><span>Forma de Pago:</span><span style="text-transform:uppercase;">${getPaymentMethodLabel(s.payment_method)}</span></div>
+    ${s.transaction_reference ? `<div class="flex" style="margin-bottom:4px;"><span>Ref. Transacción:</span><span>${s.transaction_reference}</span></div>` : ''}
+    <div class="flex" style="margin-bottom:4px;"><span>Monto Pagado:</span><span>L ${fm(s.amount_paid)}</span></div>
+    ${parseFloat(s.amount_change) > 0 ? `<div class="flex" style="margin-bottom:4px;"><span>Cambio:</span><span>L ${fm(s.amount_change)}</span></div>` : ''}
+  </div>
+</div>
 
-        .text-right {
-          text-align: right;
-        }
+${loyaltyHtml}
 
-        .font-bold {
-          font-weight: bold;
-        }
+<!-- 7. INFORMACIÓN LEGAL -->
+<div style="font-size:9px;text-align:center;margin-bottom:8px;">
+  <div style="font-weight:600;margin-bottom:4px;">${totalInWords.value}</div>
+  <div style="color:#666;margin-bottom:4px;">G = Gravado (15%) | E = Exento</div>
+  ${caiInfo ? `<div style="color:#666;">Rango Autorizado: ${caiInfo.range_from} - ${caiInfo.range_to}</div><div style="color:#666;">Fecha Límite: ${formatDate(caiInfo.expiry_date)}</div>` : ''}
+</div>
 
-        .font-semibold {
-          font-weight: 600;
-        }
+<!-- Footer -->
+<div style="text-align:center;font-size:9px;color:#666;border-top:1px dashed #999;padding-top:8px;">
+  <div>¡Gracias por su compra!</div>
+  <div style="margin-top:4px;">${c.name}</div>
+</div>
 
-        .text-xs {
-          font-size: 9px;
-        }
-
-        .text-sm {
-          font-size: 11px;
-        }
-
-        .border-b {
-          border-bottom: 1px solid #000;
-        }
-
-        .border-t {
-          border-top: 1px solid #000;
-        }
-
-        .border-dashed {
-          border-style: dashed;
-        }
-
-        .border-gray-400 {
-          border-color: #999;
-        }
-
-        .border-gray-200 {
-          border-color: #ddd;
-        }
-
-        .text-gray-600 {
-          color: #666;
-        }
-
-        .pb-2 {
-          padding-bottom: 8px;
-        }
-
-        .pt-2 {
-          padding-top: 8px;
-        }
-
-        .py-1 {
-          padding-top: 4px;
-          padding-bottom: 4px;
-        }
-
-        .py-2 {
-          padding-top: 8px;
-          padding-bottom: 8px;
-        }
-
-        .mb-1 {
-          margin-bottom: 4px;
-        }
-
-        .mb-2 {
-          margin-bottom: 8px;
-        }
-
-        .mt-1 {
-          margin-top: 4px;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th, td {
-          padding: 4px 2px;
-        }
-
-        .w-12 {
-          width: 12mm;
-        }
-
-        .w-16 {
-          width: 16mm;
-        }
-
-        .flex {
-          display: flex;
-        }
-
-        .justify-between {
-          justify-content: space-between;
-        }
-      </style>
-    </head>
-    <body>
-      ${content.innerHTML}
-      <${scriptTag}>
-        window.onload = function() {
-          window.print();
-          window.onafterprint = function() {
-            window.close();
-          };
-        };
-      </${scriptTag}>
-    </body>
-    </html>
-  `)
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
+</body></html>`)
   printWindow.document.close()
 }
 </script>

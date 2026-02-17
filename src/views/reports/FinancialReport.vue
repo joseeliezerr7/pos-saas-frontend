@@ -43,7 +43,9 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Todas las sucursales</option>
-            <!-- Add branches here -->
+            <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+              {{ branch.name }}
+            </option>
           </select>
         </div>
 
@@ -270,8 +272,12 @@
               <h4 class="text-lg font-semibold text-green-900 mb-4">Entradas de Efectivo</h4>
               <div class="space-y-2">
                 <div class="flex justify-between">
-                  <span>Ventas</span>
-                  <span class="font-semibold">L {{ formatCurrency(cashFlow.operating_activities?.cash_inflows?.sales) }}</span>
+                  <span>Ventas Directas</span>
+                  <span class="font-semibold">L {{ formatCurrency(cashFlow.operating_activities?.cash_inflows?.direct_sales) }}</span>
+                </div>
+                <div v-if="cashFlow.operating_activities?.cash_inflows?.customer_payments" class="flex justify-between">
+                  <span>Cobros de Clientes</span>
+                  <span class="font-semibold">L {{ formatCurrency(cashFlow.operating_activities?.cash_inflows?.customer_payments) }}</span>
                 </div>
                 <div class="border-t border-green-300 pt-2 flex justify-between font-bold text-green-900">
                   <span>Total Entradas</span>
@@ -291,6 +297,10 @@
                 <div class="flex justify-between">
                   <span>Gastos</span>
                   <span>L {{ formatCurrency(cashFlow.operating_activities?.cash_outflows?.expenses) }}</span>
+                </div>
+                <div v-if="cashFlow.operating_activities?.cash_outflows?.supplier_payments" class="flex justify-between">
+                  <span>Pagos a Proveedores</span>
+                  <span>L {{ formatCurrency(cashFlow.operating_activities?.cash_outflows?.supplier_payments) }}</span>
                 </div>
                 <div class="border-t border-red-300 pt-2 flex justify-between font-bold text-red-900">
                   <span>Total Salidas</span>
@@ -451,22 +461,26 @@
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mes</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ingresos</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Gastos</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ganancia</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">N° Ventas</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mes</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ingresos</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Costo Ventas</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ganancia Bruta</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Gastos</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ganancia Neta</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">N° Ventas</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-for="month in monthlyComparison" :key="month.month">
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ month.month_name }}</td>
-                    <td class="px-6 py-4 text-sm text-right text-green-600 font-semibold">L {{ formatCurrency(month.revenue) }}</td>
-                    <td class="px-6 py-4 text-sm text-right text-red-600">L {{ formatCurrency(month.expenses) }}</td>
-                    <td class="px-6 py-4 text-sm text-right font-bold" :class="month.profit >= 0 ? 'text-blue-600' : 'text-red-600'">
+                    <td class="px-4 py-4 text-sm font-medium text-gray-900">{{ month.month_name }}</td>
+                    <td class="px-4 py-4 text-sm text-right text-green-600 font-semibold">L {{ formatCurrency(month.revenue) }}</td>
+                    <td class="px-4 py-4 text-sm text-right text-orange-600">L {{ formatCurrency(month.cost_of_sales) }}</td>
+                    <td class="px-4 py-4 text-sm text-right text-blue-600 font-semibold">L {{ formatCurrency(month.gross_profit) }}</td>
+                    <td class="px-4 py-4 text-sm text-right text-red-600">L {{ formatCurrency(month.expenses) }}</td>
+                    <td class="px-4 py-4 text-sm text-right font-bold" :class="month.profit >= 0 ? 'text-blue-600' : 'text-red-600'">
                       L {{ formatCurrency(month.profit) }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-right text-gray-600">{{ month.sales_count }}</td>
+                    <td class="px-4 py-4 text-sm text-right text-gray-600">{{ month.sales_count }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -484,10 +498,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useFinancialReportStore } from '@/stores/financialReport'
+import branchService from '@/services/branchService'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 const financialReportStore = useFinancialReportStore()
+const branches = ref([])
 
 const activeTab = ref('profit-loss')
 const filters = ref({
@@ -579,8 +595,14 @@ function getProfitabilityClass(margin) {
   return 'bg-red-100 text-red-800'
 }
 
-onMounted(() => {
-  // Optionally load reports on mount
-  // loadAllReports()
+onMounted(async () => {
+  try {
+    const response = await branchService.getAllBranches()
+    branches.value = Array.isArray(response.data.data)
+      ? response.data.data
+      : (Array.isArray(response.data) ? response.data : [])
+  } catch (err) {
+    console.error('Error loading branches:', err)
+  }
 })
 </script>

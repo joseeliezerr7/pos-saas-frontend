@@ -106,7 +106,10 @@
                 <div class="text-xs text-gray-500">Costo: L {{ formatPrice(product.cost) }}</div>
               </td>
               <td class="px-6 py-4 text-right">
-                <div class="text-sm">
+                <div v-if="product.manage_stock === false" class="text-sm">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Sin control</span>
+                </div>
+                <div v-else class="text-sm">
                   <span :class="getStockClass(product.total_stock, product.stock_min)" class="font-semibold">
                     {{ product.total_stock || 0 }}
                   </span>
@@ -297,38 +300,40 @@
               />
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock Disponible</label>
-              <input
-                v-model.number="form.stock"
-                type="number"
-                min="0"
-                class="input w-full"
-                placeholder="0"
-              />
-            </div>
+            <template v-if="form.manage_stock">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Disponible</label>
+                <input
+                  v-model.number="form.stock"
+                  type="number"
+                  min="0"
+                  class="input w-full"
+                  placeholder="0"
+                />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock Mínimo</label>
-              <input
-                v-model.number="form.stock_min"
-                type="number"
-                min="0"
-                class="input w-full"
-                placeholder="0"
-              />
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Mínimo</label>
+                <input
+                  v-model.number="form.stock_min"
+                  type="number"
+                  min="0"
+                  class="input w-full"
+                  placeholder="0"
+                />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock Máximo</label>
-              <input
-                v-model.number="form.stock_max"
-                type="number"
-                min="0"
-                class="input w-full"
-                placeholder="0"
-              />
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Máximo</label>
+                <input
+                  v-model.number="form.stock_max"
+                  type="number"
+                  min="0"
+                  class="input w-full"
+                  placeholder="0"
+                />
+              </div>
+            </template>
 
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
@@ -358,7 +363,10 @@
                   id="manage_stock"
                   class="mr-2"
                 />
-                <label for="manage_stock" class="text-sm text-gray-700">Controlar inventario</label>
+                <label for="manage_stock" class="text-sm text-gray-700">
+                  Controlar inventario
+                  <span class="text-xs text-gray-500">(desactivar para combos, comidas preparadas, etc.)</span>
+                </label>
               </div>
 
               <div class="flex items-center">
@@ -369,6 +377,53 @@
                   class="mr-2"
                 />
                 <label for="is_service" class="text-sm text-gray-700">Es un servicio (no producto físico)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- E-commerce Section (Solo Plan Empresarial) -->
+          <div v-if="can('access_ecommerce')" class="border-t pt-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Configuracion E-commerce</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2 space-y-2">
+                <div class="flex items-center">
+                  <input
+                    v-model="form.show_in_ecommerce"
+                    type="checkbox"
+                    id="show_in_ecommerce"
+                    class="mr-2"
+                  />
+                  <label for="show_in_ecommerce" class="text-sm text-gray-700">Mostrar en tienda online</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    v-model="form.featured"
+                    type="checkbox"
+                    id="featured"
+                    class="mr-2"
+                  />
+                  <label for="featured" class="text-sm text-gray-700">Producto destacado</label>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Descripcion para tienda online</label>
+                <textarea
+                  v-model="form.ecommerce_description"
+                  rows="2"
+                  class="input w-full"
+                  placeholder="Descripcion especial para la tienda online (opcional)"
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Peso (kg)</label>
+                <input
+                  v-model.number="form.weight"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  class="input w-full"
+                  placeholder="0.00"
+                />
               </div>
             </div>
           </div>
@@ -548,7 +603,12 @@ const form = ref({
   is_active: true,
   is_service: false,
   manage_stock: true,
-  units: []
+  units: [],
+  // E-commerce fields
+  show_in_ecommerce: false,
+  featured: false,
+  ecommerce_description: '',
+  weight: 0
 })
 
 onMounted(() => {
@@ -642,7 +702,12 @@ function openCreateModal() {
     is_active: true,
     is_service: false,
     manage_stock: true,
-    units: []
+    units: [],
+    // E-commerce fields
+    show_in_ecommerce: false,
+    featured: false,
+    ecommerce_description: '',
+    weight: 0
   }
   showModal.value = true
 }
@@ -673,7 +738,12 @@ function openEditModal(product) {
       price: pu.price,
       barcode: pu.barcode || '',
       is_base_unit: pu.is_base_unit
-    })) : []
+    })) : [],
+    // E-commerce fields
+    show_in_ecommerce: product.show_in_ecommerce || false,
+    featured: product.featured || false,
+    ecommerce_description: product.ecommerce_description || '',
+    weight: product.weight || 0
   }
   showModal.value = true
 }

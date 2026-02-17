@@ -9,6 +9,18 @@
         </span>
       </div>
       <div class="flex items-center space-x-2 md:space-x-3">
+        <!-- Keyboard shortcuts help button -->
+        <button
+          @click="showShortcutsHelp = true"
+          class="hidden md:flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm font-medium"
+          title="Atajos de teclado (F1)"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          F1
+        </button>
         <!-- Mobile toggle button -->
         <button
           @click="mobileView = mobileView === 'products' ? 'cart' : 'products'"
@@ -20,7 +32,7 @@
           <span v-else>📦 Productos</span>
         </button>
         <button @click="clearSale" class="px-3 md:px-6 py-2 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm md:text-base">
-          Nueva
+          Nueva <span class="hidden lg:inline text-green-200 text-xs">(F8)</span>
         </button>
         <router-link to="/dashboard" class="px-3 md:px-6 py-2 md:py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium text-sm md:text-base">
           Salir
@@ -38,7 +50,8 @@
             v-model="searchQuery"
             @input="searchProducts"
             type="text"
-            placeholder="Buscar productos..."
+            placeholder="Buscar productos... (F2)"
+            data-shortcut="search-products"
             class="w-full px-3 md:px-5 py-3 md:py-4 text-base md:text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
             autofocus
           />
@@ -82,31 +95,67 @@
           <div v-else-if="productStore.products.length === 0" class="text-center py-12">
             <p class="text-gray-500 text-lg">No se encontraron productos</p>
           </div>
-          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
-            <button
-              v-for="product in productStore.products"
-              :key="product.id"
-              @click="addProductToCart(product)"
-              class="bg-white rounded-lg md:rounded-xl shadow-md border-2 border-gray-200 p-2 md:p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-105 transition-all active:scale-95 touch-manipulation"
-            >
-              <div v-if="product.image" class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
-                <img :src="getImageUrl(product.image)" :alt="product.name" class="max-h-full max-w-full object-contain" @error="handleImageError" />
-              </div>
-              <div v-else class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
-                <svg class="w-10 md:w-20 h-10 md:h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <h3 class="font-semibold text-gray-900 text-xs md:text-base mb-1 md:mb-2 line-clamp-2 min-h-[2rem] md:min-h-[3rem]">{{ product.name }}</h3>
-              <div v-if="product.manage_stock === false" class="text-[10px] md:text-xs text-blue-500 mb-1 md:mb-2">
-                Disponible
-              </div>
-              <div v-else-if="product.total_stock !== undefined" class="text-[10px] md:text-xs text-gray-500 mb-1 md:mb-2">
-                Stock: <span :class="product.total_stock > 0 ? 'text-green-600' : 'text-red-600'">{{ product.total_stock }}</span>
-              </div>
-              <p class="text-base md:text-2xl font-bold text-primary-600">L {{ formatMoney(product.price) }}</p>
-            </button>
-          </div>
+          <template v-else>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
+              <button
+                v-for="product in productStore.products"
+                :key="product.id"
+                @click="addProductToCart(product)"
+                class="bg-white rounded-lg md:rounded-xl shadow-md border-2 border-gray-200 p-2 md:p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-105 transition-all active:scale-95 touch-manipulation"
+              >
+                <div v-if="product.image" class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
+                  <img :src="getImageUrl(product.image)" :alt="product.name" class="max-h-full max-w-full object-contain" @error="handleImageError" />
+                </div>
+                <div v-else class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg">
+                  <svg class="w-10 md:w-20 h-10 md:h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-xs md:text-base mb-1 line-clamp-2 min-h-[2rem] md:min-h-[3rem]">{{ product.name }}</h3>
+                <p v-if="product.description" class="text-[10px] md:text-xs text-gray-500 mb-1 md:mb-2 line-clamp-2">{{ product.description }}</p>
+                <div v-if="product.manage_stock === false" class="text-[10px] md:text-xs text-blue-500 mb-1 md:mb-2">
+                  Disponible
+                </div>
+                <div v-else-if="product.total_stock !== undefined" class="text-[10px] md:text-xs text-gray-500 mb-1 md:mb-2">
+                  Stock: <span :class="product.total_stock > 0 ? 'text-green-600' : 'text-red-600'">{{ product.total_stock }}</span>
+                </div>
+                <p class="text-base md:text-2xl font-bold text-primary-600">L {{ formatMoney(product.price) }}</p>
+              </button>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="productStore.pagination.total > productStore.pagination.per_page" class="flex items-center justify-center gap-2 mt-4 pb-2">
+              <button
+                @click="changePage(productStore.pagination.current_page - 1)"
+                :disabled="productStore.pagination.current_page <= 1"
+                class="px-3 py-2 rounded-lg text-sm font-medium bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation active:scale-95 transition-all"
+              >
+                &larr; Ant
+              </button>
+              <template v-for="page in paginationPages" :key="page">
+                <span v-if="page === '...'" class="px-2 text-gray-400">...</span>
+                <button
+                  v-else
+                  @click="changePage(page)"
+                  :class="[
+                    'w-10 h-10 rounded-lg text-sm font-bold touch-manipulation active:scale-95 transition-all',
+                    page === productStore.pagination.current_page
+                      ? 'bg-primary-600 text-white shadow-md'
+                      : 'bg-white border-2 border-gray-300 hover:bg-gray-100'
+                  ]"
+                >
+                  {{ page }}
+                </button>
+              </template>
+              <button
+                @click="changePage(productStore.pagination.current_page + 1)"
+                :disabled="productStore.pagination.current_page >= totalPages"
+                class="px-3 py-2 rounded-lg text-sm font-medium bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation active:scale-95 transition-all"
+              >
+                Sig &rarr;
+              </button>
+            </div>
+          </template>
         </div>
       </div>
 
@@ -120,7 +169,8 @@
               v-model="customerSearchQuery"
               @input="searchCustomers"
               type="text"
-              placeholder="Buscar cliente..."
+              placeholder="Buscar cliente... (F3)"
+              data-shortcut="search-customer"
               class="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
             />
             <button @click="showCustomerModal = true" class="px-5 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium text-lg">
@@ -333,6 +383,17 @@
                 </div>
               </div>
 
+              <!-- Item Notes (KDS) -->
+              <div v-if="enableKds" class="mb-3">
+                <input
+                  v-model="item.notes"
+                  type="text"
+                  maxlength="200"
+                  placeholder="Nota: sin cebolla, extra salsa..."
+                  class="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-200 bg-orange-50"
+                />
+              </div>
+
               <!-- Subtotal -->
               <div class="flex justify-between items-center pt-3 border-t-2 border-gray-300">
                 <span class="text-sm font-medium text-gray-600">Subtotal:</span>
@@ -409,8 +470,9 @@
               type="number"
               step="0.01"
               min="0"
+              data-shortcut="amount-paid"
               class="w-full px-4 py-4 text-xl font-semibold text-center border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
-              placeholder="0.00"
+              placeholder="0.00 (F6)"
             />
             <!-- Quick Amount Buttons -->
             <div class="grid grid-cols-4 gap-2 mt-3">
@@ -519,8 +581,34 @@
             </div>
           </div>
 
+          <!-- Kitchen Notes (KDS) -->
+          <div v-if="enableKds" class="mb-4">
+            <button
+              @click="showKitchenNotes = !showKitchenNotes"
+              class="w-full flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-sm font-semibold text-orange-800"
+            >
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                </svg>
+                Notas para Cocina
+              </span>
+              <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': showKitchenNotes }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <textarea
+              v-if="showKitchenNotes"
+              v-model="kitchenNotes"
+              rows="2"
+              maxlength="500"
+              placeholder="Instrucciones generales para cocina..."
+              class="w-full mt-2 px-3 py-2 text-sm border border-orange-300 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-200 bg-orange-50"
+            ></textarea>
+          </div>
+
           <!-- Order Number Toggle -->
-          <label class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+          <label v-if="enableOrderNumbers && !enableKds" class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
             <input type="checkbox" v-model="assignOrderNumber" class="w-5 h-5 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
             <div>
               <span class="text-sm font-semibold text-blue-800">Asignar No. de Orden</span>
@@ -535,7 +623,7 @@
             class="w-full py-5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl font-bold text-xl shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation active:scale-95 transition-all"
           >
             <span v-if="saleStore.loading">Procesando...</span>
-            <span v-else>💰 Completar Venta</span>
+            <span v-else>Completar Venta (F9)</span>
           </button>
         </div>
       </div>
@@ -597,6 +685,69 @@
       </div>
     </div>
 
+    <!-- Quick Create Customer Modal -->
+    <div v-if="showCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Nuevo Cliente</h3>
+        <form @submit.prevent="handleQuickCreateCustomer" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <input
+              v-model="newCustomerForm.name"
+              type="text"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="Nombre del cliente"
+              ref="customerNameInputRef"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">RTN</label>
+            <input
+              v-model="newCustomerForm.rtn"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="0000-0000-000000"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Telefono</label>
+            <input
+              v-model="newCustomerForm.phone"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="+504 0000-0000"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              v-model="newCustomerForm.email"
+              type="email"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="correo@ejemplo.com"
+            />
+          </div>
+          <div class="flex space-x-3 pt-2">
+            <button
+              type="button"
+              @click="showCustomerModal = false"
+              class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              :disabled="!newCustomerForm.name || creatingCustomer"
+              class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ creatingCustomer ? 'Guardando...' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Invoice Ticket Modal -->
     <invoice-ticket
       :show="showInvoiceTicket"
@@ -606,11 +757,192 @@
       :invoice-number="completedSale?.sale_number || ''"
       @close="closeInvoiceTicket"
     />
+
+    <!-- Shortcuts Help Overlay -->
+    <shortcuts-help-overlay
+      :show="showShortcutsHelp"
+      :shortcuts="shortcutsList"
+      @close="showShortcutsHelp = false"
+    />
+
+    <!-- Kitchen Orders Mini Panel (KDS) -->
+    <div v-if="enableKds" class="fixed bottom-4 right-4 z-40">
+      <!-- Toggle Button -->
+      <button
+        @click="showKitchenPanel = !showKitchenPanel"
+        class="relative w-14 h-14 bg-orange-600 text-white rounded-full shadow-lg hover:bg-orange-700 active:scale-95 transition-all flex items-center justify-center"
+        title="Pedidos de Cocina"
+      >
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+        </svg>
+        <!-- Badge with active count -->
+        <span
+          v-if="kitchenActiveCount > 0"
+          class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse"
+        >
+          {{ kitchenActiveCount }}
+        </span>
+        <!-- Ready indicator -->
+        <span
+          v-if="kitchenReadyCount > 0"
+          class="absolute -top-1 -left-1 w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
+        >
+          {{ kitchenReadyCount }}
+        </span>
+      </button>
+
+      <!-- Slide-up Panel -->
+      <transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-4 scale-95"
+        enter-to-class="opacity-100 translate-y-0 scale-100"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0 scale-100"
+        leave-to-class="opacity-0 translate-y-4 scale-95"
+      >
+        <div
+          v-if="showKitchenPanel"
+          class="absolute bottom-16 right-0 w-80 max-h-[70vh] bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 overflow-hidden flex flex-col"
+        >
+          <!-- Panel Header -->
+          <div class="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
+            <h3 class="font-bold text-sm flex items-center gap-2">
+              <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+              </svg>
+              Pedidos Cocina
+            </h3>
+            <div class="flex items-center gap-2">
+              <a href="/kitchen" target="_blank" class="text-xs text-blue-400 hover:text-blue-300 underline">
+                Pantalla completa
+              </a>
+              <button @click="showKitchenPanel = false" class="text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Summary -->
+          <div class="flex items-center gap-3 px-4 py-2 bg-gray-800/50 text-xs border-b border-gray-700/50 flex-shrink-0">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+              {{ kitchenPendingOrders.length }}
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              {{ kitchenPreparingOrders.length }}
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+              {{ kitchenReadyOrders.length }}
+            </span>
+            <span class="ml-auto flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full animate-pulse" :class="kitchenStore.isPolling ? 'bg-green-500' : 'bg-red-500'"></span>
+              <span class="text-gray-500">Auto</span>
+            </span>
+          </div>
+
+          <!-- Orders List -->
+          <div class="flex-1 overflow-y-auto">
+            <!-- Ready Orders (highlighted) -->
+            <div v-if="kitchenReadyOrders.length > 0">
+              <div class="px-3 py-1.5 bg-green-900/30 text-green-400 text-xs font-bold uppercase tracking-wide sticky top-0">Listos para entregar</div>
+              <div
+                v-for="order in kitchenReadyOrders"
+                :key="'r-'+order.id"
+                class="px-3 py-2.5 border-b border-gray-700/50 bg-green-900/20 hover:bg-green-900/30"
+              >
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-green-400">#{{ order.order_number || order.id }}</span>
+                  <button
+                    @click="markDelivered(order.id)"
+                    class="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 font-medium"
+                  >
+                    Entregado
+                  </button>
+                </div>
+                <div v-if="order.customer" class="text-xs text-gray-400 mb-1">{{ order.customer.name }}</div>
+                <div class="space-y-0.5">
+                  <div v-for="detail in order.details" :key="detail.id" class="text-xs text-gray-300 flex items-start gap-1">
+                    <span class="text-green-400 font-bold flex-shrink-0">{{ detail.quantity }}x</span>
+                    <span>{{ detail.product?.name || detail.product_name || 'Producto' }}</span>
+                    <span v-if="detail.product?.description" class="text-gray-500 ml-1">- {{ detail.product.description }}</span>
+                    <span v-if="detail.notes" class="text-orange-400 italic ml-1">({{ detail.notes }})</span>
+                  </div>
+                </div>
+                <div v-if="order.kitchen_notes" class="mt-1 text-xs text-orange-300 italic">{{ order.kitchen_notes }}</div>
+              </div>
+            </div>
+
+            <!-- Preparing Orders -->
+            <div v-if="kitchenPreparingOrders.length > 0">
+              <div class="px-3 py-1.5 bg-blue-900/30 text-blue-400 text-xs font-bold uppercase tracking-wide sticky top-0">Preparando</div>
+              <div
+                v-for="order in kitchenPreparingOrders"
+                :key="'p-'+order.id"
+                class="px-3 py-2.5 border-b border-gray-700/50"
+              >
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-blue-400">#{{ order.order_number || order.id }}</span>
+                  <span class="text-xs text-gray-500">{{ kitchenElapsed(order) }}</span>
+                </div>
+                <div v-if="order.customer" class="text-xs text-gray-400 mb-1">{{ order.customer.name }}</div>
+                <div class="space-y-0.5">
+                  <div v-for="detail in order.details" :key="detail.id" class="text-xs text-gray-300 flex items-start gap-1">
+                    <span class="text-blue-400 font-bold flex-shrink-0">{{ detail.quantity }}x</span>
+                    <span>{{ detail.product?.name || detail.product_name || 'Producto' }}</span>
+                    <span v-if="detail.product?.description" class="text-gray-500 ml-1">- {{ detail.product.description }}</span>
+                    <span v-if="detail.notes" class="text-orange-400 italic ml-1">({{ detail.notes }})</span>
+                  </div>
+                </div>
+                <div v-if="order.kitchen_notes" class="mt-1 text-xs text-orange-300 italic">{{ order.kitchen_notes }}</div>
+              </div>
+            </div>
+
+            <!-- Pending Orders -->
+            <div v-if="kitchenPendingOrders.length > 0">
+              <div class="px-3 py-1.5 bg-yellow-900/30 text-yellow-400 text-xs font-bold uppercase tracking-wide sticky top-0">Pendientes</div>
+              <div
+                v-for="order in kitchenPendingOrders"
+                :key="'w-'+order.id"
+                class="px-3 py-2.5 border-b border-gray-700/50"
+              >
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-yellow-400">#{{ order.order_number || order.id }}</span>
+                  <span class="text-xs text-gray-500">{{ kitchenElapsed(order) }}</span>
+                </div>
+                <div v-if="order.customer" class="text-xs text-gray-400 mb-1">{{ order.customer.name }}</div>
+                <div class="space-y-0.5">
+                  <div v-for="detail in order.details" :key="detail.id" class="text-xs text-gray-300 flex items-start gap-1">
+                    <span class="text-yellow-400 font-bold flex-shrink-0">{{ detail.quantity }}x</span>
+                    <span>{{ detail.product?.name || detail.product_name || 'Producto' }}</span>
+                    <span v-if="detail.product?.description" class="text-gray-500 ml-1">- {{ detail.product.description }}</span>
+                    <span v-if="detail.notes" class="text-orange-400 italic ml-1">({{ detail.notes }})</span>
+                  </div>
+                </div>
+                <div v-if="order.kitchen_notes" class="mt-1 text-xs text-orange-300 italic">{{ order.kitchen_notes }}</div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-if="kitchenActiveCount === 0" class="flex flex-col items-center justify-center py-8 text-gray-600">
+              <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <p class="text-sm">Sin pedidos activos</p>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useCategoryStore } from '@/stores/category'
@@ -619,11 +951,15 @@ import { useSaleStore } from '@/stores/sale'
 import { usePromotionStore } from '@/stores/promotion'
 import { useLoyaltyStore } from '@/stores/loyalty'
 import { useGiftCardStore } from '@/stores/giftCard'
+import { useSettingsStore } from '@/stores/settings'
+import { useKitchenStore } from '@/stores/kitchen'
 import { usePermissions } from '@/composables/usePermissions'
 import { toast } from 'vue3-toastify'
 import InvoiceTicket from '@/components/pos/InvoiceTicket.vue'
 import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge.vue'
+import ShortcutsHelpOverlay from '@/components/pos/ShortcutsHelpOverlay.vue'
 import cashRegisterService from '@/services/cashRegisterService'
+import { usePosKeyboardShortcuts } from '@/composables/usePosKeyboardShortcuts'
 
 const authStore = useAuthStore()
 const productStore = useProductStore()
@@ -633,6 +969,8 @@ const saleStore = useSaleStore()
 const promotionStore = usePromotionStore()
 const loyaltyStore = useLoyaltyStore()
 const giftCardStore = useGiftCardStore()
+const settingsStore = useSettingsStore()
+const kitchenStore = useKitchenStore()
 const { can } = usePermissions()
 
 const searchQuery = ref('')
@@ -672,17 +1010,36 @@ const checkingGiftCard = ref(false)
 const appliedGiftCard = ref(null)
 const giftCardDiscount = ref(0)
 
+// Quick create customer
+const customerNameInputRef = ref(null)
+const creatingCustomer = ref(false)
+const newCustomerForm = ref({
+  name: '',
+  rtn: '',
+  phone: '',
+  email: ''
+})
+
 // Company and CAI data
-const companyData = computed(() => ({
-  name: authStore.currentUser?.company?.name || 'Mi Empresa',
-  legal_name: authStore.currentUser?.company?.legal_name || 'Mi Empresa S.A. de C.V.',
-  rtn: authStore.currentUser?.company?.rtn || '0000000000000',
-  address: authStore.currentUser?.company?.address || 'Tegucigalpa, Honduras',
-  city: authStore.currentUser?.company?.city || 'Tegucigalpa',
-  phone: authStore.currentUser?.company?.phone || '+504 0000-0000',
-  email: authStore.currentUser?.company?.email || 'info@empresa.hn',
-  logo_url: authStore.currentUser?.company?.logo_url || null
-}))
+const companyData = computed(() => {
+  const company = authStore.currentUser?.company
+  let logoUrl = company?.logo_url || null
+  if (!logoUrl && company?.logo) {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+    const backendUrl = apiUrl.replace('/api', '')
+    logoUrl = `${backendUrl}/storage/${company.logo}`
+  }
+  return {
+    name: company?.name || 'Mi Empresa',
+    legal_name: company?.legal_name || 'Mi Empresa S.A. de C.V.',
+    rtn: company?.rtn || '0000000000000',
+    address: company?.address || 'Tegucigalpa, Honduras',
+    city: company?.city || 'Tegucigalpa',
+    phone: company?.phone || '+504 0000-0000',
+    email: company?.email || 'info@empresa.hn',
+    logo_url: logoUrl
+  }
+})
 
 const caiData = ref(null) // Will be fetched from backend in future
 
@@ -698,6 +1055,25 @@ const quickAmounts = [0, 10, 20, 50, 100, 200, 500, 1000]
 
 const cartTotals = computed(() => saleStore.getCartTotal())
 
+// Keyboard shortcuts
+const { showShortcutsHelp, shortcutsList } = usePosKeyboardShortcuts({
+  searchQuery,
+  customerSearchQuery,
+  paymentMethod,
+  amountPaid,
+  assignOrderNumber,
+  showInvoiceTicket,
+  showRedeemModal,
+  showCustomerModal,
+  saleStore,
+  cartTotals,
+  paymentMethods,
+  quickAmounts,
+  completeSale,
+  clearSale,
+  closeInvoiceTicket
+})
+
 const maxRedeemablePoints = computed(() => {
   if (!availablePoints.value || !pointsValue.value) return 0
   // Can't redeem more points than available
@@ -712,10 +1088,148 @@ const creditAvailable = computed(() => {
   return Math.max(0, saleStore.customer.credit_limit - currentBalance)
 })
 
+function parseCompanySettings() {
+  const s = settingsStore.companySettings?.settings
+  if (!s) return {}
+  if (typeof s === 'object') return s
+  try { return JSON.parse(s) } catch { return {} }
+}
+const enableOrderNumbers = computed(() => parseCompanySettings().enable_order_numbers || false)
+const enableKds = computed(() => parseCompanySettings().enable_kds || false)
+const kitchenNotes = ref('')
+const showKitchenNotes = ref(false)
+
+// Kitchen mini-panel
+const showKitchenPanel = ref(false)
+const knownReadyIds = ref(new Set())
+const isFirstKitchenLoad = ref(true)
+
+const kitchenPendingOrders = computed(() =>
+  kitchenStore.orders.filter(o => o.kitchen_status === 'pending')
+)
+const kitchenPreparingOrders = computed(() =>
+  kitchenStore.orders.filter(o => o.kitchen_status === 'preparing')
+)
+const kitchenReadyOrders = computed(() =>
+  kitchenStore.orders.filter(o => o.kitchen_status === 'ready')
+)
+const kitchenActiveCount = computed(() => kitchenStore.orders.length)
+const kitchenReadyCount = computed(() => kitchenReadyOrders.value.length)
+
+function kitchenElapsed(order) {
+  const start = new Date(order.created_at)
+  const diff = Math.round((Date.now() - start.getTime()) / 1000)
+  const m = Math.floor(diff / 60)
+  const s = diff % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+async function markDelivered(orderId) {
+  try {
+    await kitchenStore.updateStatus(orderId, 'delivered')
+    toast.success('Pedido entregado')
+  } catch {
+    toast.error('Error al marcar como entregado')
+  }
+}
+
+// Audio for "order ready" notification in POS — using AudioContext
+let posAudioCtx = null
+
+function ensurePosAudioCtx() {
+  if (!posAudioCtx) {
+    posAudioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  }
+  if (posAudioCtx.state === 'suspended') posAudioCtx.resume()
+  return posAudioCtx
+}
+
+function playReadySound() {
+  try {
+    const ctx = ensurePosAudioCtx()
+    const now = ctx.currentTime
+    // Cheerful ding-ding-ding sound
+    for (let i = 0; i < 3; i++) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'square'
+      osc.frequency.value = i % 2 === 0 ? 1047 : 1319
+      gain.gain.setValueAtTime(0.8, now + i * 0.18)
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.18 + 0.15)
+      osc.start(now + i * 0.18)
+      osc.stop(now + i * 0.18 + 0.16)
+    }
+  } catch (e) {
+    // Audio not supported
+  }
+}
+
+function resumePosAudio() {
+  // Create AudioContext on first user interaction to unlock audio
+  try { ensurePosAudioCtx() } catch (e) {}
+  document.removeEventListener('click', resumePosAudio)
+  document.removeEventListener('touchstart', resumePosAudio)
+}
+
+// Watch for orders becoming "ready" — notify cashier by comparing IDs
+watch(kitchenReadyOrders, (readyOrders) => {
+  if (!enableKds.value) return
+
+  const currentReadyIds = new Set(readyOrders.map(o => o.id))
+
+  if (isFirstKitchenLoad.value) {
+    knownReadyIds.value = currentReadyIds
+    isFirstKitchenLoad.value = false
+    return
+  }
+
+  // Find new ready orders
+  let newReady = 0
+  for (const id of currentReadyIds) {
+    if (!knownReadyIds.value.has(id)) {
+      newReady++
+    }
+  }
+
+  if (newReady > 0) {
+    playReadySound()
+    toast.info(`${newReady} pedido${newReady > 1 ? 's' : ''} listo${newReady > 1 ? 's' : ''} para entregar`, { autoClose: 4000 })
+  }
+
+  knownReadyIds.value = currentReadyIds
+}, { deep: true })
+
 onMounted(async () => {
+  settingsStore.fetchCompanySettings()
   await checkCashRegister()
   loadCategories()
   loadProducts()
+
+  // Start kitchen polling if KDS enabled (check after settings load)
+  setTimeout(() => {
+    if (enableKds.value) {
+      kitchenStore.startPolling(5000)
+    }
+  }, 1500)
+
+  // Resume AudioContext on first user interaction
+  document.addEventListener('click', resumePosAudio)
+  document.addEventListener('touchstart', resumePosAudio)
+})
+
+// Start kitchen polling when KDS setting loads
+watch(enableKds, (enabled) => {
+  if (enabled && !kitchenStore.isPolling) {
+    kitchenStore.startPolling(5000)
+  }
+})
+
+onUnmounted(() => {
+  kitchenStore.stopPolling()
+  document.removeEventListener('click', resumePosAudio)
+  document.removeEventListener('touchstart', resumePosAudio)
 })
 
 async function checkCashRegister() {
@@ -757,8 +1271,10 @@ async function loadCategories() {
   await categoryStore.fetchCategories({ per_page: 100 })
 }
 
-async function loadProducts() {
-  const params = { per_page: 50, is_active: true }
+const PRODUCTS_PER_PAGE = 20
+
+async function loadProducts(page = 1) {
+  const params = { per_page: PRODUCTS_PER_PAGE, page, is_active: true }
   if (selectedCategory.value) {
     params.category_id = selectedCategory.value
   }
@@ -768,14 +1284,14 @@ async function loadProducts() {
 function selectCategory(categoryId) {
   selectedCategory.value = categoryId
   searchQuery.value = ''
-  loadProducts()
+  loadProducts(1)
 }
 
 async function searchProducts() {
   if (searchQuery.value.length >= 2) {
     const params = {
       search: searchQuery.value,
-      per_page: 50,
+      per_page: PRODUCTS_PER_PAGE,
       is_active: true
     }
     if (selectedCategory.value) {
@@ -783,12 +1299,58 @@ async function searchProducts() {
     }
     await productStore.fetchProducts(params)
   } else if (searchQuery.value.length === 0) {
-    await loadProducts()
+    await loadProducts(1)
+  }
+}
+
+function changePage(page) {
+  if (page < 1 || page > totalPages.value) return
+  loadProducts(page)
+}
+
+const totalPages = computed(() => {
+  const { total, per_page } = productStore.pagination
+  return Math.ceil(total / per_page) || 1
+})
+
+const paginationPages = computed(() => {
+  const current = productStore.pagination.current_page
+  const total = totalPages.value
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = []
+  pages.push(1)
+  if (current > 3) pages.push('...')
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i)
+  }
+  if (current < total - 2) pages.push('...')
+  pages.push(total)
+  return pages
+})
+
+// Sound effect for adding to cart
+function playAddSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(800, ctx.currentTime)
+    osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08)
+    gain.gain.setValueAtTime(0.3, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.15)
+  } catch (e) {
+    // Audio not supported
   }
 }
 
 function addProductToCart(product) {
   saleStore.addToCart(product, 1)
+  playAddSound()
   toast.success(`${product.name} agregado al carrito`)
 }
 
@@ -809,6 +1371,29 @@ async function selectCustomer(customer) {
   await saleStore.setCustomer(customer)
   customerSearchQuery.value = customer.name
   customerSearchResults.value = []
+}
+
+async function handleQuickCreateCustomer() {
+  if (!newCustomerForm.value.name) return
+  creatingCustomer.value = true
+  try {
+    const customer = await customerStore.createCustomer({
+      name: newCustomerForm.value.name,
+      rtn: newCustomerForm.value.rtn || null,
+      phone: newCustomerForm.value.phone || null,
+      email: newCustomerForm.value.email || null,
+      is_active: true
+    })
+    if (customer) {
+      await selectCustomer(customer)
+      showCustomerModal.value = false
+      newCustomerForm.value = { name: '', rtn: '', phone: '', email: '' }
+    }
+  } catch (error) {
+    console.error('Error creating customer:', error)
+  } finally {
+    creatingCustomer.value = false
+  }
 }
 
 async function completeSale() {
@@ -855,8 +1440,10 @@ async function completeSale() {
       quantity: item.quantity,
       price: item.price,
       discount: item.discount || 0,
-      tax_rate: item.tax_rate || 0
+      tax_rate: item.tax_rate || 0,
+      notes: item.notes || null
     })),
+    kitchen_notes: enableKds.value ? (kitchenNotes.value || null) : null,
     discount: saleStore.discount,
     promotion_id: appliedPromotion.value?.id || null,
     coupon_code: appliedPromotion.value?.code || null,
@@ -992,6 +1579,10 @@ function clearSale() {
   giftCardCode.value = ''
   appliedGiftCard.value = null
   giftCardDiscount.value = 0
+
+  // Clear kitchen notes
+  kitchenNotes.value = ''
+  showKitchenNotes.value = false
 
   loadProducts()
 }
@@ -1166,6 +1757,14 @@ watch(() => saleStore.cartItems.length, () => {
 watch(() => saleStore.customer, () => {
   loadAvailablePromotions()
 }, { deep: true })
+
+watch(showCustomerModal, (val) => {
+  if (val) {
+    nextTick(() => {
+      customerNameInputRef.value?.focus()
+    })
+  }
+})
 
 function formatMoney(amount) {
   return parseFloat(amount || 0).toFixed(2)

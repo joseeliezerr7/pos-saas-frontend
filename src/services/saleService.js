@@ -19,5 +19,13 @@ export default {
 
   getStatistics(params = {}) {
     return api.get('/sales/statistics', { params })
+  },
+
+  getReceipt(id) {
+    return api.get(`/sales/${id}/receipt`)
+  },
+
+  getReceiptPdf(id) {
+    return api.get(`/sales/${id}/receipt/pdf`, { responseType: 'blob' })
   }
 }
