@@ -193,6 +193,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { getCashDrawerKickCommand } from '@/utils/cashDrawer'
 
 const props = defineProps({
   show: {
@@ -401,8 +402,7 @@ const printTicket = () => {
   .flex{display:flex;justify-content:space-between;}
   table{width:100%;border-collapse:collapse;}
   th,td{padding:4px 2px;font-size:10px;}
-</style></head><body>
-
+</style></head><body>${getCashDrawerKickCommand()}
 <!-- 1. ENCABEZADO -->
 <div style="text-align:center;" class="sep">
   ${c.logo_url ? `<img src="${c.logo_url}" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />` : ''}

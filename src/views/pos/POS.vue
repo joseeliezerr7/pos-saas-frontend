@@ -960,6 +960,7 @@ import LoyaltyBadge from '@/components/loyalty/LoyaltyBadge.vue'
 import ShortcutsHelpOverlay from '@/components/pos/ShortcutsHelpOverlay.vue'
 import cashRegisterService from '@/services/cashRegisterService'
 import { usePosKeyboardShortcuts } from '@/composables/usePosKeyboardShortcuts'
+import { openCashDrawer } from '@/utils/cashDrawer'
 
 const authStore = useAuthStore()
 const productStore = useProductStore()
@@ -1529,6 +1530,9 @@ async function completeSale() {
     console.log('Loyalty Info:', completedSale.value.loyalty)
     console.log('Company Data:', companyData.value)
     console.log('Showing invoice ticket...')
+
+    // Open cash drawer
+    openCashDrawer()
 
     // Show invoice ticket
     showInvoiceTicket.value = true

@@ -153,6 +153,22 @@
               />
             </div>
 
+            <!-- Username del Admin -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Nombre de Usuario *
+              </label>
+              <input
+                v-model="form.admin_username"
+                type="text"
+                required
+                maxlength="255"
+                class="input"
+                placeholder="juan.perez"
+              />
+              <p class="mt-1 text-xs text-gray-500">Solo letras, números, puntos, guiones y guiones bajos</p>
+            </div>
+
             <!-- Email del Admin -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -333,6 +349,7 @@ const form = ref({
 
   // Admin
   admin_name: '',
+  admin_username: '',
   admin_email: '',
   admin_password: '',
 
@@ -353,6 +370,7 @@ const isFormValid = computed(() => {
          form.value.company_rtn.length === 14 &&
          form.value.email &&
          form.value.admin_name &&
+         form.value.admin_username &&
          form.value.admin_email &&
          form.value.admin_password &&
          form.value.admin_password.length >= 8 &&

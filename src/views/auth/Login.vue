@@ -13,7 +13,7 @@
             Ingresando a: <strong>{{ tenantFromDomain.slug }}</strong>
           </p>
           <p class="text-xs text-blue-700 mt-0.5">
-            Asegúrate de usar una cuenta asociada a esta empresa
+            Asegúrate de usar un usuario asociado a esta empresa
           </p>
         </div>
       </div>
@@ -31,13 +31,14 @@
 
     <form @submit.prevent="handleLogin" class="space-y-6">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
         <input
-          v-model="form.email"
-          type="email"
+          v-model="form.username"
+          type="text"
           required
+          autocomplete="username"
           class="input"
-          placeholder="tu@email.com"
+          placeholder="tu nombre de usuario"
         />
       </div>
 
@@ -90,7 +91,7 @@ const authStore = useAuthStore()
 const tenantStore = useTenantStore()
 
 const form = ref({
-  email: '',
+  username: '',
   password: '',
   remember: false
 })
@@ -152,7 +153,7 @@ async function handleLogin() {
       // Redirect to dashboard - using window.location for clean reload
       window.location.href = '/dashboard'
     } else {
-      errorMessage.value = 'Credenciales incorrectas. Por favor, verifica tu email y contraseña.'
+      errorMessage.value = 'Credenciales incorrectas. Por favor, verifica tu usuario y contraseña.'
     }
   } catch (error) {
     console.error('[Login] Error:', error)

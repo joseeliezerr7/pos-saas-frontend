@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       console.log('[Auth] User logged in:', {
         id: data.user.id,
-        email: data.user.email,
+        username: data.user.username,
         roles: data.user.roles,
         company_active: data.user.company?.is_active
       })

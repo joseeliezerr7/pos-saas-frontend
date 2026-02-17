@@ -28,6 +28,18 @@
       </div>
 
       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de Usuario</label>
+        <input
+          v-model="form.username"
+          type="text"
+          required
+          class="input"
+          placeholder="nombre.usuario"
+        />
+        <p class="text-xs text-gray-500 mt-1">Solo letras, números, puntos, guiones y guiones bajos</p>
+      </div>
+
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
         <input v-model="form.email" type="email" required class="input" />
       </div>
@@ -84,6 +96,7 @@ const form = ref({
   company_name: '',
   company_rtn: '',
   name: '',
+  username: '',
   email: '',
   password: '',
   password_confirmation: ''

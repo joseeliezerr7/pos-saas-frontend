@@ -17,7 +17,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Buscar por nombre o email..."
+          placeholder="Buscar por nombre o usuario..."
           class="input"
           @input="handleSearch"
         />
@@ -66,7 +66,7 @@
                   </div>
                   <div class="ml-4">
                     <div class="font-medium text-gray-900">{{ user.name }}</div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                    <div class="text-sm text-gray-500">@{{ user.username }}</div>
                   </div>
                 </div>
               </td>
@@ -145,6 +145,17 @@
               required
               class="input w-full"
               placeholder="Nombre completo"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de usuario *</label>
+            <input
+              v-model="form.username"
+              type="text"
+              required
+              class="input w-full"
+              placeholder="nombre.usuario"
             />
           </div>
 
@@ -284,6 +295,7 @@ const userToDelete = ref(null)
 
 const form = ref({
   name: '',
+  username: '',
   email: '',
   password: '',
   password_confirmation: '',
@@ -338,6 +350,7 @@ function openCreateModal() {
   editingUser.value = null
   form.value = {
     name: '',
+    username: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -352,6 +365,7 @@ function openEditModal(user) {
   editingUser.value = user
   form.value = {
     name: user.name,
+    username: user.username || '',
     email: user.email,
     password: '',
     password_confirmation: '',
