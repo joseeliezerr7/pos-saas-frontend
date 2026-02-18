@@ -1,7 +1,9 @@
 <template>
   <div class="inventory-transfers p-6">
     <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Transferencias de Inventario</h1>
+      <h1 class="text-3xl font-bold text-gray-900">
+        Transferencias de Inventario
+      </h1>
       <p class="text-gray-600 mt-2">Transfiera productos entre sucursales</p>
     </div>
 
@@ -23,7 +25,11 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">Seleccione sucursal origen</option>
-              <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+              <option
+                v-for="branch in branches"
+                :key="branch.id"
+                :value="branch.id"
+              >
                 {{ branch.name }}
               </option>
             </select>
@@ -83,23 +89,33 @@
                 >
                   <div class="font-medium">{{ product.name }}</div>
                   <div class="text-sm text-gray-600">
-                    SKU: {{ product.sku || 'N/A' }} | Stock disponible en origen: {{ getProductStockInBranch(product) }}
+                    SKU: {{ product.sku || "N/A" }} | Stock disponible en
+                    origen: {{ getProductStockInBranch(product) }}
                   </div>
                 </button>
               </div>
             </div>
 
             <!-- Selected Product Display -->
-            <div v-if="selectedProduct" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div
+              v-if="selectedProduct"
+              class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md"
+            >
               <div class="flex justify-between items-start">
                 <div>
-                  <p class="font-medium text-gray-900">{{ selectedProduct.name }}</p>
+                  <p class="font-medium text-gray-900">
+                    {{ selectedProduct.name }}
+                  </p>
                   <p class="text-sm text-gray-600">
-                    SKU: {{ selectedProduct.sku || 'N/A' }}
+                    SKU: {{ selectedProduct.sku || "N/A" }}
                   </p>
                   <p class="text-sm font-semibold mt-1">
                     <span class="text-gray-700">Stock en origen:</span>
-                    <span :class="availableStock > 0 ? 'text-green-600' : 'text-red-600'">
+                    <span
+                      :class="
+                        availableStock > 0 ? 'text-green-600' : 'text-red-600'
+                      "
+                    >
                       {{ availableStock }} unidades
                     </span>
                   </p>
@@ -135,10 +151,16 @@
               placeholder="0.00"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-gray-100"
             />
-            <p v-if="selectedProduct && availableStock > 0" class="text-xs text-gray-500 mt-1">
+            <p
+              v-if="selectedProduct && availableStock > 0"
+              class="text-xs text-gray-500 mt-1"
+            >
               Máximo disponible: {{ availableStock }}
             </p>
-            <p v-if="selectedProduct && availableStock <= 0" class="text-xs text-red-500 mt-1">
+            <p
+              v-if="selectedProduct && availableStock <= 0"
+              class="text-xs text-red-500 mt-1"
+            >
               No hay stock disponible en la sucursal origen
             </p>
           </div>
@@ -155,7 +177,9 @@
               placeholder="Describa el motivo de la transferencia..."
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             ></textarea>
-            <p class="text-xs text-gray-500 mt-1">{{ form.notes.length }}/500 caracteres</p>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ form.notes.length }}/500 caracteres
+            </p>
           </div>
         </div>
 
@@ -173,7 +197,7 @@
             :disabled="loading || !canSubmit"
             class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ loading ? 'Procesando...' : 'Registrar Transferencia' }}
+            {{ loading ? "Procesando..." : "Registrar Transferencia" }}
           </button>
         </div>
       </form>
@@ -193,7 +217,11 @@
             class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Todas</option>
-            <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+            <option
+              v-for="branch in branches"
+              :key="branch.id"
+              :value="branch.id"
+            >
               {{ branch.name }}
             </option>
           </select>
@@ -201,29 +229,73 @@
       </div>
 
       <div v-if="loadingTransfers" class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary"></div>
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary"
+        ></div>
         <p class="mt-2 text-gray-600">Cargando transferencias...</p>
       </div>
 
       <div v-else-if="transfers.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+          />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay transferencias recientes</h3>
-        <p class="mt-1 text-sm text-gray-500">Las transferencias que registre aparecerán aquí.</p>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">
+          No hay transferencias recientes
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">
+          Las transferencias que registre aparecerán aquí.
+        </p>
       </div>
 
       <div v-else class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destino</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notas</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Fecha
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Producto
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Origen
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Destino
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Cantidad
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Tipo
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Notas
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -231,16 +303,25 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatDate(transfer.created_at) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ transfer.product?.name || 'N/A' }}
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ transfer.product?.name || "N/A" }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {{ getBranchName(transfer.from_branch_id) || transfer.branch?.name }}
+                {{
+                  getBranchName(transfer.from_branch_id) ||
+                  transfer.branch?.name
+                }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {{ getBranchName(transfer.to_branch_id) || transfer.branch?.name }}
+                {{
+                  getBranchName(transfer.to_branch_id) || transfer.branch?.name
+                }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600"
+              >
                 {{ transfer.quantity }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
@@ -249,7 +330,7 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                {{ transfer.notes || '-' }}
+                {{ transfer.notes || "-" }}
               </td>
             </tr>
           </tbody>
@@ -260,219 +341,228 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useStockStore } from '../../stores/stock'
-import { useBranchStore } from '../../stores/branch'
-import { useProductStore } from '../../stores/product'
-import { toast } from 'vue3-toastify'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { ref, computed, onMounted } from "vue";
+import { useStockStore } from "../../stores/stock";
+import { useBranchStore } from "../../stores/branch";
+import { useProductStore } from "../../stores/product";
+import { toast } from "vue3-toastify";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
-const stockStore = useStockStore()
-const branchStore = useBranchStore()
-const productStore = useProductStore()
+const stockStore = useStockStore();
+const branchStore = useBranchStore();
+const productStore = useProductStore();
 
-const loading = ref(false)
-const loadingTransfers = ref(false)
-const productSearch = ref('')
-const searchResults = ref([])
-const selectedProduct = ref(null)
-const availableStock = ref(0)
-const filterBranchId = ref('')
-const branchStocks = ref([])
+const loading = ref(false);
+const loadingTransfers = ref(false);
+const productSearch = ref("");
+const searchResults = ref([]);
+const selectedProduct = ref(null);
+const availableStock = ref(0);
+const filterBranchId = ref("");
+const branchStocks = ref([]);
 
 const form = ref({
-  from_branch_id: '',
-  to_branch_id: '',
-  product_id: '',
+  from_branch_id: "",
+  to_branch_id: "",
+  product_id: "",
   quantity: 0,
-  notes: ''
-})
+  notes: "",
+});
 
-const branches = computed(() => branchStore.branches || [])
+const branches = computed(() => branchStore.branches || []);
 const availableDestinationBranches = computed(() => {
-  if (!form.value.from_branch_id) return []
-  return branches.value.filter(b => b.id !== form.value.from_branch_id)
-})
+  if (!form.value.from_branch_id) return [];
+  return branches.value.filter((b) => b.id !== form.value.from_branch_id);
+});
 
 const transfers = computed(() => {
-  return (stockStore.movements || []).filter(m =>
-    m.type === 'transfer_in' || m.type === 'transfer_out'
-  )
-})
+  return (stockStore.movements || []).filter(
+    (m) => m.type === "transfer_in" || m.type === "transfer_out",
+  );
+});
 
 const canSubmit = computed(() => {
-  return form.value.from_branch_id &&
-         form.value.to_branch_id &&
-         form.value.product_id &&
-         form.value.quantity > 0 &&
-         form.value.quantity <= availableStock.value &&
-         availableStock.value > 0
-})
+  return (
+    form.value.from_branch_id &&
+    form.value.to_branch_id &&
+    form.value.product_id &&
+    form.value.quantity > 0 &&
+    form.value.quantity <= availableStock.value &&
+    availableStock.value > 0
+  );
+});
 
 async function onFromBranchChange() {
   // Clear product selection when changing origin branch
   if (selectedProduct.value) {
-    clearProduct()
+    clearProduct();
   }
 
   // Reset destination branch if it's the same as origin
   if (form.value.from_branch_id === form.value.to_branch_id) {
-    form.value.to_branch_id = ''
+    form.value.to_branch_id = "";
   }
 }
 
 async function searchProducts() {
   if (productSearch.value.length < 2) {
-    searchResults.value = []
-    return
+    searchResults.value = [];
+    return;
   }
 
   if (!form.value.from_branch_id) {
-    toast.error('Primero seleccione la sucursal de origen')
-    return
+    toast.error("Primero seleccione la sucursal de origen");
+    return;
   }
 
   try {
     await productStore.fetchProducts({
       search: productSearch.value,
       per_page: 10,
-      is_active: true
-    })
-    searchResults.value = productStore.products
+      is_active: true,
+    });
+    searchResults.value = productStore.products;
   } catch (error) {
-    console.error('Error searching products:', error)
+    console.error("Error searching products:", error);
   }
 }
 
 function getProductStockInBranch(product) {
   // This is a simplified version - ideally should fetch actual stock per branch
-  return product.total_stock || 0
+  return product.total_stock || 0;
 }
 
 async function selectProduct(product) {
-  selectedProduct.value = product
-  form.value.product_id = product.id
-  productSearch.value = product.name
-  searchResults.value = []
+  selectedProduct.value = product;
+  form.value.product_id = product.id;
+  productSearch.value = product.name;
+  searchResults.value = [];
 
   // Fetch actual stock for this product in the origin branch
-  await fetchProductStockInBranch()
+  await fetchProductStockInBranch();
 }
 
 async function fetchProductStockInBranch() {
-  if (!form.value.from_branch_id || !form.value.product_id) return
+  if (!form.value.from_branch_id || !form.value.product_id) return;
 
   try {
-    const response = await stockStore.fetchStockByBranch(form.value.from_branch_id)
-    const stockItem = response.find(s => s.product_id === form.value.product_id)
-    availableStock.value = stockItem ? parseFloat(stockItem.quantity) : 0
+    const response = await stockStore.fetchStockByBranch(
+      form.value.from_branch_id,
+    );
+    const stockItem = response.find(
+      (s) => s.product_id === form.value.product_id,
+    );
+    availableStock.value = stockItem ? parseFloat(stockItem.quantity) : 0;
   } catch (error) {
-    console.error('Error fetching stock:', error)
-    availableStock.value = 0
+    console.error("Error fetching stock:", error);
+    availableStock.value = 0;
   }
 }
 
 function clearProduct() {
-  selectedProduct.value = null
-  form.value.product_id = ''
-  productSearch.value = ''
-  searchResults.value = []
-  availableStock.value = 0
-  form.value.quantity = 0
+  selectedProduct.value = null;
+  form.value.product_id = "";
+  productSearch.value = "";
+  searchResults.value = [];
+  availableStock.value = 0;
+  form.value.quantity = 0;
 }
 
 async function submitTransfer() {
   if (!canSubmit.value) {
-    toast.error('Por favor complete todos los campos correctamente')
-    return
+    toast.error("Por favor complete todos los campos correctamente");
+    return;
   }
 
   if (form.value.quantity > availableStock.value) {
-    toast.error(`Stock insuficiente. Disponible: ${availableStock.value}`)
-    return
+    toast.error(`Stock insuficiente. Disponible: ${availableStock.value}`);
+    return;
   }
 
-  loading.value = true
+  loading.value = true;
   try {
     await stockStore.transferStock({
       from_branch_id: form.value.from_branch_id,
       to_branch_id: form.value.to_branch_id,
       product_id: form.value.product_id,
       quantity: form.value.quantity,
-      notes: form.value.notes
-    })
+      notes: form.value.notes,
+    });
 
-    toast.success('Transferencia registrada exitosamente')
-    resetForm()
-    await loadTransfers()
+    toast.success("Transferencia registrada exitosamente");
+    resetForm();
+    await loadTransfers();
   } catch (error) {
-    const message = error.response?.data?.message || 'Error al registrar la transferencia'
-    toast.error(message)
+    const message =
+      error.response?.data?.message || "Error al registrar la transferencia";
+    toast.error(message);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function resetForm() {
   form.value = {
-    from_branch_id: '',
-    to_branch_id: '',
-    product_id: '',
+    from_branch_id: "",
+    to_branch_id: "",
+    product_id: "",
     quantity: 0,
-    notes: ''
-  }
-  clearProduct()
+    notes: "",
+  };
+  clearProduct();
 }
 
 async function loadTransfers() {
-  loadingTransfers.value = true
+  loadingTransfers.value = true;
   try {
-    const params = { per_page: 50 }
+    const params = { per_page: 50 };
     if (filterBranchId.value) {
-      params.branch_id = filterBranchId.value
+      params.branch_id = filterBranchId.value;
     }
-    await stockStore.fetchMovements(params)
+    await stockStore.fetchMovements(params);
   } catch (error) {
-    console.error('Error loading transfers:', error)
+    console.error("Error loading transfers:", error);
   } finally {
-    loadingTransfers.value = false
+    loadingTransfers.value = false;
   }
 }
 
 function getBranchName(branchId) {
-  const branch = branches.value.find(b => b.id === branchId)
-  return branch ? branch.name : 'N/A'
+  const branch = branches.value.find((b) => b.id === branchId);
+  return branch ? branch.name : "N/A";
 }
 
 function getTransferTypeLabel(type) {
   const labels = {
-    transfer_in: 'Entrada',
-    transfer_out: 'Salida'
-  }
-  return labels[type] || type
+    transfer_in: "Entrada",
+    transfer_out: "Salida",
+  };
+  return labels[type] || type;
 }
 
 function getTransferTypeBadgeClass(type) {
   const classes = {
-    transfer_in: 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800',
-    transfer_out: 'px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800'
-  }
-  return classes[type] || 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800'
+    transfer_in:
+      "px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800",
+    transfer_out:
+      "px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800",
+  };
+  return (
+    classes[type] ||
+    "px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"
+  );
 }
 
 function formatDate(dateString) {
   try {
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: es })
+    return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: es });
   } catch {
-    return dateString
+    return dateString;
   }
 }
 
 onMounted(async () => {
-  await Promise.all([
-    branchStore.fetchBranches(),
-    loadTransfers()
-  ])
-})
+  await Promise.all([branchStore.fetchBranches(), loadTransfers()]);
+});
 </script>

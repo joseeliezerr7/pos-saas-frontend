@@ -5,7 +5,11 @@
       <div>
         <h1 class="text-3xl font-bold text-gray-900">Notificaciones</h1>
         <p class="text-gray-600 mt-1">
-          {{ unreadCount > 0 ? `Tienes ${unreadCount} notificaciones sin leer` : 'No tienes notificaciones sin leer' }}
+          {{
+            unreadCount > 0
+              ? `Tienes ${unreadCount} notificaciones sin leer`
+              : "No tienes notificaciones sin leer"
+          }}
         </p>
       </div>
       <button
@@ -38,8 +42,12 @@
           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
         />
       </svg>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay notificaciones</h3>
-      <p class="mt-1 text-sm text-gray-500">Cuando tengas notificaciones, aparecerán aquí.</p>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">
+        No hay notificaciones
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        Cuando tengas notificaciones, aparecerán aquí.
+      </p>
     </div>
 
     <!-- Notifications List -->
@@ -49,7 +57,9 @@
         :key="notification.id"
         :class="[
           'card hover:shadow-md transition-shadow cursor-pointer',
-          notification.read_at ? 'bg-white' : 'bg-blue-50 border-l-4 border-blue-500'
+          notification.read_at
+            ? 'bg-white'
+            : 'bg-blue-50 border-l-4 border-blue-500',
         ]"
         @click="handleMarkAsRead(notification)"
       >
@@ -60,7 +70,7 @@
               <div
                 :class="[
                   'flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center',
-                  getNotificationColor(notification.type)
+                  getNotificationColor(notification.type),
                 ]"
               >
                 <svg
@@ -77,7 +87,10 @@
                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                   />
                   <path
-                    v-else-if="notification.type.includes('CAI') || notification.type.includes('Fiscal')"
+                    v-else-if="
+                      notification.type.includes('CAI') ||
+                      notification.type.includes('Fiscal')
+                    "
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
@@ -98,21 +111,27 @@
                 <p
                   :class="[
                     'text-sm font-medium',
-                    notification.read_at ? 'text-gray-900' : 'text-blue-900'
+                    notification.read_at ? 'text-gray-900' : 'text-blue-900',
                   ]"
                 >
-                  {{ notification.data.title || getNotificationTitle(notification.type) }}
+                  {{
+                    notification.data.title ||
+                    getNotificationTitle(notification.type)
+                  }}
                 </p>
 
                 <!-- Message -->
                 <p class="text-sm text-gray-600 mt-1">
-                  {{ notification.data.message || 'Sin mensaje' }}
+                  {{ notification.data.message || "Sin mensaje" }}
                 </p>
 
                 <!-- Metadata -->
                 <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
                   <span>{{ formatDate(notification.created_at) }}</span>
-                  <span v-if="!notification.read_at" class="text-blue-600 font-medium">
+                  <span
+                    v-if="!notification.read_at"
+                    class="text-blue-600 font-medium"
+                  >
                     • Nueva
                   </span>
                 </div>
@@ -127,7 +146,12 @@
             class="ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium"
             title="Marcar como leída"
           >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -143,66 +167,67 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
-import { useNotificationStore } from '@/stores/notification'
-import { storeToRefs } from 'pinia'
-import { format, formatDistanceToNow } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { onMounted, computed } from "vue";
+import { useNotificationStore } from "@/stores/notification";
+import { storeToRefs } from "pinia";
+import { format, formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 
-const notificationStore = useNotificationStore()
-const { notifications, unreadCount, loading } = storeToRefs(notificationStore)
+const notificationStore = useNotificationStore();
+const { notifications, unreadCount, loading } = storeToRefs(notificationStore);
 
 onMounted(() => {
-  notificationStore.fetchNotifications()
-})
+  notificationStore.fetchNotifications();
+});
 
 function getNotificationTitle(type) {
   const titles = {
-    'App\\Notifications\\LowStockNotification': 'Stock Bajo',
-    'App\\Notifications\\CAIExpiringNotification': 'CAI Próximo a Vencer',
-    'App\\Notifications\\CorrelativeAlertNotification': 'Alerta de Correlativos',
-    'App\\Notifications\\SaleNotification': 'Nueva Venta',
-    'App\\Notifications\\PurchaseNotification': 'Nueva Compra'
-  }
-  return titles[type] || 'Notificación'
+    "App\\Notifications\\LowStockNotification": "Stock Bajo",
+    "App\\Notifications\\CAIExpiringNotification": "CAI Próximo a Vencer",
+    "App\\Notifications\\CorrelativeAlertNotification":
+      "Alerta de Correlativos",
+    "App\\Notifications\\SaleNotification": "Nueva Venta",
+    "App\\Notifications\\PurchaseNotification": "Nueva Compra",
+  };
+  return titles[type] || "Notificación";
 }
 
 function getNotificationColor(type) {
-  if (type.includes('Stock')) {
-    return 'bg-orange-100 text-orange-600'
-  } else if (type.includes('CAI') || type.includes('Correlative')) {
-    return 'bg-red-100 text-red-600'
-  } else if (type.includes('Sale')) {
-    return 'bg-green-100 text-green-600'
-  } else if (type.includes('Purchase')) {
-    return 'bg-blue-100 text-blue-600'
+  if (type.includes("Stock")) {
+    return "bg-orange-100 text-orange-600";
+  } else if (type.includes("CAI") || type.includes("Correlative")) {
+    return "bg-red-100 text-red-600";
+  } else if (type.includes("Sale")) {
+    return "bg-green-100 text-green-600";
+  } else if (type.includes("Purchase")) {
+    return "bg-blue-100 text-blue-600";
   }
-  return 'bg-gray-100 text-gray-600'
+  return "bg-gray-100 text-gray-600";
 }
 
 function formatDate(date) {
-  if (!date) return ''
+  if (!date) return "";
 
-  const dateObj = new Date(date)
-  const now = new Date()
-  const diffInHours = (now - dateObj) / (1000 * 60 * 60)
+  const dateObj = new Date(date);
+  const now = new Date();
+  const diffInHours = (now - dateObj) / (1000 * 60 * 60);
 
   // If less than 24 hours, show relative time
   if (diffInHours < 24) {
-    return formatDistanceToNow(dateObj, { addSuffix: true, locale: es })
+    return formatDistanceToNow(dateObj, { addSuffix: true, locale: es });
   }
 
   // Otherwise show formatted date
-  return format(dateObj, "d 'de' MMMM 'a las' HH:mm", { locale: es })
+  return format(dateObj, "d 'de' MMMM 'a las' HH:mm", { locale: es });
 }
 
 async function handleMarkAsRead(notification) {
-  if (notification.read_at) return
+  if (notification.read_at) return;
 
-  await notificationStore.markAsRead(notification.id)
+  await notificationStore.markAsRead(notification.id);
 }
 
 async function handleMarkAllAsRead() {
-  await notificationStore.markAllAsRead()
+  await notificationStore.markAllAsRead();
 }
 </script>

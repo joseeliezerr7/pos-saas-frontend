@@ -25,7 +25,7 @@
         <div class="tenant-details flex-1 min-w-0">
           <div class="flex items-center space-x-2">
             <h3 class="text-sm font-semibold text-gray-900 truncate">
-              {{ currentTenant?.name || 'Sin empresa' }}
+              {{ currentTenant?.name || "Sin empresa" }}
             </h3>
             <span
               v-if="currentTenant?.is_active"
@@ -43,11 +43,11 @@
 
           <div class="flex items-center space-x-2 mt-1">
             <p class="text-xs text-gray-500">
-              RTN: {{ currentTenant?.rtn || 'N/A' }}
+              RTN: {{ currentTenant?.rtn || "N/A" }}
             </p>
             <span class="text-gray-300">•</span>
             <p class="text-xs text-gray-500">
-              {{ currentBranch?.name || 'Sin sucursal' }}
+              {{ currentBranch?.name || "Sin sucursal" }}
             </p>
           </div>
         </div>
@@ -59,7 +59,12 @@
           class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
           title="Ver detalles de la empresa"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -73,23 +78,34 @@
 
     <!-- Expanded Details (conditional) -->
     <transition name="slide-fade">
-      <div v-if="showDetails && currentTenant" class="tenant-details-expanded mt-3 pt-3 border-t border-gray-200">
+      <div
+        v-if="showDetails && currentTenant"
+        class="tenant-details-expanded mt-3 pt-3 border-t border-gray-200"
+      >
         <div class="grid grid-cols-2 gap-3 text-xs">
           <div>
             <span class="text-gray-500">Razón Social:</span>
-            <p class="font-medium text-gray-900 mt-1">{{ currentTenant.legal_name || 'N/A' }}</p>
+            <p class="font-medium text-gray-900 mt-1">
+              {{ currentTenant.legal_name || "N/A" }}
+            </p>
           </div>
           <div>
             <span class="text-gray-500">Email:</span>
-            <p class="font-medium text-gray-900 mt-1">{{ currentTenant.email || 'N/A' }}</p>
+            <p class="font-medium text-gray-900 mt-1">
+              {{ currentTenant.email || "N/A" }}
+            </p>
           </div>
           <div>
             <span class="text-gray-500">Teléfono:</span>
-            <p class="font-medium text-gray-900 mt-1">{{ currentTenant.phone || 'N/A' }}</p>
+            <p class="font-medium text-gray-900 mt-1">
+              {{ currentTenant.phone || "N/A" }}
+            </p>
           </div>
           <div>
             <span class="text-gray-500">Dirección:</span>
-            <p class="font-medium text-gray-900 mt-1 line-clamp-2">{{ currentTenant.address || 'N/A' }}</p>
+            <p class="font-medium text-gray-900 mt-1 line-clamp-2">
+              {{ currentTenant.address || "N/A" }}
+            </p>
           </div>
         </div>
 
@@ -100,13 +116,16 @@
             <span
               :class="[
                 'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                subscriptionStatusClass
+                subscriptionStatusClass,
               ]"
             >
               {{ subscriptionStatusText }}
             </span>
           </div>
-          <p v-if="subscriptionInfo.expires_at" class="text-xs text-gray-500 mt-1">
+          <p
+            v-if="subscriptionInfo.expires_at"
+            class="text-xs text-gray-500 mt-1"
+          >
             Vence: {{ formatDate(subscriptionInfo.expires_at) }}
           </p>
         </div>
@@ -116,87 +135,87 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useTenantStore } from '@/stores/tenant'
-import { useAuthStore } from '@/stores/auth'
+import { computed, ref } from "vue";
+import { useTenantStore } from "@/stores/tenant";
+import { useAuthStore } from "@/stores/auth";
 
 // Props
 defineProps({
   showInfoButton: {
     type: Boolean,
-    default: true
-  }
-})
+    default: true,
+  },
+});
 
 // Stores
-const tenantStore = useTenantStore()
-const authStore = useAuthStore()
+const tenantStore = useTenantStore();
+const authStore = useAuthStore();
 
 // State
-const showDetails = ref(false)
+const showDetails = ref(false);
 
 // Computed
-const currentTenant = computed(() => tenantStore.currentTenant)
-const currentBranch = computed(() => authStore.user?.branch)
+const currentTenant = computed(() => tenantStore.currentTenant);
+const currentBranch = computed(() => authStore.user?.branch);
 
 const tenantLogoUrl = computed(() => {
-  const tenant = currentTenant.value
-  if (!tenant) return null
-  if (tenant.logo_url) return tenant.logo_url
+  const tenant = currentTenant.value;
+  if (!tenant) return null;
+  if (tenant.logo_url) return tenant.logo_url;
   if (tenant.logo) {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-    return `${apiUrl.replace('/api', '')}/storage/${tenant.logo}`
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    return `${apiUrl.replace("/api", "")}/storage/${tenant.logo}`;
   }
-  return null
-})
+  return null;
+});
 
 const tenantInitials = computed(() => {
-  if (!currentTenant.value?.name) return 'N/A'
+  if (!currentTenant.value?.name) return "N/A";
   return currentTenant.value.name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
     .toUpperCase()
-    .substring(0, 2)
-})
+    .substring(0, 2);
+});
 
 const subscriptionInfo = computed(() => {
-  return authStore.user?.company?.subscription || null
-})
+  return authStore.user?.company?.subscription || null;
+});
 
 const subscriptionStatusClass = computed(() => {
-  const status = subscriptionInfo.value?.status
+  const status = subscriptionInfo.value?.status;
   const classes = {
-    active: 'bg-green-100 text-green-800',
-    trial: 'bg-blue-100 text-blue-800',
-    expired: 'bg-red-100 text-red-800',
-    canceled: 'bg-gray-100 text-gray-800',
-    suspended: 'bg-yellow-100 text-yellow-800'
-  }
-  return classes[status] || 'bg-gray-100 text-gray-800'
-})
+    active: "bg-green-100 text-green-800",
+    trial: "bg-blue-100 text-blue-800",
+    expired: "bg-red-100 text-red-800",
+    canceled: "bg-gray-100 text-gray-800",
+    suspended: "bg-yellow-100 text-yellow-800",
+  };
+  return classes[status] || "bg-gray-100 text-gray-800";
+});
 
 const subscriptionStatusText = computed(() => {
-  const status = subscriptionInfo.value?.status
+  const status = subscriptionInfo.value?.status;
   const texts = {
-    active: 'Activa',
-    trial: 'Prueba',
-    expired: 'Expirada',
-    canceled: 'Cancelada',
-    suspended: 'Suspendida'
-  }
-  return texts[status] || 'Desconocida'
-})
+    active: "Activa",
+    trial: "Prueba",
+    expired: "Expirada",
+    canceled: "Cancelada",
+    suspended: "Suspendida",
+  };
+  return texts[status] || "Desconocida";
+});
 
 // Methods
 function formatDate(dateString) {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-HN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("es-HN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 </script>
 

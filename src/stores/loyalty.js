@@ -1,233 +1,246 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import loyaltyService from '@/services/loyaltyService'
-import { toast } from 'vue3-toastify'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import loyaltyService from "@/services/loyaltyService";
+import { toast } from "vue3-toastify";
 
-export const useLoyaltyStore = defineStore('loyalty', () => {
-  const program = ref(null)
-  const tiers = ref([])
-  const customerSummary = ref(null)
-  const transactions = ref([])
-  const loading = ref(false)
+export const useLoyaltyStore = defineStore("loyalty", () => {
+  const program = ref(null);
+  const tiers = ref([]);
+  const customerSummary = ref(null);
+  const transactions = ref([]);
+  const loading = ref(false);
   const pagination = ref({
     current_page: 1,
     per_page: 15,
-    total: 0
-  })
+    total: 0,
+  });
 
   // Program management
   async function fetchProgram() {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.getProgram()
+      const response = await loyaltyService.getProgram();
       if (response.data.success) {
-        program.value = response.data.data
-        return response.data.data
+        program.value = response.data.data;
+        return response.data.data;
       }
-      program.value = null
-      return null
+      program.value = null;
+      return null;
     } catch (error) {
-      console.error('Error fetching program:', error)
-      toast.error('Error al cargar programa de lealtad')
-      program.value = null
-      return null
+      console.error("Error fetching program:", error);
+      toast.error("Error al cargar programa de lealtad");
+      program.value = null;
+      return null;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function saveProgram(data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.saveProgram(data)
+      const response = await loyaltyService.saveProgram(data);
       if (response.data.success) {
-        program.value = response.data.data
-        toast.success(response.data.message || 'Programa guardado exitosamente')
-        return response.data.data
+        program.value = response.data.data;
+        toast.success(
+          response.data.message || "Programa guardado exitosamente",
+        );
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al guardar programa'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al guardar programa";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   // Tier management
   async function fetchTiers() {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.getTiers()
+      const response = await loyaltyService.getTiers();
       if (response.data.success) {
-        tiers.value = response.data.data || []
-        return response.data.data || []
+        tiers.value = response.data.data || [];
+        return response.data.data || [];
       }
-      tiers.value = []
-      return []
+      tiers.value = [];
+      return [];
     } catch (error) {
-      console.error('Error fetching tiers:', error)
-      toast.error('Error al cargar niveles de lealtad')
-      tiers.value = []
-      return []
+      console.error("Error fetching tiers:", error);
+      toast.error("Error al cargar niveles de lealtad");
+      tiers.value = [];
+      return [];
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function createTier(data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.createTier(data)
+      const response = await loyaltyService.createTier(data);
       if (response.data.success) {
-        toast.success(response.data.message || 'Nivel creado exitosamente')
-        await fetchTiers()
-        return response.data.data
+        toast.success(response.data.message || "Nivel creado exitosamente");
+        await fetchTiers();
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al crear nivel'
-      toast.error(message)
-      throw error
+      const message = error.response?.data?.message || "Error al crear nivel";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function updateTier(id, data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.updateTier(id, data)
+      const response = await loyaltyService.updateTier(id, data);
       if (response.data.success) {
-        toast.success(response.data.message || 'Nivel actualizado exitosamente')
-        await fetchTiers()
-        return response.data.data
+        toast.success(
+          response.data.message || "Nivel actualizado exitosamente",
+        );
+        await fetchTiers();
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al actualizar nivel'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al actualizar nivel";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function deleteTier(id) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.deleteTier(id)
+      const response = await loyaltyService.deleteTier(id);
       if (response.data.success) {
-        toast.success(response.data.message || 'Nivel eliminado exitosamente')
-        await fetchTiers()
-        return true
+        toast.success(response.data.message || "Nivel eliminado exitosamente");
+        await fetchTiers();
+        return true;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al eliminar nivel'
-      toast.error(message)
-      return false
+      const message =
+        error.response?.data?.message || "Error al eliminar nivel";
+      toast.error(message);
+      return false;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   // Customer loyalty
   async function fetchCustomerSummary(customerId) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.getCustomerSummary(customerId)
+      const response = await loyaltyService.getCustomerSummary(customerId);
       if (response.data.success) {
-        customerSummary.value = response.data.data
-        return response.data.data
+        customerSummary.value = response.data.data;
+        return response.data.data;
       }
     } catch (error) {
       if (error.response?.status !== 404) {
-        toast.error('Error al cargar resumen de lealtad')
-        console.error(error)
+        toast.error("Error al cargar resumen de lealtad");
+        console.error(error);
       }
-      return null
+      return null;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function enrollCustomer(customerId) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.enrollCustomer(customerId)
+      const response = await loyaltyService.enrollCustomer(customerId);
       if (response.data.success) {
-        toast.success(response.data.message || 'Cliente inscrito exitosamente')
-        await fetchCustomerSummary(customerId)
-        return response.data.data
+        toast.success(response.data.message || "Cliente inscrito exitosamente");
+        await fetchCustomerSummary(customerId);
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al inscribir cliente'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al inscribir cliente";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function fetchCustomerTransactions(customerId, params = {}) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.getCustomerTransactions(customerId, params)
+      const response = await loyaltyService.getCustomerTransactions(
+        customerId,
+        params,
+      );
       if (response.data.success) {
-        const data = response.data.data
-        transactions.value = data.data
+        const data = response.data.data;
+        transactions.value = data.data;
         pagination.value = {
           current_page: data.current_page,
           per_page: data.per_page,
-          total: data.total
-        }
-        return transactions.value
+          total: data.total,
+        };
+        return transactions.value;
       }
     } catch (error) {
-      toast.error('Error al cargar transacciones')
-      console.error(error)
-      return []
+      toast.error("Error al cargar transacciones");
+      console.error(error);
+      return [];
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   // Points operations
   async function redeemPoints(data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.redeemPoints(data)
+      const response = await loyaltyService.redeemPoints(data);
       if (response.data.success) {
-        toast.success(response.data.message || 'Puntos canjeados exitosamente')
-        return response.data.data
+        toast.success(response.data.message || "Puntos canjeados exitosamente");
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al canjear puntos'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al canjear puntos";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function adjustPoints(data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await loyaltyService.adjustPoints(data)
+      const response = await loyaltyService.adjustPoints(data);
       if (response.data.success) {
-        toast.success(response.data.message || 'Puntos ajustados exitosamente')
-        return response.data.data
+        toast.success(response.data.message || "Puntos ajustados exitosamente");
+        return response.data.data;
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al ajustar puntos'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al ajustar puntos";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   function clearCustomerData() {
-    customerSummary.value = null
-    transactions.value = []
+    customerSummary.value = null;
+    transactions.value = [];
   }
 
   return {
@@ -248,6 +261,6 @@ export const useLoyaltyStore = defineStore('loyalty', () => {
     fetchCustomerTransactions,
     redeemPoints,
     adjustPoints,
-    clearCustomerData
-  }
-})
+    clearCustomerData,
+  };
+});

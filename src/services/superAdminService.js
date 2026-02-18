@@ -1,4 +1,4 @@
-import api from './api'
+import api from "./api";
 
 /**
  * Servicio para operaciones de Super Admin
@@ -12,7 +12,7 @@ export default {
    * @returns {Promise}
    */
   getTenants(params = {}) {
-    return api.get('/super-admin/tenants', { params })
+    return api.get("/super-admin/tenants", { params });
   },
 
   /**
@@ -21,7 +21,7 @@ export default {
    * @returns {Promise}
    */
   getTenantDetails(tenantId) {
-    return api.get(`/super-admin/tenants/${tenantId}`)
+    return api.get(`/super-admin/tenants/${tenantId}`);
   },
 
   /**
@@ -30,7 +30,7 @@ export default {
    * @returns {Promise}
    */
   createTenant(tenantData) {
-    return api.post('/super-admin/tenants', tenantData)
+    return api.post("/super-admin/tenants", tenantData);
   },
 
   /**
@@ -39,7 +39,7 @@ export default {
    * @returns {Promise}
    */
   toggleTenantStatus(tenantId) {
-    return api.post(`/super-admin/tenants/${tenantId}/toggle-status`)
+    return api.post(`/super-admin/tenants/${tenantId}/toggle-status`);
   },
 
   /**
@@ -49,7 +49,10 @@ export default {
    * @returns {Promise}
    */
   updateTenantSubscription(tenantId, subscriptionData) {
-    return api.put(`/super-admin/tenants/${tenantId}/subscription`, subscriptionData)
+    return api.put(
+      `/super-admin/tenants/${tenantId}/subscription`,
+      subscriptionData,
+    );
   },
 
   /**
@@ -58,7 +61,7 @@ export default {
    * @returns {Promise}
    */
   deleteTenant(tenantId) {
-    return api.delete(`/super-admin/tenants/${tenantId}`)
+    return api.delete(`/super-admin/tenants/${tenantId}`);
   },
 
   /**
@@ -66,7 +69,7 @@ export default {
    * @returns {Promise}
    */
   getDashboard() {
-    return api.get('/super-admin/dashboard')
+    return api.get("/super-admin/dashboard");
   },
 
   /**
@@ -75,7 +78,7 @@ export default {
    * @returns {Promise}
    */
   exportTenants(params = {}) {
-    return api.get('/super-admin/tenants/export', { params })
+    return api.get("/super-admin/tenants/export", { params });
   },
 
   /**
@@ -83,7 +86,7 @@ export default {
    * @returns {Promise}
    */
   getPlans() {
-    return api.get('/super-admin/plans')
+    return api.get("/super-admin/plans");
   },
 
   /**
@@ -92,7 +95,7 @@ export default {
    * @returns {Promise}
    */
   createPlan(planData) {
-    return api.post('/super-admin/plans', planData)
+    return api.post("/super-admin/plans", planData);
   },
 
   /**
@@ -102,7 +105,7 @@ export default {
    * @returns {Promise}
    */
   updatePlan(planId, planData) {
-    return api.put(`/super-admin/plans/${planId}`, planData)
+    return api.put(`/super-admin/plans/${planId}`, planData);
   },
 
   /**
@@ -111,7 +114,7 @@ export default {
    * @returns {Promise}
    */
   deletePlan(planId) {
-    return api.delete(`/super-admin/plans/${planId}`)
+    return api.delete(`/super-admin/plans/${planId}`);
   },
 
   /**
@@ -120,6 +123,6 @@ export default {
    * @returns {Promise}
    */
   togglePlanStatus(planId) {
-    return api.post(`/super-admin/plans/${planId}/toggle-status`)
-  }
-}
+    return api.post(`/super-admin/plans/${planId}/toggle-status`);
+  },
+};

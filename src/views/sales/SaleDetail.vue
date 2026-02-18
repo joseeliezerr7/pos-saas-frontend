@@ -7,8 +7,18 @@
           @click="router.back()"
           class="text-gray-600 hover:text-gray-900"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
           </svg>
         </button>
         <div>
@@ -24,8 +34,18 @@
           @click="printReceipt"
           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+            />
           </svg>
           Reimprimir
         </button>
@@ -34,8 +54,18 @@
           @click="generateInvoice"
           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
           </svg>
           Generar Factura
         </button>
@@ -44,9 +74,24 @@
           @click="router.push(`/invoices/${sale.invoice?.id}`)"
           class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
           </svg>
           Ver Factura
         </button>
@@ -55,17 +100,32 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
       <p class="text-gray-600 mt-2">Cargando venta...</p>
     </div>
 
     <!-- Sale Content -->
     <div v-else-if="sale" class="space-y-6">
       <!-- Status Badge -->
-      <div v-if="sale.status === 'voided'" class="bg-red-50 border-l-4 border-red-400 p-4">
+      <div
+        v-if="sale.status === 'voided'"
+        class="bg-red-50 border-l-4 border-red-400 p-4"
+      >
         <div class="flex items-center">
-          <svg class="w-6 h-6 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <svg
+            class="w-6 h-6 text-red-400 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
           </svg>
           <div>
             <h3 class="text-lg font-semibold text-red-800">Venta Anulada</h3>
@@ -77,7 +137,9 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Sale Information -->
         <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Información de Venta</h2>
+          <h2 class="text-xl font-bold text-gray-900 mb-4">
+            Información de Venta
+          </h2>
           <dl class="space-y-3">
             <div>
               <dt class="text-sm font-medium text-gray-500">Número de Venta</dt>
@@ -85,11 +147,15 @@
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Fecha</dt>
-              <dd class="text-base text-gray-900">{{ formatDate(sale.sold_at) }}</dd>
+              <dd class="text-base text-gray-900">
+                {{ formatDate(sale.sold_at) }}
+              </dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Método de Pago</dt>
-              <dd class="text-base text-gray-900">{{ getPaymentMethodLabel(sale.payment_method) }}</dd>
+              <dd class="text-base text-gray-900">
+                {{ getPaymentMethodLabel(sale.payment_method) }}
+              </dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Estado</dt>
@@ -111,11 +177,15 @@
 
         <!-- Customer Information -->
         <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Información del Cliente</h2>
+          <h2 class="text-xl font-bold text-gray-900 mb-4">
+            Información del Cliente
+          </h2>
           <dl class="space-y-3">
             <div>
               <dt class="text-sm font-medium text-gray-500">Nombre</dt>
-              <dd class="text-base text-gray-900">{{ sale.customer_name || 'Cliente General' }}</dd>
+              <dd class="text-base text-gray-900">
+                {{ sale.customer_name || "Cliente General" }}
+              </dd>
             </div>
             <div v-if="sale.customer_rtn">
               <dt class="text-sm font-medium text-gray-500">RTN</dt>
@@ -131,7 +201,9 @@
             </div>
             <div v-if="sale.customer?.address">
               <dt class="text-sm font-medium text-gray-500">Dirección</dt>
-              <dd class="text-base text-gray-900">{{ sale.customer.address }}</dd>
+              <dd class="text-base text-gray-900">
+                {{ sale.customer.address }}
+              </dd>
             </div>
           </dl>
         </div>
@@ -146,28 +218,66 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Descuento</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Impuesto</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Producto
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Cantidad
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Precio
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Descuento
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Impuesto
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="item in sale.details" :key="item.id">
                 <td class="px-6 py-4">
-                  <div class="text-sm font-medium text-gray-900">{{ item.product_name }}</div>
-                  <div class="text-xs text-gray-500">{{ item.product?.code }}</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ item.product_name }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    {{ item.product?.code }}
+                  </div>
                 </td>
-                <td class="px-6 py-4 text-right text-sm text-gray-900">{{ item.quantity }}</td>
-                <td class="px-6 py-4 text-right text-sm text-gray-900">L {{ formatMoney(item.unit_price) }}</td>
-                <td class="px-6 py-4 text-right text-sm text-gray-900">L {{ formatMoney(item.discount) }}</td>
+                <td class="px-6 py-4 text-right text-sm text-gray-900">
+                  {{ item.quantity }}
+                </td>
+                <td class="px-6 py-4 text-right text-sm text-gray-900">
+                  L {{ formatMoney(item.unit_price) }}
+                </td>
+                <td class="px-6 py-4 text-right text-sm text-gray-900">
+                  L {{ formatMoney(item.discount) }}
+                </td>
                 <td class="px-6 py-4 text-right text-sm text-gray-900">
                   L {{ formatMoney(item.tax_amount) }}
                   <div class="text-xs text-gray-500">{{ item.tax_rate }}%</div>
                 </td>
-                <td class="px-6 py-4 text-right text-sm font-semibold text-gray-900">L {{ formatMoney(item.total) }}</td>
+                <td
+                  class="px-6 py-4 text-right text-sm font-semibold text-gray-900"
+                >
+                  L {{ formatMoney(item.total) }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -179,17 +289,25 @@
         <div class="max-w-md ml-auto space-y-3">
           <div class="flex justify-between text-base">
             <span class="text-gray-600">Subtotal:</span>
-            <span class="font-medium text-gray-900">L {{ formatMoney(sale.subtotal) }}</span>
+            <span class="font-medium text-gray-900"
+              >L {{ formatMoney(sale.subtotal) }}</span
+            >
           </div>
           <div class="flex justify-between text-base">
             <span class="text-gray-600">Descuento:</span>
-            <span class="font-medium text-gray-900">L {{ formatMoney(sale.discount) }}</span>
+            <span class="font-medium text-gray-900"
+              >L {{ formatMoney(sale.discount) }}</span
+            >
           </div>
           <div class="flex justify-between text-base">
             <span class="text-gray-600">Impuesto:</span>
-            <span class="font-medium text-gray-900">L {{ formatMoney(sale.tax) }}</span>
+            <span class="font-medium text-gray-900"
+              >L {{ formatMoney(sale.tax) }}</span
+            >
           </div>
-          <div class="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold">
+          <div
+            class="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold"
+          >
             <span class="text-gray-900">Total:</span>
             <span class="text-gray-900">L {{ formatMoney(sale.total) }}</span>
           </div>
@@ -200,117 +318,167 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useSaleStore } from '@/stores/sale'
-import { useInvoiceStore } from '@/stores/invoice'
-import saleService from '@/services/saleService'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { toast } from 'vue3-toastify'
+import { ref, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useSaleStore } from "@/stores/sale";
+import { useInvoiceStore } from "@/stores/invoice";
+import saleService from "@/services/saleService";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { toast } from "vue3-toastify";
 
-const router = useRouter()
-const route = useRoute()
-const saleStore = useSaleStore()
-const invoiceStore = useInvoiceStore()
+const router = useRouter();
+const route = useRoute();
+const saleStore = useSaleStore();
+const invoiceStore = useInvoiceStore();
 
-const sale = computed(() => saleStore.currentSale)
-const loading = computed(() => saleStore.loading)
+const sale = computed(() => saleStore.currentSale);
+const loading = computed(() => saleStore.loading);
 
 onMounted(() => {
-  loadSale()
-})
+  loadSale();
+});
 
 async function loadSale() {
-  const id = route.params.id
-  await saleStore.fetchSaleById(id)
-  console.log('Sale loaded:', sale.value)
-  console.log('Sale details:', sale.value?.details)
+  const id = route.params.id;
+  await saleStore.fetchSaleById(id);
+  console.log("Sale loaded:", sale.value);
+  console.log("Sale details:", sale.value?.details);
 }
 
 async function printReceipt() {
   try {
-    const response = await saleService.getReceipt(sale.value.id)
+    const response = await saleService.getReceipt(sale.value.id);
     if (response.data.success) {
-      const data = response.data.data
-      const printWindow = window.open('', '_blank', 'width=400,height=600')
-      printWindow.document.write(buildReceiptHtml(data))
-      printWindow.document.close()
-      printWindow.focus()
+      const data = response.data.data;
+      const printWindow = window.open("", "_blank", "width=400,height=600");
+      printWindow.document.write(buildReceiptHtml(data));
+      printWindow.document.close();
+      printWindow.focus();
       printWindow.onload = () => {
-        printWindow.print()
-      }
+        printWindow.print();
+      };
     }
   } catch (error) {
-    console.error('Error printing receipt:', error)
-    toast.error('Error al obtener los datos del recibo')
+    console.error("Error printing receipt:", error);
+    toast.error("Error al obtener los datos del recibo");
   }
 }
 
 function numberToWords(num) {
-  const units = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE']
-  const tens = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA']
-  const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS']
-  if (num === 0) return 'CERO'
-  if (num === 100) return 'CIEN'
-  let result = ''
+  const units = [
+    "",
+    "UN",
+    "DOS",
+    "TRES",
+    "CUATRO",
+    "CINCO",
+    "SEIS",
+    "SIETE",
+    "OCHO",
+    "NUEVE",
+  ];
+  const tens = [
+    "",
+    "DIEZ",
+    "VEINTE",
+    "TREINTA",
+    "CUARENTA",
+    "CINCUENTA",
+    "SESENTA",
+    "SETENTA",
+    "OCHENTA",
+    "NOVENTA",
+  ];
+  const hundreds = [
+    "",
+    "CIENTO",
+    "DOSCIENTOS",
+    "TRESCIENTOS",
+    "CUATROCIENTOS",
+    "QUINIENTOS",
+    "SEISCIENTOS",
+    "SETECIENTOS",
+    "OCHOCIENTOS",
+    "NOVECIENTOS",
+  ];
+  if (num === 0) return "CERO";
+  if (num === 100) return "CIEN";
+  let result = "";
   if (num >= 1000) {
-    const thousands = Math.floor(num / 1000)
-    if (thousands === 1) { result += 'MIL ' } else { result += units[thousands] + ' MIL ' }
-    num %= 1000
+    const thousands = Math.floor(num / 1000);
+    if (thousands === 1) {
+      result += "MIL ";
+    } else {
+      result += units[thousands] + " MIL ";
+    }
+    num %= 1000;
   }
-  if (num >= 100) { result += hundreds[Math.floor(num / 100)] + ' '; num %= 100 }
-  if (num >= 10) { result += tens[Math.floor(num / 10)] + ' '; num %= 10 }
-  if (num > 0) { result += units[num] }
-  return result.trim()
+  if (num >= 100) {
+    result += hundreds[Math.floor(num / 100)] + " ";
+    num %= 100;
+  }
+  if (num >= 10) {
+    result += tens[Math.floor(num / 10)] + " ";
+    num %= 10;
+  }
+  if (num > 0) {
+    result += units[num];
+  }
+  return result.trim();
 }
 
 function buildReceiptHtml(data) {
-  const company = data.company || {}
-  const sale = data.sale || {}
-  const branch = data.branch || {}
-  const items = data.items || []
-  const invoice = data.invoice || null
-  const seller = data.seller || {}
+  const company = data.company || {};
+  const sale = data.sale || {};
+  const branch = data.branch || {};
+  const items = data.items || [];
+  const invoice = data.invoice || null;
+  const seller = data.seller || {};
 
-  const fm = (v) => parseFloat(v || 0).toFixed(2)
+  const fm = (v) => parseFloat(v || 0).toFixed(2);
 
   const getTaxLabel = (rate) => {
-    const r = Math.round(parseFloat(rate) || 0)
-    if (r === 0) return 'E - Exento'
-    if (r === 15) return 'G - Gravado 15%'
-    if (r === 18) return 'G - Gravado 18%'
-    return ''
-  }
+    const r = Math.round(parseFloat(rate) || 0);
+    if (r === 0) return "E - Exento";
+    if (r === 15) return "G - Gravado 15%";
+    if (r === 18) return "G - Gravado 18%";
+    return "";
+  };
 
   // Tax summary
-  let exempt = 0, taxable15 = 0
-  items.forEach(item => {
-    const itemTotal = parseFloat(item.subtotal) || (item.quantity * item.price)
-    const r = Math.round(parseFloat(item.tax_rate) || 0)
-    if (r === 0) exempt += itemTotal
-    else if (r === 15) taxable15 += itemTotal
-  })
+  let exempt = 0,
+    taxable15 = 0;
+  items.forEach((item) => {
+    const itemTotal = parseFloat(item.subtotal) || item.quantity * item.price;
+    const r = Math.round(parseFloat(item.tax_rate) || 0);
+    if (r === 0) exempt += itemTotal;
+    else if (r === 15) taxable15 += itemTotal;
+  });
 
   // Total in words
-  const total = parseFloat(sale.total) || 0
-  const intPart = Math.floor(total)
-  const decPart = Math.round((total - intPart) * 100)
-  const totalWords = `SON: ${numberToWords(intPart)} LEMPIRAS CON ${decPart}/100`
+  const total = parseFloat(sale.total) || 0;
+  const intPart = Math.floor(total);
+  const decPart = Math.round((total - intPart) * 100);
+  const totalWords = `SON: ${numberToWords(intPart)} LEMPIRAS CON ${decPart}/100`;
 
   // Items HTML
-  const itemsHtml = items.map(item => `
+  const itemsHtml = items
+    .map(
+      (item) => `
     <tr class="item-row">
       <td class="py1">
         <div>${item.product_name}</div>
-        ${item.product_sku ? `<div class="text-gray">Código: ${item.product_sku}</div>` : ''}
+        ${item.product_sku ? `<div class="text-gray">Código: ${item.product_sku}</div>` : ""}
         <div class="text-gray">${getTaxLabel(item.tax_rate)}</div>
       </td>
       <td class="py1" style="text-align:center;">${item.quantity}</td>
       <td class="py1" style="text-align:right;">L ${fm(item.price)}</td>
       <td class="py1" style="text-align:right;">L ${fm(item.subtotal)}</td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Factura ${sale.sale_number}</title>
 <style>
@@ -346,35 +514,39 @@ function buildReceiptHtml(data) {
 
   <!-- 1. ENCABEZADO -->
   <div class="text-center sep">
-    ${company.logo_url ? `<img src="${company.logo_url}" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />` : ''}
-    <div class="bold text-sm">${company.legal_name || company.name || 'EMPRESA'}</div>
-    ${company.address ? `<div class="text-xs">${company.address}</div>` : ''}
+    ${company.logo_url ? `<img src="${company.logo_url}" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />` : ""}
+    <div class="bold text-sm">${company.legal_name || company.name || "EMPRESA"}</div>
+    ${company.address ? `<div class="text-xs">${company.address}</div>` : ""}
     <div class="text-xs">Honduras, C.A.</div>
-    ${company.phone ? `<div class="text-xs">Tel: ${company.phone}</div>` : ''}
-    ${company.email ? `<div class="text-xs">Email: ${company.email}</div>` : ''}
-    <div class="text-xs semibold mt1">RTN: ${company.rtn || ''}</div>
-    ${invoice && invoice.cai_number ? `<div class="text-xs">CAI: ${invoice.cai_number}</div>` : ''}
-    ${branch.name ? `<div class="text-xs">Sucursal: ${branch.name}</div>` : ''}
+    ${company.phone ? `<div class="text-xs">Tel: ${company.phone}</div>` : ""}
+    ${company.email ? `<div class="text-xs">Email: ${company.email}</div>` : ""}
+    <div class="text-xs semibold mt1">RTN: ${company.rtn || ""}</div>
+    ${invoice && invoice.cai_number ? `<div class="text-xs">CAI: ${invoice.cai_number}</div>` : ""}
+    ${branch.name ? `<div class="text-xs">Sucursal: ${branch.name}</div>` : ""}
   </div>
 
   <!-- 2. DATOS DEL DOCUMENTO -->
   <div class="text-center sep">
     <div class="bold text-sm">FACTURA</div>
     <div class="text-xs">No. ${invoice ? invoice.invoice_number : sale.sale_number}</div>
-    <div class="text-xs">${sale.sold_at || ''}</div>
-    ${seller.name ? `<div class="text-xs">Vendedor: ${seller.name}</div>` : ''}
+    <div class="text-xs">${sale.sold_at || ""}</div>
+    ${seller.name ? `<div class="text-xs">Vendedor: ${seller.name}</div>` : ""}
   </div>
 
   <!-- NÚMERO DE ORDEN -->
-  ${sale.order_number ? `<div class="text-center sep">
+  ${
+    sale.order_number
+      ? `<div class="text-center sep">
     <div class="text-xs" style="color:#666;">ORDEN No.</div>
     <div class="bold" style="font-size:28px;line-height:1.2;">${sale.order_number}</div>
-  </div>` : ''}
+  </div>`
+      : ""
+  }
 
   <!-- 3. DATOS DEL CLIENTE -->
   <div class="sep">
-    <div class="text-xs"><span class="semibold">Cliente:</span> ${sale.customer_name || 'Consumidor Final'}</div>
-    ${sale.customer_rtn ? `<div class="text-xs"><span class="semibold">RTN:</span> ${sale.customer_rtn}</div>` : ''}
+    <div class="text-xs"><span class="semibold">Cliente:</span> ${sale.customer_name || "Consumidor Final"}</div>
+    ${sale.customer_rtn ? `<div class="text-xs"><span class="semibold">RTN:</span> ${sale.customer_rtn}</div>` : ""}
   </div>
 
   <!-- 4. DETALLE DE PRODUCTOS -->
@@ -394,88 +566,88 @@ function buildReceiptHtml(data) {
     <div class="flex mb1"><span>Importe Gravado 15%:</span><span>L ${fm(taxable15)}</span></div>
     <div class="flex mb1"><span>Subtotal:</span><span>L ${fm(sale.subtotal)}</span></div>
     <div class="flex mb1"><span>ISV 15%:</span><span>L ${fm(sale.tax)}</span></div>
-    ${parseFloat(sale.discount) > 0 ? `<div class="flex mb1"><span>Descuento:</span><span>- L ${fm(sale.discount)}</span></div>` : ''}
+    ${parseFloat(sale.discount) > 0 ? `<div class="flex mb1"><span>Descuento:</span><span>- L ${fm(sale.discount)}</span></div>` : ""}
   </div>
 
   <!-- 6. TOTALES DE PAGO -->
   <div class="sep">
     <div class="flex bold text-sm" style="margin-bottom:8px;"><span>TOTAL A PAGAR:</span><span>L ${fm(sale.total)}</span></div>
     <div class="flex mb1 text-xs"><span>Forma de Pago:</span><span style="text-transform:uppercase;">${sale.payment_method_label || sale.payment_method}</span></div>
-    ${sale.transaction_reference ? `<div class="flex mb1 text-xs"><span>Ref. Transacción:</span><span>${sale.transaction_reference}</span></div>` : ''}
+    ${sale.transaction_reference ? `<div class="flex mb1 text-xs"><span>Ref. Transacción:</span><span>${sale.transaction_reference}</span></div>` : ""}
     <div class="flex mb1 text-xs"><span>Monto Pagado:</span><span>L ${fm(sale.amount_paid)}</span></div>
-    ${parseFloat(sale.amount_change) > 0 ? `<div class="flex mb1 text-xs"><span>Cambio:</span><span>L ${fm(sale.amount_change)}</span></div>` : ''}
+    ${parseFloat(sale.amount_change) > 0 ? `<div class="flex mb1 text-xs"><span>Cambio:</span><span>L ${fm(sale.amount_change)}</span></div>` : ""}
   </div>
 
-  ${sale.status === 'voided' ? '<div class="voided-badge">*** ANULADA ***</div>' : ''}
+  ${sale.status === "voided" ? '<div class="voided-badge">*** ANULADA ***</div>' : ""}
 
   <!-- 7. INFORMACIÓN LEGAL -->
   <div class="text-center text-xs" style="margin-bottom:8px;">
     <div class="semibold mb1">${totalWords}</div>
     <div class="text-gray mb1">G = Gravado (15%) | E = Exento</div>
-    ${invoice && invoice.range_authorized ? `<div class="text-gray">Rango Autorizado: ${invoice.range_authorized}</div>` : ''}
-    ${invoice && invoice.cai_expiration_date ? `<div class="text-gray">Fecha Límite: ${invoice.cai_expiration_date}</div>` : ''}
+    ${invoice && invoice.range_authorized ? `<div class="text-gray">Rango Autorizado: ${invoice.range_authorized}</div>` : ""}
+    ${invoice && invoice.cai_expiration_date ? `<div class="text-gray">Fecha Límite: ${invoice.cai_expiration_date}</div>` : ""}
   </div>
 
   <!-- Footer -->
   <div class="text-center text-xs sep" style="border-top:1px dashed #999;padding-top:8px;border-bottom:none;">
     <div>¡Gracias por su compra!</div>
-    <div class="mt1">${company.name || ''}</div>
-    <div class="text-gray mt1">Reimpreso: ${new Date().toLocaleString('es-HN')}</div>
+    <div class="mt1">${company.name || ""}</div>
+    <div class="text-gray mt1">Reimpreso: ${new Date().toLocaleString("es-HN")}</div>
   </div>
 </div>
 <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
-</body></html>`
+</body></html>`;
 }
 
 async function generateInvoice() {
   try {
     const invoice = await invoiceStore.createInvoice({
-      sale_id: sale.value.id
-    })
-    toast.success('Factura generada exitosamente')
-    router.push(`/invoices/${invoice.id}`)
+      sale_id: sale.value.id,
+    });
+    toast.success("Factura generada exitosamente");
+    router.push(`/invoices/${invoice.id}`);
   } catch (error) {
-    console.error('Error generating invoice:', error)
+    console.error("Error generating invoice:", error);
   }
 }
 
 function formatDate(date) {
-  if (!date) return '-'
-  return format(new Date(date), 'dd MMM yyyy HH:mm', { locale: es })
+  if (!date) return "-";
+  return format(new Date(date), "dd MMM yyyy HH:mm", { locale: es });
 }
 
 function formatMoney(amount) {
-  return parseFloat(amount || 0).toLocaleString('es-HN', {
+  return parseFloat(amount || 0).toLocaleString("es-HN", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
+    maximumFractionDigits: 2,
+  });
 }
 
 function getPaymentMethodLabel(method) {
   const labels = {
-    cash: 'Efectivo',
-    card: 'Tarjeta',
-    transfer: 'Transferencia',
-    credit: 'Crédito'
-  }
-  return labels[method] || method
+    cash: "Efectivo",
+    card: "Tarjeta",
+    transfer: "Transferencia",
+    credit: "Crédito",
+  };
+  return labels[method] || method;
 }
 
 function getStatusClass(status) {
   const classes = {
-    completed: 'bg-green-100 text-green-800',
-    voided: 'bg-red-100 text-red-800',
-    pending: 'bg-yellow-100 text-yellow-800'
-  }
-  return classes[status] || 'bg-gray-100 text-gray-800'
+    completed: "bg-green-100 text-green-800",
+    voided: "bg-red-100 text-red-800",
+    pending: "bg-yellow-100 text-yellow-800",
+  };
+  return classes[status] || "bg-gray-100 text-gray-800";
 }
 
 function getStatusLabel(status) {
   const labels = {
-    completed: 'Completada',
-    voided: 'Anulada',
-    pending: 'Pendiente'
-  }
-  return labels[status] || status
+    completed: "Completada",
+    voided: "Anulada",
+    pending: "Pendiente",
+  };
+  return labels[status] || status;
 }
 </script>

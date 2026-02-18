@@ -21,7 +21,11 @@
           class="input flex-1 min-w-[200px]"
           @input="handleSearch"
         />
-        <select v-model="filterStatus" @change="handleFilterChange" class="input">
+        <select
+          v-model="filterStatus"
+          @change="handleFilterChange"
+          class="input"
+        >
           <option value="">Todos los estados</option>
           <option value="1">Activos</option>
           <option value="0">Inactivos</option>
@@ -41,7 +45,10 @@
         <p class="text-gray-500">Cargando clientes...</p>
       </div>
 
-      <div v-else-if="customerStore.customers.length === 0" class="text-center py-8">
+      <div
+        v-else-if="customerStore.customers.length === 0"
+        class="text-center py-8"
+      >
         <p class="text-gray-500">No hay clientes registrados</p>
       </div>
 
@@ -49,32 +56,78 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">RTN</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grupo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tags</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lealtad</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Crédito</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Nombre
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                RTN
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Teléfono
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Email
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Grupo
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Tags
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Lealtad
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Crédito
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Estado
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"
+              >
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="customer in customerStore.customers" :key="customer.id" class="hover:bg-gray-50">
+            <tr
+              v-for="customer in customerStore.customers"
+              :key="customer.id"
+              class="hover:bg-gray-50"
+            >
               <td class="px-6 py-4">
                 <div class="font-medium text-gray-900">{{ customer.name }}</div>
-                <div v-if="customer.address" class="text-sm text-gray-500">{{ customer.address }}</div>
+                <div v-if="customer.address" class="text-sm text-gray-500">
+                  {{ customer.address }}
+                </div>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ customer.rtn || '-' }}
+                {{ customer.rtn || "-" }}
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ customer.phone || '-' }}
+                {{ customer.phone || "-" }}
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
-                {{ customer.email || '-' }}
+                {{ customer.email || "-" }}
               </td>
               <td class="px-6 py-4">
                 <div v-if="customer.customer_group" class="flex items-center">
@@ -82,12 +135,17 @@
                     class="w-2 h-2 rounded-full mr-2"
                     :style="{ backgroundColor: customer.customer_group.color }"
                   ></div>
-                  <span class="text-xs text-gray-700">{{ customer.customer_group.name }}</span>
+                  <span class="text-xs text-gray-700">{{
+                    customer.customer_group.name
+                  }}</span>
                 </div>
                 <span v-else class="text-xs text-gray-500">Sin grupo</span>
               </td>
               <td class="px-6 py-4">
-                <div v-if="customer.tags && customer.tags.length > 0" class="flex flex-wrap gap-1">
+                <div
+                  v-if="customer.tags && customer.tags.length > 0"
+                  class="flex flex-wrap gap-1"
+                >
                   <span
                     v-for="tag in customer.tags"
                     :key="tag.id"
@@ -105,10 +163,12 @@
                     <div
                       v-if="customer.loyalty.current_tier"
                       class="w-3 h-3 rounded-full"
-                      :style="{ backgroundColor: customer.loyalty.current_tier.color }"
+                      :style="{
+                        backgroundColor: customer.loyalty.current_tier.color,
+                      }"
                     ></div>
                     <span class="text-xs font-medium text-gray-900">
-                      {{ customer.loyalty.current_tier?.name || 'Sin Nivel' }}
+                      {{ customer.loyalty.current_tier?.name || "Sin Nivel" }}
                     </span>
                   </div>
                   <div class="text-xs text-gray-500">
@@ -133,17 +193,27 @@
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 <div>Límite: L {{ formatNumber(customer.credit_limit) }}</div>
-                <div class="text-xs">Saldo: L {{ formatNumber(customer.current_balance) }}</div>
+                <div class="text-xs">
+                  Saldo: L {{ formatNumber(customer.current_balance) }}
+                </div>
               </td>
               <td class="px-6 py-4">
-                <span v-if="customer.is_active" class="badge-success">Activo</span>
+                <span v-if="customer.is_active" class="badge-success"
+                  >Activo</span
+                >
                 <span v-else class="badge-danger">Inactivo</span>
               </td>
               <td class="px-6 py-4 text-right space-x-2">
-                <button @click="openEditModal(customer)" class="text-blue-600 hover:text-blue-800">
+                <button
+                  @click="openEditModal(customer)"
+                  class="text-blue-600 hover:text-blue-800"
+                >
                   Editar
                 </button>
-                <button @click="confirmDelete(customer)" class="text-red-600 hover:text-red-800">
+                <button
+                  @click="confirmDelete(customer)"
+                  class="text-red-600 hover:text-red-800"
+                >
                   Eliminar
                 </button>
               </td>
@@ -153,9 +223,15 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="customerStore.pagination.total > customerStore.pagination.per_page" class="mt-4 flex justify-between items-center">
+      <div
+        v-if="
+          customerStore.pagination.total > customerStore.pagination.per_page
+        "
+        class="mt-4 flex justify-between items-center"
+      >
         <div class="text-sm text-gray-500">
-          Mostrando {{ customerStore.customers.length }} de {{ customerStore.pagination.total }} clientes
+          Mostrando {{ customerStore.customers.length }} de
+          {{ customerStore.pagination.total }} clientes
         </div>
         <div class="flex gap-2">
           <button
@@ -167,7 +243,11 @@
           </button>
           <button
             @click="changePage(customerStore.pagination.current_page + 1)"
-            :disabled="customerStore.pagination.current_page * customerStore.pagination.per_page >= customerStore.pagination.total"
+            :disabled="
+              customerStore.pagination.current_page *
+                customerStore.pagination.per_page >=
+              customerStore.pagination.total
+            "
             class="btn-secondary"
           >
             Siguiente
@@ -177,16 +257,23 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto"
+      >
         <h2 class="text-xl font-bold mb-4">
-          {{ editingCustomer ? 'Editar Cliente' : 'Nuevo Cliente' }}
+          {{ editingCustomer ? "Editar Cliente" : "Nuevo Cliente" }}
         </h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Nombre *</label
+              >
               <input
                 v-model="form.name"
                 type="text"
@@ -197,7 +284,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">RTN</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >RTN</label
+              >
               <input
                 v-model="form.rtn"
                 type="text"
@@ -208,7 +297,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Teléfono</label
+              >
               <input
                 v-model="form.phone"
                 type="tel"
@@ -218,7 +309,9 @@
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Email</label
+              >
               <input
                 v-model="form.email"
                 type="email"
@@ -228,7 +321,9 @@
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Dirección</label
+              >
               <textarea
                 v-model="form.address"
                 rows="2"
@@ -238,11 +333,10 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Grupo de Cliente</label>
-              <select
-                v-model="form.customer_group_id"
-                class="input w-full"
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Grupo de Cliente</label
               >
+              <select v-model="form.customer_group_id" class="input w-full">
                 <option :value="null">Sin grupo</option>
                 <option
                   v-for="group in customerGroupStore.groups"
@@ -255,16 +349,26 @@
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
-              <div class="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg min-h-[60px]">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Tags</label
+              >
+              <div
+                class="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg min-h-[60px]"
+              >
                 <label
                   v-for="tag in tagStore.tags"
                   :key="tag.id"
                   class="inline-flex items-center px-3 py-1.5 rounded-full text-sm cursor-pointer transition-all"
-                  :class="form.tag_ids.includes(tag.id)
-                    ? 'text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                  :style="form.tag_ids.includes(tag.id) ? { backgroundColor: tag.color } : {}"
+                  :class="
+                    form.tag_ids.includes(tag.id)
+                      ? 'text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  "
+                  :style="
+                    form.tag_ids.includes(tag.id)
+                      ? { backgroundColor: tag.color }
+                      : {}
+                  "
                 >
                   <input
                     type="checkbox"
@@ -274,15 +378,22 @@
                   />
                   <span>{{ tag.name }}</span>
                 </label>
-                <span v-if="tagStore.tags.length === 0" class="text-gray-400 text-sm">
+                <span
+                  v-if="tagStore.tags.length === 0"
+                  class="text-gray-400 text-sm"
+                >
                   No hay tags disponibles
                 </span>
               </div>
-              <p class="text-xs text-gray-500 mt-1">Selecciona los tags que aplican a este cliente</p>
+              <p class="text-xs text-gray-500 mt-1">
+                Selecciona los tags que aplican a este cliente
+              </p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Límite de Crédito (L)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Límite de Crédito (L)</label
+              >
               <input
                 v-model.number="form.credit_limit"
                 type="number"
@@ -300,16 +411,26 @@
                 id="is_active"
                 class="mr-2"
               />
-              <label for="is_active" class="text-sm text-gray-700">Cliente activo</label>
+              <label for="is_active" class="text-sm text-gray-700"
+                >Cliente activo</label
+              >
             </div>
           </div>
 
           <div class="flex gap-2 pt-4">
-            <button type="submit" :disabled="customerStore.loading" class="btn-primary flex-1">
+            <button
+              type="submit"
+              :disabled="customerStore.loading"
+              class="btn-primary flex-1"
+            >
               <span v-if="customerStore.loading">Guardando...</span>
-              <span v-else>{{ editingCustomer ? 'Actualizar' : 'Crear' }}</span>
+              <span v-else>{{ editingCustomer ? "Actualizar" : "Crear" }}</span>
             </button>
-            <button type="button" @click="closeModal" class="btn-secondary flex-1">
+            <button
+              type="button"
+              @click="closeModal"
+              class="btn-secondary flex-1"
+            >
               Cancelar
             </button>
           </div>
@@ -318,15 +439,25 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
       <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h2 class="text-xl font-bold mb-4 text-red-600">Confirmar Eliminación</h2>
+        <h2 class="text-xl font-bold mb-4 text-red-600">
+          Confirmar Eliminación
+        </h2>
         <p class="text-gray-600 mb-6">
-          ¿Estás seguro de eliminar el cliente <strong>{{ customerToDelete?.name }}</strong>?
-          Esta acción no se puede deshacer.
+          ¿Estás seguro de eliminar el cliente
+          <strong>{{ customerToDelete?.name }}</strong
+          >? Esta acción no se puede deshacer.
         </p>
         <div class="flex gap-2">
-          <button @click="handleDelete" :disabled="customerStore.loading" class="btn-danger flex-1">
+          <button
+            @click="handleDelete"
+            :disabled="customerStore.loading"
+            class="btn-danger flex-1"
+          >
             <span v-if="customerStore.loading">Eliminando...</span>
             <span v-else>Eliminar</span>
           </button>
@@ -338,8 +469,13 @@
     </div>
 
     <!-- Loyalty Modal -->
-    <div v-if="showLoyaltyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-lg max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+    <div
+      v-if="showLoyaltyModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-white rounded-lg max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto"
+      >
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-bold text-gray-900">
             Programa de Lealtad - {{ selectedCustomer?.name }}
@@ -348,8 +484,18 @@
             @click="closeLoyaltyModal"
             class="text-gray-400 hover:text-gray-600"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -368,181 +514,181 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useCustomerStore } from '@/stores/customer'
-import { useCustomerGroupStore } from '@/stores/customerGroup'
-import { useCustomerTagStore } from '@/stores/customerTag'
-import CustomerLoyaltyPanel from '@/components/loyalty/CustomerLoyaltyPanel.vue'
+import { ref, onMounted } from "vue";
+import { useCustomerStore } from "@/stores/customer";
+import { useCustomerGroupStore } from "@/stores/customerGroup";
+import { useCustomerTagStore } from "@/stores/customerTag";
+import CustomerLoyaltyPanel from "@/components/loyalty/CustomerLoyaltyPanel.vue";
 
-const customerStore = useCustomerStore()
-const customerGroupStore = useCustomerGroupStore()
-const tagStore = useCustomerTagStore()
+const customerStore = useCustomerStore();
+const customerGroupStore = useCustomerGroupStore();
+const tagStore = useCustomerTagStore();
 
-const searchQuery = ref('')
-const filterStatus = ref('')
-const filterTag = ref('')
-const showModal = ref(false)
-const showDeleteModal = ref(false)
-const showLoyaltyModal = ref(false)
-const editingCustomer = ref(null)
-const customerToDelete = ref(null)
-const selectedCustomer = ref(null)
+const searchQuery = ref("");
+const filterStatus = ref("");
+const filterTag = ref("");
+const showModal = ref(false);
+const showDeleteModal = ref(false);
+const showLoyaltyModal = ref(false);
+const editingCustomer = ref(null);
+const customerToDelete = ref(null);
+const selectedCustomer = ref(null);
 
 const form = ref({
-  name: '',
-  rtn: '',
-  phone: '',
-  email: '',
-  address: '',
+  name: "",
+  rtn: "",
+  phone: "",
+  email: "",
+  address: "",
   customer_group_id: null,
   credit_limit: 0,
   is_active: true,
-  tag_ids: []
-})
+  tag_ids: [],
+});
 
 onMounted(() => {
-  loadCustomers()
-  customerGroupStore.fetchGroups()
-  tagStore.fetchTags()
-})
+  loadCustomers();
+  customerGroupStore.fetchGroups();
+  tagStore.fetchTags();
+});
 
 function loadCustomers() {
   const params = {
     page: customerStore.pagination.current_page,
-    per_page: customerStore.pagination.per_page
-  }
+    per_page: customerStore.pagination.per_page,
+  };
 
   if (searchQuery.value) {
-    params.search = searchQuery.value
+    params.search = searchQuery.value;
   }
 
-  if (filterStatus.value !== '') {
-    params.is_active = filterStatus.value
+  if (filterStatus.value !== "") {
+    params.is_active = filterStatus.value;
   }
 
-  if (filterTag.value !== '') {
-    params.tag_id = filterTag.value
+  if (filterTag.value !== "") {
+    params.tag_id = filterTag.value;
   }
 
-  customerStore.fetchCustomers(params)
+  customerStore.fetchCustomers(params);
 }
 
 function handleSearch() {
-  customerStore.pagination.current_page = 1
-  loadCustomers()
+  customerStore.pagination.current_page = 1;
+  loadCustomers();
 }
 
 function handleFilterChange() {
-  customerStore.pagination.current_page = 1
-  loadCustomers()
+  customerStore.pagination.current_page = 1;
+  loadCustomers();
 }
 
 function changePage(page) {
-  customerStore.pagination.current_page = page
-  loadCustomers()
+  customerStore.pagination.current_page = page;
+  loadCustomers();
 }
 
 function openCreateModal() {
-  editingCustomer.value = null
+  editingCustomer.value = null;
   form.value = {
-    name: '',
-    rtn: '',
-    phone: '',
-    email: '',
-    address: '',
+    name: "",
+    rtn: "",
+    phone: "",
+    email: "",
+    address: "",
     customer_group_id: null,
     credit_limit: 0,
     is_active: true,
-    tag_ids: []
-  }
-  showModal.value = true
+    tag_ids: [],
+  };
+  showModal.value = true;
 }
 
 function openEditModal(customer) {
-  editingCustomer.value = customer
+  editingCustomer.value = customer;
   form.value = {
     name: customer.name,
-    rtn: customer.rtn || '',
-    phone: customer.phone || '',
-    email: customer.email || '',
-    address: customer.address || '',
+    rtn: customer.rtn || "",
+    phone: customer.phone || "",
+    email: customer.email || "",
+    address: customer.address || "",
     customer_group_id: customer.customer_group_id || null,
     credit_limit: customer.credit_limit || 0,
     is_active: customer.is_active,
-    tag_ids: customer.tags ? customer.tags.map(t => t.id) : []
-  }
-  showModal.value = true
+    tag_ids: customer.tags ? customer.tags.map((t) => t.id) : [],
+  };
+  showModal.value = true;
 }
 
 function closeModal() {
-  showModal.value = false
-  editingCustomer.value = null
+  showModal.value = false;
+  editingCustomer.value = null;
 }
 
 async function handleSubmit() {
   try {
     if (editingCustomer.value) {
-      await customerStore.updateCustomer(editingCustomer.value.id, form.value)
+      await customerStore.updateCustomer(editingCustomer.value.id, form.value);
     } else {
-      await customerStore.createCustomer(form.value)
+      await customerStore.createCustomer(form.value);
     }
-    closeModal()
+    closeModal();
   } catch (error) {
     // Error already handled in store
   }
 }
 
 function confirmDelete(customer) {
-  customerToDelete.value = customer
-  showDeleteModal.value = true
+  customerToDelete.value = customer;
+  showDeleteModal.value = true;
 }
 
 function closeDeleteModal() {
-  showDeleteModal.value = false
-  customerToDelete.value = null
+  showDeleteModal.value = false;
+  customerToDelete.value = null;
 }
 
 async function handleDelete() {
-  const success = await customerStore.deleteCustomer(customerToDelete.value.id)
+  const success = await customerStore.deleteCustomer(customerToDelete.value.id);
   if (success) {
-    closeDeleteModal()
+    closeDeleteModal();
   }
 }
 
 function formatNumber(value) {
-  return parseFloat(value || 0).toFixed(2)
+  return parseFloat(value || 0).toFixed(2);
 }
 
 // Loyalty modal functions
 function openLoyaltyModal(customer) {
-  selectedCustomer.value = customer
-  showLoyaltyModal.value = true
+  selectedCustomer.value = customer;
+  showLoyaltyModal.value = true;
 }
 
 function closeLoyaltyModal() {
-  showLoyaltyModal.value = false
-  selectedCustomer.value = null
+  showLoyaltyModal.value = false;
+  selectedCustomer.value = null;
 }
 
 function handleEnrolled() {
   // Customer was enrolled successfully
-  console.log('Customer enrolled in loyalty program')
+  console.log("Customer enrolled in loyalty program");
   // Reload customers to show updated loyalty status
-  loadCustomers()
+  loadCustomers();
 }
 
 function handlePointsRedeemed() {
   // Points were redeemed successfully
-  console.log('Points redeemed successfully')
+  console.log("Points redeemed successfully");
   // Reload customers to show updated points
-  loadCustomers()
+  loadCustomers();
 }
 
 function handlePointsAdjusted() {
   // Points were adjusted successfully
-  console.log('Points adjusted successfully')
+  console.log("Points adjusted successfully");
   // Reload customers to show updated points
-  loadCustomers()
+  loadCustomers();
 }
 </script>
 

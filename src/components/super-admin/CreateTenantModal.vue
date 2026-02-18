@@ -1,23 +1,52 @@
 <template>
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="$emit('close')">
-    <div class="relative top-10 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white mb-10">
+  <div
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    @click.self="$emit('close')"
+  >
+    <div
+      class="relative top-10 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white mb-10"
+    >
       <!-- Header -->
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">
-          Crear Nuevo Cliente
-        </h3>
-        <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <h3 class="text-lg font-semibold text-gray-900">Crear Nuevo Cliente</h3>
+        <button
+          @click="$emit('close')"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <!-- Error Messages -->
-      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+      <div
+        v-if="errorMessage"
+        class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg"
+      >
         <div class="flex items-center space-x-2">
-          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            class="w-5 h-5 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <p class="text-sm text-red-900">{{ errorMessage }}</p>
         </div>
@@ -136,7 +165,9 @@
 
         <!-- Sección 2: Usuario Administrador -->
         <div class="bg-blue-50 rounded-lg p-4">
-          <h4 class="font-medium text-gray-900 mb-4">2. Usuario Administrador</h4>
+          <h4 class="font-medium text-gray-900 mb-4">
+            2. Usuario Administrador
+          </h4>
           <div class="grid grid-cols-2 gap-4">
             <!-- Nombre del Admin -->
             <div>
@@ -166,7 +197,9 @@
                 class="input"
                 placeholder="juan.perez"
               />
-              <p class="mt-1 text-xs text-gray-500">Solo letras, números, puntos, guiones y guiones bajos</p>
+              <p class="mt-1 text-xs text-gray-500">
+                Solo letras, números, puntos, guiones y guiones bajos
+              </p>
             </div>
 
             <!-- Email del Admin -->
@@ -197,14 +230,18 @@
                 class="input"
                 placeholder="Mínimo 8 caracteres"
               />
-              <p class="mt-1 text-xs text-gray-500">La contraseña debe tener al menos 8 caracteres</p>
+              <p class="mt-1 text-xs text-gray-500">
+                La contraseña debe tener al menos 8 caracteres
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Sección 3: Suscripción -->
         <div class="bg-green-50 rounded-lg p-4">
-          <h4 class="font-medium text-gray-900 mb-4">3. Configuración de Suscripción</h4>
+          <h4 class="font-medium text-gray-900 mb-4">
+            3. Configuración de Suscripción
+          </h4>
           <div class="grid grid-cols-2 gap-4">
             <!-- Plan -->
             <div>
@@ -214,7 +251,10 @@
               <select v-model="form.plan_id" required class="input">
                 <option value="">Selecciona un plan</option>
                 <option v-for="plan in plans" :key="plan.id" :value="plan.id">
-                  {{ plan.name }} - L {{ formatCurrency(plan.monthly_price || plan.price_monthly) }}/mes
+                  {{ plan.name }} - L
+                  {{
+                    formatCurrency(plan.monthly_price || plan.price_monthly)
+                  }}/mes
                 </option>
               </select>
             </div>
@@ -267,31 +307,82 @@
 
         <!-- Plan Features Preview (if plan selected) -->
         <div v-if="selectedPlan" class="bg-gray-50 rounded-lg p-4">
-          <h5 class="font-medium text-gray-900 mb-3">Características del Plan Seleccionado</h5>
+          <h5 class="font-medium text-gray-900 mb-3">
+            Características del Plan Seleccionado
+          </h5>
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div class="flex items-center">
-              <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-4 h-4 text-green-500 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
-              <span>{{ formatLimit(selectedPlan.max_users, 'usuarios') }}</span>
+              <span>{{ formatLimit(selectedPlan.max_users, "usuarios") }}</span>
             </div>
             <div class="flex items-center">
-              <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-4 h-4 text-green-500 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
-              <span>{{ formatLimit(selectedPlan.max_branches, 'sucursales') }}</span>
+              <span>{{
+                formatLimit(selectedPlan.max_branches, "sucursales")
+              }}</span>
             </div>
             <div class="flex items-center">
-              <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-4 h-4 text-green-500 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
-              <span>{{ formatLimit(selectedPlan.max_products, 'productos') }}</span>
+              <span>{{
+                formatLimit(selectedPlan.max_products, "productos")
+              }}</span>
             </div>
             <div class="flex items-center">
-              <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-4 h-4 text-green-500 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
-              <span>{{ formatLimit(selectedPlan.max_monthly_transactions, 'transacciones/mes') }}</span>
+              <span>{{
+                formatLimit(
+                  selectedPlan.max_monthly_transactions,
+                  "transacciones/mes",
+                )
+              }}</span>
             </div>
           </div>
         </div>
@@ -321,114 +412,119 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import superAdminService from '@/services/superAdminService'
-import { toast } from 'vue3-toastify'
+import { ref, computed } from "vue";
+import superAdminService from "@/services/superAdminService";
+import { toast } from "vue3-toastify";
 
 const props = defineProps({
   plans: {
     type: Array,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['close', 'created'])
+const emit = defineEmits(["close", "created"]);
 
-const loading = ref(false)
-const errorMessage = ref('')
+const loading = ref(false);
+const errorMessage = ref("");
 
 const form = ref({
   // Empresa
-  company_name: '',
-  legal_name: '',
-  company_rtn: '',
-  email: '',
-  phone: '',
-  address: '',
-  website: '',
+  company_name: "",
+  legal_name: "",
+  company_rtn: "",
+  email: "",
+  phone: "",
+  address: "",
+  website: "",
 
   // Admin
-  admin_name: '',
-  admin_username: '',
-  admin_email: '',
-  admin_password: '',
+  admin_name: "",
+  admin_username: "",
+  admin_email: "",
+  admin_password: "",
 
   // Suscripción
-  plan_id: '',
-  subscription_status: 'trial',
+  plan_id: "",
+  subscription_status: "trial",
   trial_days: 30,
-  subscription_days: 30
-})
+  subscription_days: 30,
+});
 
 const selectedPlan = computed(() => {
-  return props.plans.find(p => p.id === form.value.plan_id)
-})
+  return props.plans.find((p) => p.id === form.value.plan_id);
+});
 
 const isFormValid = computed(() => {
-  return form.value.company_name &&
-         form.value.company_rtn &&
-         form.value.company_rtn.length === 14 &&
-         form.value.email &&
-         form.value.admin_name &&
-         form.value.admin_username &&
-         form.value.admin_email &&
-         form.value.admin_password &&
-         form.value.admin_password.length >= 8 &&
-         form.value.plan_id &&
-         form.value.subscription_status
-})
+  return (
+    form.value.company_name &&
+    form.value.company_rtn &&
+    form.value.company_rtn.length === 14 &&
+    form.value.email &&
+    form.value.admin_name &&
+    form.value.admin_username &&
+    form.value.admin_email &&
+    form.value.admin_password &&
+    form.value.admin_password.length >= 8 &&
+    form.value.plan_id &&
+    form.value.subscription_status
+  );
+});
 
 function validateRTN(event) {
   // Solo permitir números
-  form.value.company_rtn = event.target.value.replace(/\D/g, '').slice(0, 14)
+  form.value.company_rtn = event.target.value.replace(/\D/g, "").slice(0, 14);
 }
 
 async function handleSubmit() {
   if (!isFormValid.value) {
-    errorMessage.value = 'Por favor completa todos los campos requeridos correctamente'
-    return
+    errorMessage.value =
+      "Por favor completa todos los campos requeridos correctamente";
+    return;
   }
 
-  loading.value = true
-  errorMessage.value = ''
+  loading.value = true;
+  errorMessage.value = "";
 
   try {
-    const response = await superAdminService.createTenant(form.value)
+    const response = await superAdminService.createTenant(form.value);
 
     if (response.data.success) {
-      toast.success('Cliente creado exitosamente')
-      emit('created', response.data.data)
-      emit('close')
+      toast.success("Cliente creado exitosamente");
+      emit("created", response.data.data);
+      emit("close");
     } else {
-      errorMessage.value = response.data.message || 'Error al crear el cliente'
+      errorMessage.value = response.data.message || "Error al crear el cliente";
     }
   } catch (error) {
-    console.error('Error creating tenant:', error)
+    console.error("Error creating tenant:", error);
 
     // Manejar errores de validación del backend
     if (error.response?.data?.errors) {
-      const errors = error.response.data.errors
-      const errorMessages = Object.values(errors).flat()
-      errorMessage.value = errorMessages.join(', ')
+      const errors = error.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      errorMessage.value = errorMessages.join(", ");
     } else {
-      errorMessage.value = error.response?.data?.message || 'Error al crear el cliente. Por favor, intenta nuevamente.'
+      errorMessage.value =
+        error.response?.data?.message ||
+        "Error al crear el cliente. Por favor, intenta nuevamente.";
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat('es-HN', {
+  return new Intl.NumberFormat("es-HN", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value)
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 function formatLimit(value, label) {
   if (value === -1) {
-    return `${label.charAt(0).toUpperCase() + label.slice(1)} ilimitados`
+    return `${label.charAt(0).toUpperCase() + label.slice(1)} ilimitados`;
   }
-  return `${value} ${label}`
+  return `${value} ${label}`;
 }
 </script>

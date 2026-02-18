@@ -4,13 +4,17 @@
     <div class="flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">
-          {{ isEditing ? 'Editar Compra' : 'Nueva Compra' }}
+          {{ isEditing ? "Editar Compra" : "Nueva Compra" }}
         </h1>
-        <p class="text-gray-600 mt-1">{{ isEditing ? 'Modifica los datos de la compra' : 'Crea una nueva orden de compra' }}</p>
+        <p class="text-gray-600 mt-1">
+          {{
+            isEditing
+              ? "Modifica los datos de la compra"
+              : "Crea una nueva orden de compra"
+          }}
+        </p>
       </div>
-      <router-link to="/purchases" class="btn-secondary">
-        Volver
-      </router-link>
+      <router-link to="/purchases" class="btn-secondary"> Volver </router-link>
     </div>
 
     <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -19,7 +23,9 @@
         <h2 class="text-lg font-semibold mb-4">Información General</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Proveedor *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Proveedor *</label
+            >
             <select
               v-model="form.supplier_id"
               required
@@ -27,14 +33,20 @@
               :disabled="isEditing && form.status !== 'draft'"
             >
               <option value="">Selecciona un proveedor</option>
-              <option v-for="supplier in supplierStore.suppliers" :key="supplier.id" :value="supplier.id">
+              <option
+                v-for="supplier in supplierStore.suppliers"
+                :key="supplier.id"
+                :value="supplier.id"
+              >
                 {{ supplier.name }}
               </option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Factura del Proveedor</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Factura del Proveedor</label
+            >
             <input
               v-model="form.supplier_invoice_number"
               type="text"
@@ -44,7 +56,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Esperada</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Fecha Esperada</label
+            >
             <input
               v-model="form.expected_date"
               type="date"
@@ -53,7 +67,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Estado</label
+            >
             <select v-model="form.status" class="input w-full">
               <option value="draft">Borrador</option>
               <option value="ordered">Ordenada</option>
@@ -61,7 +77,9 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Notas</label
+            >
             <textarea
               v-model="form.notes"
               rows="3"
@@ -86,7 +104,10 @@
         </div>
 
         <!-- Product Search Results -->
-        <div v-if="searchResults.length > 0" class="mt-4 border rounded-lg overflow-hidden">
+        <div
+          v-if="searchResults.length > 0"
+          class="mt-4 border rounded-lg overflow-hidden"
+        >
           <div
             v-for="product in searchResults"
             :key="product.id"
@@ -106,7 +127,10 @@
       <div class="card">
         <h2 class="text-lg font-semibold mb-4">Productos de la Compra</h2>
 
-        <div v-if="form.details.length === 0" class="text-center py-8 text-gray-500">
+        <div
+          v-if="form.details.length === 0"
+          class="text-center py-8 text-gray-500"
+        >
           No hay productos agregados. Busca y agrega productos arriba.
         </div>
 
@@ -114,13 +138,41 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Costo Unit.</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Impuesto %</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descuento</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  Producto
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  Cantidad
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  Costo Unit.
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  Impuesto %
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  Descuento
+                </th>
+                <th
+                  class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase"
+                >
+                  Subtotal
+                </th>
+                <th
+                  class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase"
+                >
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -195,7 +247,9 @@
             <div class="w-full md:w-1/2 space-y-2">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Subtotal:</span>
-                <span class="font-medium">L {{ formatMoney(totals.subtotal) }}</span>
+                <span class="font-medium"
+                  >L {{ formatMoney(totals.subtotal) }}</span
+                >
               </div>
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Impuestos:</span>
@@ -229,8 +283,12 @@
           :disabled="purchaseStore.loading || form.details.length === 0"
           class="btn-primary flex-1"
         >
-          <span v-if="purchaseStore.loading">{{ isEditing ? 'Actualizando...' : 'Guardando...' }}</span>
-          <span v-else>{{ isEditing ? 'Actualizar Compra' : 'Guardar Compra' }}</span>
+          <span v-if="purchaseStore.loading">{{
+            isEditing ? "Actualizando..." : "Guardando..."
+          }}</span>
+          <span v-else>{{
+            isEditing ? "Actualizar Compra" : "Guardar Compra"
+          }}</span>
         </button>
         <router-link to="/purchases" class="btn-secondary flex-1">
           Cancelar
@@ -241,66 +299,69 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { usePurchaseStore } from '@/stores/purchase'
-import { useSupplierStore } from '@/stores/supplier'
-import { useProductStore } from '@/stores/product'
+import { ref, reactive, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { usePurchaseStore } from "@/stores/purchase";
+import { useSupplierStore } from "@/stores/supplier";
+import { useProductStore } from "@/stores/product";
 
-const router = useRouter()
-const route = useRoute()
-const purchaseStore = usePurchaseStore()
-const supplierStore = useSupplierStore()
-const productStore = useProductStore()
+const router = useRouter();
+const route = useRoute();
+const purchaseStore = usePurchaseStore();
+const supplierStore = useSupplierStore();
+const productStore = useProductStore();
 
-const isEditing = computed(() => !!route.params.id)
-const productSearch = ref('')
-const searchResults = ref([])
-let searchTimeout = null
+const isEditing = computed(() => !!route.params.id);
+const productSearch = ref("");
+const searchResults = ref([]);
+let searchTimeout = null;
 
 const form = reactive({
-  supplier_id: '',
-  supplier_invoice_number: '',
-  expected_date: '',
-  status: 'draft',
-  notes: '',
+  supplier_id: "",
+  supplier_invoice_number: "",
+  expected_date: "",
+  status: "draft",
+  notes: "",
   discount: 0,
-  details: []
-})
+  details: [],
+});
 
 const totals = computed(() => {
-  const subtotal = form.details.reduce((sum, item) => sum + (item.subtotal || 0), 0)
+  const subtotal = form.details.reduce(
+    (sum, item) => sum + (item.subtotal || 0),
+    0,
+  );
   const tax = form.details.reduce((sum, item) => {
-    const itemTax = ((item.subtotal || 0) * (item.tax_rate || 0)) / 100
-    return sum + itemTax
-  }, 0)
-  const total = subtotal + tax - (form.discount || 0)
+    const itemTax = ((item.subtotal || 0) * (item.tax_rate || 0)) / 100;
+    return sum + itemTax;
+  }, 0);
+  const total = subtotal + tax - (form.discount || 0);
 
   return {
     subtotal,
     tax,
-    total
-  }
-})
+    total,
+  };
+});
 
 onMounted(async () => {
-  await supplierStore.fetchSuppliers({ per_page: 1000 })
+  await supplierStore.fetchSuppliers({ per_page: 1000 });
 
   if (isEditing.value) {
-    await loadPurchase()
+    await loadPurchase();
   }
-})
+});
 
 async function loadPurchase() {
-  const purchase = await purchaseStore.fetchPurchaseById(route.params.id)
+  const purchase = await purchaseStore.fetchPurchaseById(route.params.id);
   if (purchase) {
-    form.supplier_id = purchase.supplier_id
-    form.supplier_invoice_number = purchase.supplier_invoice_number || ''
-    form.expected_date = purchase.expected_date || ''
-    form.status = purchase.status
-    form.notes = purchase.notes || ''
-    form.discount = purchase.discount || 0
-    form.details = purchase.details.map(detail => ({
+    form.supplier_id = purchase.supplier_id;
+    form.supplier_invoice_number = purchase.supplier_invoice_number || "";
+    form.expected_date = purchase.expected_date || "";
+    form.status = purchase.status;
+    form.notes = purchase.notes || "";
+    form.discount = purchase.discount || 0;
+    form.details = purchase.details.map((detail) => ({
       product_id: detail.product_id,
       variant_id: detail.variant_id,
       product_name: detail.product_name,
@@ -308,33 +369,35 @@ async function loadPurchase() {
       cost: parseFloat(detail.cost),
       tax_rate: parseFloat(detail.tax_rate || 0),
       discount: parseFloat(detail.discount || 0),
-      subtotal: parseFloat(detail.subtotal)
-    }))
+      subtotal: parseFloat(detail.subtotal),
+    }));
   }
 }
 
 async function handleProductSearch() {
   if (searchTimeout) {
-    clearTimeout(searchTimeout)
+    clearTimeout(searchTimeout);
   }
 
   if (productSearch.value.length < 2) {
-    searchResults.value = []
-    return
+    searchResults.value = [];
+    return;
   }
 
   searchTimeout = setTimeout(async () => {
-    const results = await productStore.searchProducts(productSearch.value)
-    searchResults.value = results
-  }, 300)
+    const results = await productStore.searchProducts(productSearch.value);
+    searchResults.value = results;
+  }, 300);
 }
 
 function addProduct(product) {
-  const existingIndex = form.details.findIndex(item => item.product_id === product.id)
+  const existingIndex = form.details.findIndex(
+    (item) => item.product_id === product.id,
+  );
 
   if (existingIndex >= 0) {
-    form.details[existingIndex].quantity++
-    calculateItemSubtotal(existingIndex)
+    form.details[existingIndex].quantity++;
+    calculateItemSubtotal(existingIndex);
   } else {
     form.details.push({
       product_id: product.id,
@@ -344,28 +407,28 @@ function addProduct(product) {
       cost: parseFloat(product.cost || 0),
       tax_rate: parseFloat(product.tax_rate || 0),
       discount: 0,
-      subtotal: parseFloat(product.cost || 0)
-    })
-    calculateItemSubtotal(form.details.length - 1)
+      subtotal: parseFloat(product.cost || 0),
+    });
+    calculateItemSubtotal(form.details.length - 1);
   }
 
-  productSearch.value = ''
-  searchResults.value = []
+  productSearch.value = "";
+  searchResults.value = [];
 }
 
 function removeProduct(index) {
-  form.details.splice(index, 1)
-  calculateTotals()
+  form.details.splice(index, 1);
+  calculateTotals();
 }
 
 function calculateItemSubtotal(index) {
-  const item = form.details[index]
-  const quantity = parseFloat(item.quantity) || 0
-  const cost = parseFloat(item.cost) || 0
-  const discount = parseFloat(item.discount) || 0
+  const item = form.details[index];
+  const quantity = parseFloat(item.quantity) || 0;
+  const cost = parseFloat(item.cost) || 0;
+  const discount = parseFloat(item.discount) || 0;
 
-  item.subtotal = (quantity * cost) - discount
-  calculateTotals()
+  item.subtotal = quantity * cost - discount;
+  calculateTotals();
 }
 
 function calculateTotals() {
@@ -374,7 +437,7 @@ function calculateTotals() {
 
 async function handleSubmit() {
   if (form.details.length === 0) {
-    return
+    return;
   }
 
   const data = {
@@ -387,7 +450,7 @@ async function handleSubmit() {
     tax: totals.value.tax,
     discount: form.discount,
     total: totals.value.total,
-    details: form.details.map(item => ({
+    details: form.details.map((item) => ({
       product_id: item.product_id,
       variant_id: item.variant_id,
       product_name: item.product_name,
@@ -395,27 +458,27 @@ async function handleSubmit() {
       cost: item.cost,
       tax_rate: item.tax_rate,
       discount: item.discount,
-      subtotal: item.subtotal
-    }))
-  }
+      subtotal: item.subtotal,
+    })),
+  };
 
   try {
     if (isEditing.value) {
-      await purchaseStore.updatePurchase(route.params.id, data)
+      await purchaseStore.updatePurchase(route.params.id, data);
     } else {
-      await purchaseStore.createPurchase(data)
+      await purchaseStore.createPurchase(data);
     }
-    router.push('/purchases')
+    router.push("/purchases");
   } catch (error) {
     // Error already handled in store
   }
 }
 
 function formatMoney(amount) {
-  return new Intl.NumberFormat('es-HN', {
+  return new Intl.NumberFormat("es-HN", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount || 0)
+    maximumFractionDigits: 2,
+  }).format(amount || 0);
 }
 </script>
 

@@ -5,7 +5,7 @@
  * con namespace automático por tenant para evitar mezcla de datos entre empresas.
  */
 
-import { useTenantStore } from '@/stores/tenant'
+import { useTenantStore } from "@/stores/tenant";
 
 /**
  * Obtiene la clave con namespace del tenant actual
@@ -16,26 +16,26 @@ import { useTenantStore } from '@/stores/tenant'
  */
 export function getNamespacedKey(key, tenantId = null) {
   if (!key) {
-    throw new Error('Storage key is required')
+    throw new Error("Storage key is required");
   }
 
   // Si no se provee tenantId, intentar obtener del store
-  let tid = tenantId
+  let tid = tenantId;
 
   if (!tid) {
     try {
-      const tenantStore = useTenantStore()
-      tid = tenantStore.tenantId
+      const tenantStore = useTenantStore();
+      tid = tenantStore.tenantId;
     } catch (e) {
       // Si el store no está disponible, usar 'default'
-      console.warn('Tenant store not available, using default namespace')
+      console.warn("Tenant store not available, using default namespace");
     }
   }
 
   // Si aún no hay tenant, usar 'default'
-  const namespace = tid || 'default'
+  const namespace = tid || "default";
 
-  return `tenant_${namespace}_${key}`
+  return `tenant_${namespace}_${key}`;
 }
 
 /**
@@ -47,12 +47,12 @@ export function getNamespacedKey(key, tenantId = null) {
  */
 export function setTenantData(key, value, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    const serializedValue = JSON.stringify(value)
-    localStorage.setItem(namespacedKey, serializedValue)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    const serializedValue = JSON.stringify(value);
+    localStorage.setItem(namespacedKey, serializedValue);
   } catch (e) {
-    console.error('Error saving to tenant storage:', e)
-    throw e
+    console.error("Error saving to tenant storage:", e);
+    throw e;
   }
 }
 
@@ -66,17 +66,17 @@ export function setTenantData(key, value, tenantId = null) {
  */
 export function getTenantData(key, defaultValue = null, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    const item = localStorage.getItem(namespacedKey)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    const item = localStorage.getItem(namespacedKey);
 
     if (item === null) {
-      return defaultValue
+      return defaultValue;
     }
 
-    return JSON.parse(item)
+    return JSON.parse(item);
   } catch (e) {
-    console.error('Error reading from tenant storage:', e)
-    return defaultValue
+    console.error("Error reading from tenant storage:", e);
+    return defaultValue;
   }
 }
 
@@ -88,10 +88,10 @@ export function getTenantData(key, defaultValue = null, tenantId = null) {
  */
 export function removeTenantData(key, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    localStorage.removeItem(namespacedKey)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    localStorage.removeItem(namespacedKey);
   } catch (e) {
-    console.error('Error removing from tenant storage:', e)
+    console.error("Error removing from tenant storage:", e);
   }
 }
 
@@ -104,11 +104,11 @@ export function removeTenantData(key, tenantId = null) {
  */
 export function hasTenantData(key, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    return localStorage.getItem(namespacedKey) !== null
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    return localStorage.getItem(namespacedKey) !== null;
   } catch (e) {
-    console.error('Error checking tenant storage:', e)
-    return false
+    console.error("Error checking tenant storage:", e);
+    return false;
   }
 }
 
@@ -119,35 +119,35 @@ export function hasTenantData(key, tenantId = null) {
  */
 export function clearTenantData(tenantId = null) {
   try {
-    let tid = tenantId
+    let tid = tenantId;
 
     if (!tid) {
-      const tenantStore = useTenantStore()
-      tid = tenantStore.tenantId
+      const tenantStore = useTenantStore();
+      tid = tenantStore.tenantId;
     }
 
     if (!tid) {
-      console.warn('No tenant ID available for clearing data')
-      return
+      console.warn("No tenant ID available for clearing data");
+      return;
     }
 
-    const prefix = `tenant_${tid}_`
-    const keysToRemove = []
+    const prefix = `tenant_${tid}_`;
+    const keysToRemove = [];
 
     // Encontrar todas las claves del tenant
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
+      const key = localStorage.key(i);
       if (key && key.startsWith(prefix)) {
-        keysToRemove.push(key)
+        keysToRemove.push(key);
       }
     }
 
     // Eliminar todas las claves encontradas
-    keysToRemove.forEach(key => localStorage.removeItem(key))
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
 
-    console.log(`Cleared ${keysToRemove.length} items for tenant ${tid}`)
+    console.log(`Cleared ${keysToRemove.length} items for tenant ${tid}`);
   } catch (e) {
-    console.error('Error clearing tenant storage:', e)
+    console.error("Error clearing tenant storage:", e);
   }
 }
 
@@ -157,20 +157,20 @@ export function clearTenantData(tenantId = null) {
  */
 export function clearAllTenantsData() {
   try {
-    const keysToRemove = []
+    const keysToRemove = [];
 
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key && key.startsWith('tenant_')) {
-        keysToRemove.push(key)
+      const key = localStorage.key(i);
+      if (key && key.startsWith("tenant_")) {
+        keysToRemove.push(key);
       }
     }
 
-    keysToRemove.forEach(key => localStorage.removeItem(key))
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
 
-    console.log(`Cleared ${keysToRemove.length} tenant items from storage`)
+    console.log(`Cleared ${keysToRemove.length} tenant items from storage`);
   } catch (e) {
-    console.error('Error clearing all tenants storage:', e)
+    console.error("Error clearing all tenants storage:", e);
   }
 }
 
@@ -182,32 +182,32 @@ export function clearAllTenantsData() {
  */
 export function getTenantKeys(tenantId = null) {
   try {
-    let tid = tenantId
+    let tid = tenantId;
 
     if (!tid) {
-      const tenantStore = useTenantStore()
-      tid = tenantStore.tenantId
+      const tenantStore = useTenantStore();
+      tid = tenantStore.tenantId;
     }
 
     if (!tid) {
-      return []
+      return [];
     }
 
-    const prefix = `tenant_${tid}_`
-    const keys = []
+    const prefix = `tenant_${tid}_`;
+    const keys = [];
 
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
+      const key = localStorage.key(i);
       if (key && key.startsWith(prefix)) {
         // Remover el prefijo para devolver la clave original
-        keys.push(key.substring(prefix.length))
+        keys.push(key.substring(prefix.length));
       }
     }
 
-    return keys
+    return keys;
   } catch (e) {
-    console.error('Error getting tenant keys:', e)
-    return []
+    console.error("Error getting tenant keys:", e);
+    return [];
   }
 }
 
@@ -220,12 +220,12 @@ export function getTenantKeys(tenantId = null) {
  */
 export function setTenantSessionData(key, value, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    const serializedValue = JSON.stringify(value)
-    sessionStorage.setItem(namespacedKey, serializedValue)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    const serializedValue = JSON.stringify(value);
+    sessionStorage.setItem(namespacedKey, serializedValue);
   } catch (e) {
-    console.error('Error saving to tenant session storage:', e)
-    throw e
+    console.error("Error saving to tenant session storage:", e);
+    throw e;
   }
 }
 
@@ -237,19 +237,23 @@ export function setTenantSessionData(key, value, tenantId = null) {
  * @param {String|Number} tenantId - ID del tenant (opcional)
  * @returns {*}
  */
-export function getTenantSessionData(key, defaultValue = null, tenantId = null) {
+export function getTenantSessionData(
+  key,
+  defaultValue = null,
+  tenantId = null,
+) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    const item = sessionStorage.getItem(namespacedKey)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    const item = sessionStorage.getItem(namespacedKey);
 
     if (item === null) {
-      return defaultValue
+      return defaultValue;
     }
 
-    return JSON.parse(item)
+    return JSON.parse(item);
   } catch (e) {
-    console.error('Error reading from tenant session storage:', e)
-    return defaultValue
+    console.error("Error reading from tenant session storage:", e);
+    return defaultValue;
   }
 }
 
@@ -261,10 +265,10 @@ export function getTenantSessionData(key, defaultValue = null, tenantId = null) 
  */
 export function removeTenantSessionData(key, tenantId = null) {
   try {
-    const namespacedKey = getNamespacedKey(key, tenantId)
-    sessionStorage.removeItem(namespacedKey)
+    const namespacedKey = getNamespacedKey(key, tenantId);
+    sessionStorage.removeItem(namespacedKey);
   } catch (e) {
-    console.error('Error removing from tenant session storage:', e)
+    console.error("Error removing from tenant session storage:", e);
   }
 }
 
@@ -275,30 +279,30 @@ export function removeTenantSessionData(key, tenantId = null) {
  */
 export function clearTenantSessionData(tenantId = null) {
   try {
-    let tid = tenantId
+    let tid = tenantId;
 
     if (!tid) {
-      const tenantStore = useTenantStore()
-      tid = tenantStore.tenantId
+      const tenantStore = useTenantStore();
+      tid = tenantStore.tenantId;
     }
 
     if (!tid) {
-      return
+      return;
     }
 
-    const prefix = `tenant_${tid}_`
-    const keysToRemove = []
+    const prefix = `tenant_${tid}_`;
+    const keysToRemove = [];
 
     for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i)
+      const key = sessionStorage.key(i);
       if (key && key.startsWith(prefix)) {
-        keysToRemove.push(key)
+        keysToRemove.push(key);
       }
     }
 
-    keysToRemove.forEach(key => sessionStorage.removeItem(key))
+    keysToRemove.forEach((key) => sessionStorage.removeItem(key));
   } catch (e) {
-    console.error('Error clearing tenant session storage:', e)
+    console.error("Error clearing tenant session storage:", e);
   }
 }
 
@@ -311,29 +315,29 @@ export function clearTenantSessionData(tenantId = null) {
  */
 export function migrateLegacyData(keys, tenantId) {
   if (!tenantId) {
-    console.error('Tenant ID required for migration')
-    return
+    console.error("Tenant ID required for migration");
+    return;
   }
 
-  let migratedCount = 0
+  let migratedCount = 0;
 
-  keys.forEach(key => {
+  keys.forEach((key) => {
     try {
-      const legacyData = localStorage.getItem(key)
+      const legacyData = localStorage.getItem(key);
       if (legacyData !== null) {
         // Guardar con namespace
-        setTenantData(key, JSON.parse(legacyData), tenantId)
+        setTenantData(key, JSON.parse(legacyData), tenantId);
         // Eliminar la versión legacy
-        localStorage.removeItem(key)
-        migratedCount++
+        localStorage.removeItem(key);
+        migratedCount++;
       }
     } catch (e) {
-      console.error(`Error migrating key ${key}:`, e)
+      console.error(`Error migrating key ${key}:`, e);
     }
-  })
+  });
 
-  console.log(`Migrated ${migratedCount} keys to tenant namespace`)
-  return migratedCount
+  console.log(`Migrated ${migratedCount} keys to tenant namespace`);
+  return migratedCount;
 }
 
 /**
@@ -344,28 +348,28 @@ export function migrateLegacyData(keys, tenantId) {
  */
 export function getTenantStorageStats(tenantId = null) {
   try {
-    let tid = tenantId
+    let tid = tenantId;
 
     if (!tid) {
-      const tenantStore = useTenantStore()
-      tid = tenantStore.tenantId
+      const tenantStore = useTenantStore();
+      tid = tenantStore.tenantId;
     }
 
     if (!tid) {
-      return { keys: 0, size: 0 }
+      return { keys: 0, size: 0 };
     }
 
-    const prefix = `tenant_${tid}_`
-    let totalSize = 0
-    let keyCount = 0
+    const prefix = `tenant_${tid}_`;
+    let totalSize = 0;
+    let keyCount = 0;
 
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
+      const key = localStorage.key(i);
       if (key && key.startsWith(prefix)) {
-        const value = localStorage.getItem(key)
+        const value = localStorage.getItem(key);
         if (value) {
-          totalSize += key.length + value.length
-          keyCount++
+          totalSize += key.length + value.length;
+          keyCount++;
         }
       }
     }
@@ -374,10 +378,10 @@ export function getTenantStorageStats(tenantId = null) {
       keys: keyCount,
       sizeBytes: totalSize,
       sizeKB: (totalSize / 1024).toFixed(2),
-      sizeMB: (totalSize / (1024 * 1024)).toFixed(4)
-    }
+      sizeMB: (totalSize / (1024 * 1024)).toFixed(4),
+    };
   } catch (e) {
-    console.error('Error getting storage stats:', e)
-    return { keys: 0, size: 0 }
+    console.error("Error getting storage stats:", e);
+    return { keys: 0, size: 0 };
   }
 }

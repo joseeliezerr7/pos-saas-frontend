@@ -4,21 +4,35 @@
     <div class="flex justify-between items-center mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-800">Cuentas por Pagar</h1>
-        <p class="text-gray-600 mt-1">Facturas de proveedores pendientes de pago</p>
+        <p class="text-gray-600 mt-1">
+          Facturas de proveedores pendientes de pago
+        </p>
       </div>
       <div class="flex gap-3">
         <button
           @click="openCreateModal"
           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           Nueva Cuenta por Pagar
         </button>
         <div class="text-right">
           <div class="text-sm text-gray-600">Total por Pagar</div>
-          <div class="text-3xl font-bold text-blue-600">L {{ formatCurrency(totalPayable) }}</div>
+          <div class="text-3xl font-bold text-blue-600">
+            L {{ formatCurrency(totalPayable) }}
+          </div>
         </div>
       </div>
     </div>
@@ -29,12 +43,26 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-600">Al Corriente</p>
-            <p class="text-2xl font-bold text-green-600">{{ stats.current_count || 0 }}</p>
-            <p class="text-xs text-gray-500 mt-1">L {{ formatCurrency(stats.current_amount || 0) }}</p>
+            <p class="text-2xl font-bold text-green-600">
+              {{ stats.current_count || 0 }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              L {{ formatCurrency(stats.current_amount || 0) }}
+            </p>
           </div>
           <div class="bg-green-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-6 h-6 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
         </div>
@@ -44,12 +72,26 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-600">Parciales</p>
-            <p class="text-2xl font-bold text-yellow-600">{{ stats.partial_count || 0 }}</p>
-            <p class="text-xs text-gray-500 mt-1">L {{ formatCurrency(stats.partial_amount || 0) }}</p>
+            <p class="text-2xl font-bold text-yellow-600">
+              {{ stats.partial_count || 0 }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              L {{ formatCurrency(stats.partial_amount || 0) }}
+            </p>
           </div>
           <div class="bg-yellow-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-6 h-6 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
         </div>
@@ -59,12 +101,26 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-600">Vencidas</p>
-            <p class="text-2xl font-bold text-red-600">{{ stats.overdue_count || 0 }}</p>
-            <p class="text-xs text-gray-500 mt-1">L {{ formatCurrency(stats.overdue_amount || 0) }}</p>
+            <p class="text-2xl font-bold text-red-600">
+              {{ stats.overdue_count || 0 }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              L {{ formatCurrency(stats.overdue_amount || 0) }}
+            </p>
           </div>
           <div class="bg-red-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-6 h-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
         </div>
@@ -74,12 +130,26 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-600">Pagadas Hoy</p>
-            <p class="text-2xl font-bold text-purple-600">{{ stats.paid_today_count || 0 }}</p>
-            <p class="text-xs text-gray-500 mt-1">L {{ formatCurrency(stats.paid_today_amount || 0) }}</p>
+            <p class="text-2xl font-bold text-purple-600">
+              {{ stats.paid_today_count || 0 }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              L {{ formatCurrency(stats.paid_today_amount || 0) }}
+            </p>
           </div>
           <div class="bg-purple-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              class="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
           </div>
         </div>
@@ -90,21 +160,29 @@
     <div class="bg-white rounded-lg shadow p-4 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Proveedor</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Proveedor</label
+          >
           <select
             v-model="filters.supplier_id"
             @change="applyFilters"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Todos los proveedores</option>
-            <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
+            <option
+              v-for="supplier in suppliers"
+              :key="supplier.id"
+              :value="supplier.id"
+            >
               {{ supplier.name }}
             </option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Estado</label
+          >
           <select
             v-model="filters.status"
             @change="applyFilters"
@@ -118,7 +196,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Ordenar por</label
+          >
           <select
             v-model="filters.sort_by"
             @change="applyFilters"
@@ -131,7 +211,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Orden</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Orden</label
+          >
           <select
             v-model="filters.sort_order"
             @change="applyFilters"
@@ -156,13 +238,25 @@
     <!-- Payables Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
       <div v-if="loading" class="p-8 text-center">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
         <p class="text-gray-600 mt-2">Cargando cuentas por pagar...</p>
       </div>
 
       <div v-else-if="payablesList.length === 0" class="p-8 text-center">
-        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg
+          class="w-16 h-16 text-gray-400 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
         <p class="text-gray-600">No hay cuentas por pagar</p>
       </div>
@@ -170,64 +264,114 @@
       <table v-else class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               No. Compra
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Proveedor
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Fecha Compra
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Vencimiento
             </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Total
             </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Pagado
             </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Saldo
             </th>
-            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Estado
             </th>
-            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Acciones
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="payable in payablesList" :key="payable.id" class="hover:bg-gray-50">
+          <tr
+            v-for="payable in payablesList"
+            :key="payable.id"
+            class="hover:bg-gray-50"
+          >
             <td class="px-6 py-4 whitespace-nowrap">
-              <span class="text-sm font-medium text-gray-900">{{ payable.purchase?.purchase_number }}</span>
+              <span class="text-sm font-medium text-gray-900">{{
+                payable.purchase?.purchase_number
+              }}</span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ payable.supplier?.name }}</div>
-              <div class="text-sm text-gray-500">{{ payable.supplier?.rtn || 'N/A' }}</div>
+              <div class="text-sm font-medium text-gray-900">
+                {{ payable.supplier?.name }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ payable.supplier?.rtn || "N/A" }}
+              </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-              {{ formatDate(payable.purchase?.ordered_at || payable.created_at) }}
+              {{
+                formatDate(payable.purchase?.ordered_at || payable.created_at)
+              }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ formatDate(payable.due_date) }}</div>
-              <div v-if="payable.days_overdue > 0" class="text-xs text-red-600 font-medium">
+              <div class="text-sm text-gray-900">
+                {{ formatDate(payable.due_date) }}
+              </div>
+              <div
+                v-if="payable.days_overdue > 0"
+                class="text-xs text-red-600 font-medium"
+              >
                 {{ payable.days_overdue }} días vencido
               </div>
-              <div v-else-if="daysUntilDue(payable.due_date) <= 7 && daysUntilDue(payable.due_date) > 0" class="text-xs text-yellow-600">
+              <div
+                v-else-if="
+                  daysUntilDue(payable.due_date) <= 7 &&
+                  daysUntilDue(payable.due_date) > 0
+                "
+                class="text-xs text-yellow-600"
+              >
                 Vence en {{ daysUntilDue(payable.due_date) }} días
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+            >
               L {{ formatCurrency(payable.original_amount) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-green-600 font-medium">
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm text-green-600 font-medium"
+            >
               L {{ formatCurrency(payable.amount_paid) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right">
-              <span class="text-sm font-semibold" :class="payable.balance_due > 0 ? 'text-red-600' : 'text-green-600'">
+              <span
+                class="text-sm font-semibold"
+                :class="
+                  payable.balance_due > 0 ? 'text-red-600' : 'text-green-600'
+                "
+              >
                 L {{ formatCurrency(payable.balance_due) }}
               </span>
             </td>
@@ -236,16 +380,33 @@
                 {{ getStatusLabel(payable.status) }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+            <td
+              class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
+            >
               <div class="flex justify-center gap-2">
                 <button
                   @click="viewPayableDetails(payable)"
                   class="text-blue-600 hover:text-blue-800"
                   title="Ver detalles"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 </button>
               </div>
@@ -255,10 +416,22 @@
       </table>
 
       <!-- Pagination -->
-      <div v-if="pagination.total > 0" class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
+      <div
+        v-if="pagination.total > 0"
+        class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200"
+      >
         <div class="text-sm text-gray-700">
-          Mostrando <span class="font-medium">{{ (pagination.current_page - 1) * pagination.per_page + 1 }}</span>
-          a <span class="font-medium">{{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }}</span>
+          Mostrando
+          <span class="font-medium">{{
+            (pagination.current_page - 1) * pagination.per_page + 1
+          }}</span>
+          a
+          <span class="font-medium">{{
+            Math.min(
+              pagination.current_page * pagination.per_page,
+              pagination.total,
+            )
+          }}</span>
           de <span class="font-medium">{{ pagination.total }}</span> registros
         </div>
         <div class="flex gap-2">
@@ -281,17 +454,40 @@
     </div>
 
     <!-- Payable Details Modal -->
-    <div v-if="showDetailsModal && selectedPayable" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeDetailsModal">
-      <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div
+      v-if="showDetailsModal && selectedPayable"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="closeDetailsModal"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+      >
         <div class="p-6">
           <div class="flex justify-between items-start mb-6">
             <div>
-              <h2 class="text-2xl font-bold text-gray-800">Detalles de Cuenta por Pagar</h2>
-              <p class="text-gray-600">{{ selectedPayable.purchase?.purchase_number }}</p>
+              <h2 class="text-2xl font-bold text-gray-800">
+                Detalles de Cuenta por Pagar
+              </h2>
+              <p class="text-gray-600">
+                {{ selectedPayable.purchase?.purchase_number }}
+              </p>
             </div>
-            <button @click="closeDetailsModal" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <button
+              @click="closeDetailsModal"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -300,15 +496,30 @@
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div>
               <label class="text-sm font-medium text-gray-500">Proveedor</label>
-              <p class="text-gray-900 font-medium">{{ selectedPayable.supplier?.name }}</p>
+              <p class="text-gray-900 font-medium">
+                {{ selectedPayable.supplier?.name }}
+              </p>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-500">Fecha de Compra</label>
-              <p class="text-gray-900">{{ formatDate(selectedPayable.purchase?.ordered_at || selectedPayable.created_at) }}</p>
+              <label class="text-sm font-medium text-gray-500"
+                >Fecha de Compra</label
+              >
+              <p class="text-gray-900">
+                {{
+                  formatDate(
+                    selectedPayable.purchase?.ordered_at ||
+                      selectedPayable.created_at,
+                  )
+                }}
+              </p>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-500">Fecha de Vencimiento</label>
-              <p class="text-gray-900">{{ formatDate(selectedPayable.due_date) }}</p>
+              <label class="text-sm font-medium text-gray-500"
+                >Fecha de Vencimiento</label
+              >
+              <p class="text-gray-900">
+                {{ formatDate(selectedPayable.due_date) }}
+              </p>
             </div>
             <div>
               <label class="text-sm font-medium text-gray-500">Estado</label>
@@ -324,35 +535,68 @@
           <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-sm text-gray-600 mb-1">Monto Original</div>
-              <div class="text-xl font-semibold text-blue-600">L {{ formatCurrency(selectedPayable.original_amount) }}</div>
+              <div class="text-xl font-semibold text-blue-600">
+                L {{ formatCurrency(selectedPayable.original_amount) }}
+              </div>
             </div>
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-sm text-gray-600 mb-1">Monto Pagado</div>
-              <div class="text-xl font-semibold text-green-600">L {{ formatCurrency(selectedPayable.amount_paid) }}</div>
+              <div class="text-xl font-semibold text-green-600">
+                L {{ formatCurrency(selectedPayable.amount_paid) }}
+              </div>
             </div>
             <div class="bg-red-50 p-4 rounded-lg">
               <div class="text-sm text-gray-600 mb-1">Saldo Pendiente</div>
-              <div class="text-xl font-semibold text-red-600">L {{ formatCurrency(selectedPayable.balance_due) }}</div>
+              <div class="text-xl font-semibold text-red-600">
+                L {{ formatCurrency(selectedPayable.balance_due) }}
+              </div>
             </div>
           </div>
 
           <!-- Payment History -->
           <div v-if="selectedPayable.allocations?.length > 0">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Historial de Pagos</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+              Historial de Pagos
+            </h3>
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Fecha</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">No. Recibo</th>
-                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500">Monto</th>
+                    <th
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+                    >
+                      Fecha
+                    </th>
+                    <th
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+                    >
+                      No. Recibo
+                    </th>
+                    <th
+                      class="px-4 py-2 text-right text-xs font-medium text-gray-500"
+                    >
+                      Monto
+                    </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="allocation in selectedPayable.allocations" :key="allocation.id">
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ formatDate(allocation.supplier_payment?.payment_date) }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ allocation.supplier_payment?.payment_number }}</td>
-                    <td class="px-4 py-2 text-sm text-right font-semibold text-green-600">L {{ formatCurrency(allocation.amount_allocated) }}</td>
+                  <tr
+                    v-for="allocation in selectedPayable.allocations"
+                    :key="allocation.id"
+                  >
+                    <td class="px-4 py-2 text-sm text-gray-900">
+                      {{
+                        formatDate(allocation.supplier_payment?.payment_date)
+                      }}
+                    </td>
+                    <td class="px-4 py-2 text-sm text-gray-900">
+                      {{ allocation.supplier_payment?.payment_number }}
+                    </td>
+                    <td
+                      class="px-4 py-2 text-sm text-right font-semibold text-green-600"
+                    >
+                      L {{ formatCurrency(allocation.amount_allocated) }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -373,15 +617,23 @@
     </div>
 
     <!-- Create Payable Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeCreateModal">
+    <div
+      v-if="showCreateModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="closeCreateModal"
+    >
       <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
         <div class="p-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">Nueva Cuenta por Pagar</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">
+            Nueva Cuenta por Pagar
+          </h2>
 
           <form @submit.prevent="submitCreatePayable">
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Proveedor *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Proveedor *</label
+                >
                 <select
                   v-model="createForm.supplier_id"
                   required
@@ -389,28 +641,41 @@
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Seleccionar proveedor</option>
-                  <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
+                  <option
+                    v-for="supplier in suppliers"
+                    :key="supplier.id"
+                    :value="supplier.id"
+                  >
                     {{ supplier.name }}
                   </option>
                 </select>
               </div>
 
               <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Compra / Orden *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Compra / Orden *</label
+                >
                 <select
                   v-model="createForm.purchase_id"
                   required
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Seleccionar compra</option>
-                  <option v-for="purchase in supplierPurchases" :key="purchase.id" :value="purchase.id">
-                    {{ purchase.purchase_number }} - L {{ formatCurrency(purchase.total) }}
+                  <option
+                    v-for="purchase in supplierPurchases"
+                    :key="purchase.id"
+                    :value="purchase.id"
+                  >
+                    {{ purchase.purchase_number }} - L
+                    {{ formatCurrency(purchase.total) }}
                   </option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Monto *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Monto *</label
+                >
                 <input
                   v-model.number="createForm.original_amount"
                   type="number"
@@ -423,7 +688,9 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Vencimiento *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Fecha de Vencimiento *</label
+                >
                 <input
                   v-model="createForm.due_date"
                   type="date"
@@ -446,7 +713,7 @@
                 :disabled="submitting"
                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {{ submitting ? 'Guardando...' : 'Crear Cuenta por Pagar' }}
+                {{ submitting ? "Guardando..." : "Crear Cuenta por Pagar" }}
               </button>
             </div>
           </form>
@@ -457,198 +724,238 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { usePayableStore } from '@/stores/payable'
-import { useSupplierStore } from '@/stores/supplier'
-import { toast } from 'vue3-toastify'
-import { format, differenceInDays } from 'date-fns'
-import api from '@/services/api'
+import { ref, onMounted, computed } from "vue";
+import { usePayableStore } from "@/stores/payable";
+import { useSupplierStore } from "@/stores/supplier";
+import { toast } from "vue3-toastify";
+import { format, differenceInDays } from "date-fns";
+import api from "@/services/api";
 
-const payableStore = usePayableStore()
-const supplierStore = useSupplierStore()
+const payableStore = usePayableStore();
+const supplierStore = useSupplierStore();
 
-const loading = ref(false)
-const submitting = ref(false)
-const showDetailsModal = ref(false)
-const showCreateModal = ref(false)
-const selectedPayable = ref(null)
-const supplierPurchases = ref([])
+const loading = ref(false);
+const submitting = ref(false);
+const showDetailsModal = ref(false);
+const showCreateModal = ref(false);
+const selectedPayable = ref(null);
+const supplierPurchases = ref([]);
 
 const filters = ref({
-  supplier_id: '',
-  status: '',
-  sort_by: 'due_date',
-  sort_order: 'asc',
-  page: 1
-})
+  supplier_id: "",
+  status: "",
+  sort_by: "due_date",
+  sort_order: "asc",
+  page: 1,
+});
 
 const createForm = ref({
-  supplier_id: '',
-  purchase_id: '',
+  supplier_id: "",
+  purchase_id: "",
   original_amount: 0,
-  due_date: ''
-})
+  due_date: "",
+});
 
-const payablesList = computed(() => payableStore.payables || [])
-const suppliers = computed(() => supplierStore.suppliers || [])
-const pagination = computed(() => payableStore.pagination || { total: 0, current_page: 1, last_page: 1, per_page: 20 })
+const payablesList = computed(() => payableStore.payables || []);
+const suppliers = computed(() => supplierStore.suppliers || []);
+const pagination = computed(
+  () =>
+    payableStore.pagination || {
+      total: 0,
+      current_page: 1,
+      last_page: 1,
+      per_page: 20,
+    },
+);
 
 const stats = computed(() => {
-  const items = payablesList.value
+  const items = payablesList.value;
   return {
-    current_count: items.filter(s => s.status === 'pending' && s.days_overdue === 0).length,
-    current_amount: items.filter(s => s.status === 'pending' && s.days_overdue === 0).reduce((sum, s) => sum + Number(s.balance_due), 0),
-    partial_count: items.filter(s => s.status === 'partial').length,
-    partial_amount: items.filter(s => s.status === 'partial').reduce((sum, s) => sum + Number(s.balance_due), 0),
-    overdue_count: items.filter(s => s.status === 'overdue').length,
-    overdue_amount: items.filter(s => s.status === 'overdue').reduce((sum, s) => sum + Number(s.balance_due), 0),
-    paid_today_count: items.filter(s => s.paid_at && format(new Date(s.paid_at), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).length,
-    paid_today_amount: items.filter(s => s.paid_at && format(new Date(s.paid_at), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).reduce((sum, s) => sum + Number(s.original_amount), 0)
-  }
-})
+    current_count: items.filter(
+      (s) => s.status === "pending" && s.days_overdue === 0,
+    ).length,
+    current_amount: items
+      .filter((s) => s.status === "pending" && s.days_overdue === 0)
+      .reduce((sum, s) => sum + Number(s.balance_due), 0),
+    partial_count: items.filter((s) => s.status === "partial").length,
+    partial_amount: items
+      .filter((s) => s.status === "partial")
+      .reduce((sum, s) => sum + Number(s.balance_due), 0),
+    overdue_count: items.filter((s) => s.status === "overdue").length,
+    overdue_amount: items
+      .filter((s) => s.status === "overdue")
+      .reduce((sum, s) => sum + Number(s.balance_due), 0),
+    paid_today_count: items.filter(
+      (s) =>
+        s.paid_at &&
+        format(new Date(s.paid_at), "yyyy-MM-dd") ===
+          format(new Date(), "yyyy-MM-dd"),
+    ).length,
+    paid_today_amount: items
+      .filter(
+        (s) =>
+          s.paid_at &&
+          format(new Date(s.paid_at), "yyyy-MM-dd") ===
+            format(new Date(), "yyyy-MM-dd"),
+      )
+      .reduce((sum, s) => sum + Number(s.original_amount), 0),
+  };
+});
 
 const totalPayable = computed(() => {
-  return payablesList.value.reduce((sum, p) => sum + Number(p.balance_due || 0), 0)
-})
+  return payablesList.value.reduce(
+    (sum, p) => sum + Number(p.balance_due || 0),
+    0,
+  );
+});
 
 onMounted(async () => {
-  await loadPayables()
-  await loadSuppliers()
-})
+  await loadPayables();
+  await loadSuppliers();
+});
 
 const loadPayables = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    await payableStore.fetchPayables(filters.value)
+    await payableStore.fetchPayables(filters.value);
   } catch (error) {
-    toast.error('Error al cargar las cuentas por pagar')
+    toast.error("Error al cargar las cuentas por pagar");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const loadSuppliers = async () => {
   try {
-    await supplierStore.fetchSuppliers()
+    await supplierStore.fetchSuppliers();
   } catch (error) {
-    console.error('Error loading suppliers:', error)
+    console.error("Error loading suppliers:", error);
   }
-}
+};
 
 const applyFilters = () => {
-  filters.value.page = 1
-  loadPayables()
-}
+  filters.value.page = 1;
+  loadPayables();
+};
 
 const clearFilters = () => {
   filters.value = {
-    supplier_id: '',
-    status: '',
-    sort_by: 'due_date',
-    sort_order: 'asc',
-    page: 1
-  }
-  loadPayables()
-}
+    supplier_id: "",
+    status: "",
+    sort_by: "due_date",
+    sort_order: "asc",
+    page: 1,
+  };
+  loadPayables();
+};
 
 const changePage = (page) => {
-  filters.value.page = page
-  loadPayables()
-}
+  filters.value.page = page;
+  loadPayables();
+};
 
 const viewPayableDetails = async (payable) => {
   try {
-    const details = await payableStore.fetchPayableById(payable.id)
-    selectedPayable.value = details
-    showDetailsModal.value = true
+    const details = await payableStore.fetchPayableById(payable.id);
+    selectedPayable.value = details;
+    showDetailsModal.value = true;
   } catch (error) {
-    toast.error('Error al cargar los detalles')
+    toast.error("Error al cargar los detalles");
   }
-}
+};
 
 const closeDetailsModal = () => {
-  showDetailsModal.value = false
-  selectedPayable.value = null
-}
+  showDetailsModal.value = false;
+  selectedPayable.value = null;
+};
 
 const openCreateModal = () => {
   createForm.value = {
-    supplier_id: '',
-    purchase_id: '',
+    supplier_id: "",
+    purchase_id: "",
     original_amount: 0,
-    due_date: ''
-  }
-  supplierPurchases.value = []
-  showCreateModal.value = true
-}
+    due_date: "",
+  };
+  supplierPurchases.value = [];
+  showCreateModal.value = true;
+};
 
 const closeCreateModal = () => {
-  showCreateModal.value = false
-}
+  showCreateModal.value = false;
+};
 
 const onSupplierChange = async () => {
   if (!createForm.value.supplier_id) {
-    supplierPurchases.value = []
-    return
+    supplierPurchases.value = [];
+    return;
   }
   try {
-    const response = await api.get('/purchases', {
-      params: { supplier_id: createForm.value.supplier_id, per_page: 100 }
-    })
-    supplierPurchases.value = response.data.data?.data || response.data.data || []
+    const response = await api.get("/purchases", {
+      params: { supplier_id: createForm.value.supplier_id, per_page: 100 },
+    });
+    supplierPurchases.value =
+      response.data.data?.data || response.data.data || [];
   } catch (error) {
-    console.error('Error loading purchases:', error)
-    supplierPurchases.value = []
+    console.error("Error loading purchases:", error);
+    supplierPurchases.value = [];
   }
-}
+};
 
 const submitCreatePayable = async () => {
-  submitting.value = true
+  submitting.value = true;
   try {
-    await payableStore.createPayable(createForm.value)
-    closeCreateModal()
-    loadPayables()
+    await payableStore.createPayable(createForm.value);
+    closeCreateModal();
+    loadPayables();
   } catch (error) {
     // Error handled in store
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
-}
+};
 
 const formatDate = (date) => {
-  if (!date) return 'N/A'
-  return format(new Date(date), 'dd/MM/yyyy')
-}
+  if (!date) return "N/A";
+  return format(new Date(date), "dd/MM/yyyy");
+};
 
 const formatCurrency = (amount) => {
-  if (!amount && amount !== 0) return '0.00'
-  return Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
+  if (!amount && amount !== 0) return "0.00";
+  return Number(amount)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 const daysUntilDue = (dueDate) => {
-  if (!dueDate) return 0
-  return differenceInDays(new Date(dueDate), new Date())
-}
+  if (!dueDate) return 0;
+  return differenceInDays(new Date(dueDate), new Date());
+};
 
 const getStatusLabel = (status) => {
   const labels = {
-    pending: 'Pendiente',
-    partial: 'Parcial',
-    paid: 'Pagada',
-    overdue: 'Vencida'
-  }
-  return labels[status] || status
-}
+    pending: "Pendiente",
+    partial: "Parcial",
+    paid: "Pagada",
+    overdue: "Vencida",
+  };
+  return labels[status] || status;
+};
 
 const getStatusBadge = (status) => {
   const badges = {
-    pending: 'px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800',
-    partial: 'px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800',
-    paid: 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800',
-    overdue: 'px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800'
-  }
-  return badges[status] || 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800'
-}
+    pending:
+      "px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800",
+    partial:
+      "px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800",
+    paid: "px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800",
+    overdue:
+      "px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800",
+  };
+  return (
+    badges[status] ||
+    "px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"
+  );
+};
 </script>
 
 <style scoped>

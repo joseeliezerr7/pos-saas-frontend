@@ -13,4 +13,3 @@
   min-height: calc(100vh - 100px);
 }
 </style>
-

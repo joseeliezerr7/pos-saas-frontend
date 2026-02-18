@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import api from '@/services/api'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import api from "@/services/api";
 
 /**
  * Store para gestión de tenant/empresa actual
@@ -10,30 +10,30 @@ import api from '@/services/api'
  * - Persiste tenant en localStorage
  * - Proporciona helpers para validación de tenant
  */
-export const useTenantStore = defineStore('tenant', () => {
+export const useTenantStore = defineStore("tenant", () => {
   // Estado
-  const currentTenant = ref(null)
-  const loading = ref(false)
-  const error = ref(null)
+  const currentTenant = ref(null);
+  const loading = ref(false);
+  const error = ref(null);
 
   // Computed
-  const tenantId = computed(() => currentTenant.value?.id || null)
-  const tenantSlug = computed(() => currentTenant.value?.slug || null)
-  const tenantName = computed(() => currentTenant.value?.name || '')
-  const isActive = computed(() => currentTenant.value?.is_active || false)
+  const tenantId = computed(() => currentTenant.value?.id || null);
+  const tenantSlug = computed(() => currentTenant.value?.slug || null);
+  const tenantName = computed(() => currentTenant.value?.name || "");
+  const isActive = computed(() => currentTenant.value?.is_active || false);
 
   /**
    * Inicializa el tenant desde localStorage
    */
   function initializeFromStorage() {
     try {
-      const stored = localStorage.getItem('tenant')
+      const stored = localStorage.getItem("tenant");
       if (stored) {
-        currentTenant.value = JSON.parse(stored)
+        currentTenant.value = JSON.parse(stored);
       }
     } catch (e) {
-      console.error('Error loading tenant from storage:', e)
-      clearTenant()
+      console.error("Error loading tenant from storage:", e);
+      clearTenant();
     }
   }
 
@@ -43,8 +43,8 @@ export const useTenantStore = defineStore('tenant', () => {
    */
   function setTenant(tenant) {
     if (!tenant || !tenant.id) {
-      console.warn('Invalid tenant object provided')
-      return
+      console.warn("Invalid tenant object provided");
+      return;
     }
 
     currentTenant.value = {
@@ -52,21 +52,21 @@ export const useTenantStore = defineStore('tenant', () => {
       name: tenant.name,
       legal_name: tenant.legal_name,
       rtn: tenant.rtn,
-      slug: tenant.slug || tenant.name.toLowerCase().replace(/\s+/g, '-'),
+      slug: tenant.slug || tenant.name.toLowerCase().replace(/\s+/g, "-"),
       logo: tenant.logo,
       logo_url: tenant.logo_url || null,
       phone: tenant.phone,
       email: tenant.email,
       address: tenant.address,
       is_active: tenant.is_active,
-      settings: tenant.settings || {}
-    }
+      settings: tenant.settings || {},
+    };
 
     // Persistir en localStorage
     try {
-      localStorage.setItem('tenant', JSON.stringify(currentTenant.value))
+      localStorage.setItem("tenant", JSON.stringify(currentTenant.value));
     } catch (e) {
-      console.error('Error saving tenant to storage:', e)
+      console.error("Error saving tenant to storage:", e);
     }
   }
 
@@ -74,8 +74,8 @@ export const useTenantStore = defineStore('tenant', () => {
    * Limpia el tenant actual
    */
   function clearTenant() {
-    currentTenant.value = null
-    localStorage.removeItem('tenant')
+    currentTenant.value = null;
+    localStorage.removeItem("tenant");
   }
 
   /**
@@ -84,25 +84,25 @@ export const useTenantStore = defineStore('tenant', () => {
    */
   async function loadTenant(companyId) {
     if (!companyId) {
-      console.warn('No company ID provided')
-      return null
+      console.warn("No company ID provided");
+      return null;
     }
 
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
 
     try {
-      const response = await api.get('/company')
+      const response = await api.get("/company");
       if (response.data?.data) {
-        setTenant(response.data.data)
-        return currentTenant.value
+        setTenant(response.data.data);
+        return currentTenant.value;
       }
     } catch (e) {
-      error.value = e.message
-      console.error('Error loading tenant:', e)
-      throw e
+      error.value = e.message;
+      console.error("Error loading tenant:", e);
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -112,24 +112,24 @@ export const useTenantStore = defineStore('tenant', () => {
    */
   async function updateTenant(updates) {
     if (!tenantId.value) {
-      throw new Error('No tenant loaded')
+      throw new Error("No tenant loaded");
     }
 
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
 
     try {
-      const response = await api.put('/company', updates)
+      const response = await api.put("/company", updates);
       if (response.data?.data) {
-        setTenant(response.data.data)
-        return currentTenant.value
+        setTenant(response.data.data);
+        return currentTenant.value;
       }
     } catch (e) {
-      error.value = e.message
-      console.error('Error updating tenant:', e)
-      throw e
+      error.value = e.message;
+      console.error("Error updating tenant:", e);
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -140,12 +140,13 @@ export const useTenantStore = defineStore('tenant', () => {
    */
   function validateTenantOwnership(resource) {
     if (!resource || !tenantId.value) {
-      return false
+      return false;
     }
 
     // Verificar diferentes posibles nombres de campo
-    const resourceTenantId = resource.tenant_id || resource.company_id || resource.tenantId
-    return resourceTenantId === tenantId.value
+    const resourceTenantId =
+      resource.tenant_id || resource.company_id || resource.tenantId;
+    return resourceTenantId === tenantId.value;
   }
 
   /**
@@ -154,12 +155,12 @@ export const useTenantStore = defineStore('tenant', () => {
    * @returns {String} - Clave con namespace
    */
   function getNamespacedKey(key) {
-    const tid = tenantId.value || 'default'
-    return `tenant_${tid}_${key}`
+    const tid = tenantId.value || "default";
+    return `tenant_${tid}_${key}`;
   }
 
   // Inicializar al crear el store
-  initializeFromStorage()
+  initializeFromStorage();
 
   return {
     // Estado
@@ -180,6 +181,6 @@ export const useTenantStore = defineStore('tenant', () => {
     updateTenant,
     validateTenantOwnership,
     getNamespacedKey,
-    initializeFromStorage
-  }
-})
+    initializeFromStorage,
+  };
+});

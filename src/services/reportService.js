@@ -1,4 +1,4 @@
-import api from './api'
+import api from "./api";
 
 export default {
   /**
@@ -6,7 +6,7 @@ export default {
    * @param {Object} filters - date_from, date_to, branch_id, user_id, payment_method, group_by
    */
   getSalesReport(filters) {
-    return api.post('/reports/sales', filters)
+    return api.post("/reports/sales", filters);
   },
 
   /**
@@ -14,7 +14,7 @@ export default {
    * @param {Object} filters - branch_id, category_id, status, date_from, date_to
    */
   getInventoryReport(filters) {
-    return api.post('/reports/inventory', filters)
+    return api.post("/reports/inventory", filters);
   },
 
   /**
@@ -22,7 +22,7 @@ export default {
    * @param {Object} filters - date_from, date_to, branch_id
    */
   getFinancialReport(filters) {
-    return api.post('/reports/financial', filters)
+    return api.post("/reports/financial", filters);
   },
 
   /**
@@ -30,7 +30,7 @@ export default {
    * @param {Object} filters - year, month, branch_id
    */
   getSARMonthlyReport(filters) {
-    return api.post('/reports/sar/monthly', filters)
+    return api.post("/reports/sar/monthly", filters);
   },
 
   /**
@@ -38,7 +38,7 @@ export default {
    * @param {Object} filters - date_from, date_to
    */
   getSARDEIReport(filters) {
-    return api.post('/reports/sar/dei', filters)
+    return api.post("/reports/sar/dei", filters);
   },
 
   /**
@@ -47,8 +47,8 @@ export default {
    */
   downloadReport(id) {
     return api.get(`/reports/${id}/download`, {
-      responseType: 'blob'
-    })
+      responseType: "blob",
+    });
   },
 
   /**
@@ -59,7 +59,7 @@ export default {
   exportPDF(type, filters) {
     // For now, we'll handle PDF generation on the frontend
     // In the future, this could call a backend endpoint
-    return Promise.resolve({ success: true })
+    return Promise.resolve({ success: true });
   },
 
   /**
@@ -69,6 +69,6 @@ export default {
    */
   exportExcel(type, filters) {
     // Placeholder for Excel export functionality
-    return Promise.resolve({ success: true })
-  }
-}
+    return Promise.resolve({ success: true });
+  },
+};

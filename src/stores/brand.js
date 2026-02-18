@@ -1,98 +1,100 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import brandService from '@/services/brandService'
-import { toast } from 'vue3-toastify'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import brandService from "@/services/brandService";
+import { toast } from "vue3-toastify";
 
-export const useBrandStore = defineStore('brand', () => {
-  const brands = ref([])
-  const currentBrand = ref(null)
-  const loading = ref(false)
+export const useBrandStore = defineStore("brand", () => {
+  const brands = ref([]);
+  const currentBrand = ref(null);
+  const loading = ref(false);
   const pagination = ref({
     current_page: 1,
     per_page: 15,
-    total: 0
-  })
+    total: 0,
+  });
 
   async function fetchBrands(params = {}) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await brandService.getAll(params)
+      const response = await brandService.getAll(params);
 
-      brands.value = response.data.data
+      brands.value = response.data.data;
       pagination.value = {
         current_page: response.data.meta.current_page,
         last_page: response.data.meta.last_page,
         per_page: response.data.meta.per_page,
-        total: response.data.meta.total
-      }
+        total: response.data.meta.total,
+      };
     } catch (error) {
-      toast.error('Error al cargar marcas')
-      console.error(error)
+      toast.error("Error al cargar marcas");
+      console.error(error);
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function fetchBrandById(id) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await brandService.getById(id)
-      currentBrand.value = response.data.data
-      return response.data.data
+      const response = await brandService.getById(id);
+      currentBrand.value = response.data.data;
+      return response.data.data;
     } catch (error) {
-      toast.error('Error al cargar marca')
-      console.error(error)
-      return null
+      toast.error("Error al cargar marca");
+      console.error(error);
+      return null;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function createBrand(data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await brandService.create(data)
-      toast.success(response.data.message || 'Marca creada exitosamente')
-      await fetchBrands()
-      return response.data.data
+      const response = await brandService.create(data);
+      toast.success(response.data.message || "Marca creada exitosamente");
+      await fetchBrands();
+      return response.data.data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al crear marca'
-      toast.error(message)
-      throw error
+      const message = error.response?.data?.message || "Error al crear marca";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function updateBrand(id, data) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await brandService.update(id, data)
-      toast.success(response.data.message || 'Marca actualizada exitosamente')
-      await fetchBrands()
-      return response.data.data
+      const response = await brandService.update(id, data);
+      toast.success(response.data.message || "Marca actualizada exitosamente");
+      await fetchBrands();
+      return response.data.data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al actualizar marca'
-      toast.error(message)
-      throw error
+      const message =
+        error.response?.data?.message || "Error al actualizar marca";
+      toast.error(message);
+      throw error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
   async function deleteBrand(id) {
-    loading.value = true
+    loading.value = true;
     try {
-      const response = await brandService.delete(id)
-      toast.success(response.data.message || 'Marca eliminada exitosamente')
-      await fetchBrands()
-      return true
+      const response = await brandService.delete(id);
+      toast.success(response.data.message || "Marca eliminada exitosamente");
+      await fetchBrands();
+      return true;
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al eliminar marca'
-      toast.error(message)
-      return false
+      const message =
+        error.response?.data?.message || "Error al eliminar marca";
+      toast.error(message);
+      return false;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -105,6 +107,6 @@ export const useBrandStore = defineStore('brand', () => {
     fetchBrandById,
     createBrand,
     updateBrand,
-    deleteBrand
-  }
-})
+    deleteBrand,
+  };
+});

@@ -1,5 +1,8 @@
 <template>
-  <div v-if="summary && summary.enrolled" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 shadow-md">
+  <div
+    v-if="summary && summary.enrolled"
+    class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 shadow-md"
+  >
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div
@@ -11,13 +14,13 @@
         </div>
         <div>
           <div class="text-xs opacity-90">
-            {{ summary.current_tier?.name || 'Cliente' }}
+            {{ summary.current_tier?.name || "Cliente" }}
           </div>
           <div class="text-lg font-bold">
             {{ summary.points.toLocaleString() }} puntos
           </div>
           <div class="text-xs opacity-75">
-            ≈ L. {{ summary.points_value?.toFixed(2) || '0.00' }}
+            ≈ L. {{ summary.points_value?.toFixed(2) || "0.00" }}
           </div>
         </div>
       </div>
@@ -29,61 +32,69 @@
         Canjear
       </button>
     </div>
-    <div v-if="summary.tier_discount > 0" class="mt-2 pt-2 border-t border-white border-opacity-20">
+    <div
+      v-if="summary.tier_discount > 0"
+      class="mt-2 pt-2 border-t border-white border-opacity-20"
+    >
       <div class="flex items-center justify-between text-xs">
         <span>Descuento del tier:</span>
-        <span class="font-semibold">{{ summary.tier_discount }}% de descuento</span>
+        <span class="font-semibold"
+          >{{ summary.tier_discount }}% de descuento</span
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { useLoyaltyStore } from '@/stores/loyalty'
+import { ref, watch, onMounted } from "vue";
+import { useLoyaltyStore } from "@/stores/loyalty";
 
 const props = defineProps({
   customerId: {
     type: Number,
-    required: true
+    required: true,
   },
   showRedeemButton: {
     type: Boolean,
-    default: true
-  }
-})
+    default: true,
+  },
+});
 
-const emit = defineEmits(['redeem-points'])
+const emit = defineEmits(["redeem-points"]);
 
-const loyaltyStore = useLoyaltyStore()
+const loyaltyStore = useLoyaltyStore();
 
-const summary = ref(null)
+const summary = ref(null);
 
 onMounted(async () => {
   if (props.customerId) {
-    await loadLoyalty()
+    await loadLoyalty();
   }
-})
+});
 
-watch(() => props.customerId, async (newVal) => {
-  if (newVal) {
-    await loadLoyalty()
-  } else {
-    summary.value = null
-  }
-})
+watch(
+  () => props.customerId,
+  async (newVal) => {
+    if (newVal) {
+      await loadLoyalty();
+    } else {
+      summary.value = null;
+    }
+  },
+);
 
 async function loadLoyalty() {
   try {
-    summary.value = await loyaltyStore.fetchCustomerSummary(props.customerId)
+    summary.value = await loyaltyStore.fetchCustomerSummary(props.customerId);
   } catch (error) {
-    console.error('Error loading loyalty:', error)
-    summary.value = null
+    console.error("Error loading loyalty:", error);
+    summary.value = null;
   }
 }
 
 defineExpose({
   refresh: loadLoyalty,
-  summary
-})
+  summary,
+});
 </script>

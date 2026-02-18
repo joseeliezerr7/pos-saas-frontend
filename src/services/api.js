@@ -1,26 +1,26 @@
-import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
-import { useTenantStore } from '@/stores/tenant'
-import router from '@/router'
-import { toast } from 'vue3-toastify'
+import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import { useTenantStore } from "@/stores/tenant";
+import router from "@/router";
+import { toast } from "vue3-toastify";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-})
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const authStore = useAuthStore()
-    const tenantStore = useTenantStore()
+    const authStore = useAuthStore();
+    const tenantStore = useTenantStore();
 
     // Add Authorization header
     if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
+      config.headers.Authorization = `Bearer ${authStore.token}`;
     }
 
     // Add Tenant headers for multi-tenancy support
@@ -28,152 +28,159 @@ api.interceptors.request.use(
     if (authStore.isAuthenticated && authStore.user) {
       // X-Company-ID: ID de la empresa del usuario autenticado
       if (authStore.user.company_id) {
-        config.headers['X-Company-ID'] = authStore.user.company_id
+        config.headers["X-Company-ID"] = authStore.user.company_id;
       }
 
       // X-Tenant-ID: ID del tenant desde el store (puede diferir en caso de multi-tenant user)
       if (tenantStore.tenantId) {
-        config.headers['X-Tenant-ID'] = tenantStore.tenantId
+        config.headers["X-Tenant-ID"] = tenantStore.tenantId;
       }
 
       // X-Branch-ID: Sucursal del usuario (opcional, útil para filtros)
       if (authStore.user.branch_id) {
-        config.headers['X-Branch-ID'] = authStore.user.branch_id
+        config.headers["X-Branch-ID"] = authStore.user.branch_id;
       }
     }
 
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
 // Flag to prevent multiple refresh attempts
-let isRefreshing = false
-let failedQueue = []
+let isRefreshing = false;
+let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
-      prom.reject(error)
+      prom.reject(error);
     } else {
-      prom.resolve(token)
+      prom.resolve(token);
     }
-  })
-  failedQueue = []
-}
+  });
+  failedQueue = [];
+};
 
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    return response
+    return response;
   },
   async (error) => {
-    const authStore = useAuthStore()
-    const originalRequest = error.config
+    const authStore = useAuthStore();
+    const originalRequest = error.config;
 
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
       // Don't retry refresh endpoint to avoid infinite loop
-      if (originalRequest.url?.includes('/auth/refresh')) {
-        authStore.logout()
-        router.push({ name: 'login' })
-        return Promise.reject(error)
+      if (originalRequest.url?.includes("/auth/refresh")) {
+        authStore.logout();
+        router.push({ name: "login" });
+        return Promise.reject(error);
       }
 
       if (!originalRequest._retry) {
         if (isRefreshing) {
           // If already refreshing, queue this request
           return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject })
-          }).then(token => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-            return api(originalRequest)
-          }).catch(err => {
-            return Promise.reject(err)
+            failedQueue.push({ resolve, reject });
           })
+            .then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return api(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
         }
 
-        originalRequest._retry = true
-        isRefreshing = true
+        originalRequest._retry = true;
+        isRefreshing = true;
 
         try {
           // Try to refresh token
-          const refreshed = await authStore.refreshAccessToken()
+          const refreshed = await authStore.refreshAccessToken();
 
           if (refreshed) {
-            processQueue(null, authStore.token)
-            originalRequest.headers.Authorization = `Bearer ${authStore.token}`
-            return api(originalRequest)
+            processQueue(null, authStore.token);
+            originalRequest.headers.Authorization = `Bearer ${authStore.token}`;
+            return api(originalRequest);
           } else {
             // Refresh returned false - logout and redirect
-            processQueue(new Error('Refresh failed'), null)
-            authStore.logout()
-            router.push({ name: 'login' })
-            return Promise.reject(error)
+            processQueue(new Error("Refresh failed"), null);
+            authStore.logout();
+            router.push({ name: "login" });
+            return Promise.reject(error);
           }
         } catch (refreshError) {
           // Refresh failed, redirect to login
-          processQueue(refreshError, null)
-          authStore.logout()
-          router.push({ name: 'login' })
-          return Promise.reject(refreshError)
+          processQueue(refreshError, null);
+          authStore.logout();
+          router.push({ name: "login" });
+          return Promise.reject(refreshError);
         } finally {
-          isRefreshing = false
+          isRefreshing = false;
         }
       }
     }
 
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
-      const errorData = error.response.data.error
+      const errorData = error.response?.data?.error;
 
-      if (errorData?.code === 'SUBSCRIPTION_INACTIVE') {
-        toast.error('Su suscripción está inactiva')
-        router.push({ name: 'settings-subscription' })
-      } else if (errorData?.code === 'NO_ACTIVE_CAI') {
-        toast.error('No hay CAI vigente para facturar')
+      if (errorData?.code === "SUBSCRIPTION_INACTIVE") {
+        toast.error("Su suscripción está inactiva");
+        router.push({ name: "settings-subscription" });
+      } else if (errorData?.code === "NO_ACTIVE_CAI") {
+        toast.error("No hay CAI vigente para facturar");
       } else {
-        toast.error(errorData?.message || 'No tienes permisos para realizar esta acción')
+        toast.error(
+          errorData?.message || "No tienes permisos para realizar esta acción",
+        );
       }
     }
 
     // Handle 404 Not Found
     if (error.response?.status === 404) {
       // Don't show error for endpoints where 404 is expected
-      const url = originalRequest.url || ''
+      const url = originalRequest.url || "";
       const expectedNotFoundEndpoints = [
-        '/current', // Cash register current opening
-        '/summary'  // Cash register summary when no opening
-      ]
+        "/current", // Cash register current opening
+        "/summary", // Cash register summary when no opening
+      ];
 
-      const isExpectedNotFound = expectedNotFoundEndpoints.some(endpoint =>
-        url.includes(endpoint)
-      )
+      const isExpectedNotFound = expectedNotFoundEndpoints.some((endpoint) =>
+        url.includes(endpoint),
+      );
 
       if (!isExpectedNotFound) {
-        toast.error('Recurso no encontrado')
+        toast.error("Recurso no encontrado");
       }
     }
 
     // Handle 422 Validation Error
     if (error.response?.status === 422) {
-      const errors = error.response.data.error?.errors
+      const errors =
+        error.response?.data?.error?.errors || error.response?.data?.errors;
       if (errors) {
         // Show first validation error
-        const firstError = Object.values(errors)[0][0]
-        toast.error(firstError)
+        const firstError = Object.values(errors)[0]?.[0];
+        if (firstError) {
+          toast.error(firstError);
+        }
       }
     }
 
     // Handle 500 Server Error
     if (error.response?.status === 500) {
-      toast.error('Error del servidor. Por favor, intenta nuevamente.')
+      toast.error("Error del servidor. Por favor, intenta nuevamente.");
     }
 
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
-export default api
+export default api;
