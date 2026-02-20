@@ -140,9 +140,11 @@
                   class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg"
                 >
                   <img
-                    :src="getImageUrl(product.image)"
+                    :src="getThumbUrl(product.image)"
                     :alt="product.name"
                     class="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    decoding="async"
                     @error="handleImageError"
                   />
                 </div>
@@ -1111,7 +1113,9 @@
       :sale="completedSale"
       :company="companyData"
       :cai="caiData"
-      :invoice-number="completedSale?.sale_number || ''"
+      :invoice-number="
+        completedSale?.invoice_number || completedSale?.sale_number || ''
+      "
       @close="closeInvoiceTicket"
     />
 
@@ -1464,9 +1468,8 @@ import InvoiceTicket from "@/components/pos/InvoiceTicket.vue";
 import LoyaltyBadge from "@/components/loyalty/LoyaltyBadge.vue";
 import ShortcutsHelpOverlay from "@/components/pos/ShortcutsHelpOverlay.vue";
 import cashRegisterService from "@/services/cashRegisterService";
+import invoiceService from "@/services/invoiceService";
 import { usePosKeyboardShortcuts } from "@/composables/usePosKeyboardShortcuts";
-import { openCashDrawer } from "@/utils/cashDrawer";
-
 const authStore = useAuthStore();
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -1610,6 +1613,9 @@ const enableOrderNumbers = computed(
   () => parseCompanySettings().enable_order_numbers || false,
 );
 const enableKds = computed(() => parseCompanySettings().enable_kds || false);
+const autoFiscalInvoice = computed(
+  () => parseCompanySettings().auto_fiscal_invoice || false,
+);
 const kitchenNotes = ref("");
 const showKitchenNotes = ref(false);
 
@@ -1684,7 +1690,9 @@ function resumePosAudio() {
   // Create AudioContext on first user interaction to unlock audio
   try {
     ensurePosAudioCtx();
-  } catch (e) {}
+  } catch {
+    // AudioContext not supported
+  }
   document.removeEventListener("click", resumePosAudio);
   document.removeEventListener("touchstart", resumePosAudio);
 }
@@ -1725,17 +1733,15 @@ watch(
 );
 
 onMounted(async () => {
-  settingsStore.fetchCompanySettings();
+  await settingsStore.fetchCompanySettings().catch(() => {});
   await checkCashRegister();
   loadCategories();
   loadProducts();
 
-  // Start kitchen polling if KDS enabled (check after settings load)
-  setTimeout(() => {
-    if (enableKds.value) {
-      kitchenStore.startPolling(5000);
-    }
-  }, 1500);
+  // Start kitchen polling if KDS enabled (settings already loaded)
+  if (enableKds.value) {
+    kitchenStore.startPolling(5000);
+  }
 
   // Resume AudioContext on first user interaction
   document.addEventListener("click", resumePosAudio);
@@ -1864,10 +1870,10 @@ const paginationPages = computed(() => {
   return pages;
 });
 
-// Sound effect for adding to cart
+// Sound effect for adding to cart (reuses shared AudioContext)
 function playAddSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = ensurePosAudioCtx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
@@ -2082,18 +2088,37 @@ async function completeSale() {
       loyalty: sale.loyalty, // Include loyalty info
     };
 
-    console.log("Completed Sale Data:", completedSale.value);
-    console.log("Loyalty Info:", completedSale.value.loyalty);
-    console.log("Company Data:", companyData.value);
-    console.log("Showing invoice ticket...");
+    // Auto-generate fiscal invoice if enabled
+    if (autoFiscalInvoice.value) {
+      try {
+        const invoiceResponse = await invoiceService.create({
+          sale_id: sale.id,
+        });
+        const invoice = invoiceResponse.data?.data || invoiceResponse.data;
+        if (invoice) {
+          // Build caiData object as InvoiceTicket expects
+          caiData.value = invoice.cai_data || {
+            cai_number: invoice.cai,
+            range_from: invoice.range_from,
+            range_to: invoice.range_to,
+            expiry_date: invoice.cai_expiration,
+          };
+          completedSale.value.invoice_number = invoice.invoice_number || null;
+          completedSale.value.invoice = invoice;
+        }
+      } catch (error) {
+        console.warn("Auto-invoice failed:", error);
+        const msg =
+          error.response?.data?.error?.message ||
+          "No se pudo generar la factura fiscal automáticamente";
+        toast.warning(`Venta completada. ${msg}`);
+      }
+    }
 
-    // Open cash drawer
-    openCashDrawer();
+    // Cash drawer opens automatically via ESC/POS commands embedded in InvoiceTicket print
 
     // Show invoice ticket
     showInvoiceTicket.value = true;
-
-    console.log("showInvoiceTicket value:", showInvoiceTicket.value);
 
     // Refresh loyalty badge if customer has points (after showing ticket to not block)
     if (saleStore.customer?.id && loyaltyBadgeRef.value) {
@@ -2140,6 +2165,9 @@ function clearSale() {
   appliedGiftCard.value = null;
   giftCardDiscount.value = 0;
 
+  // Clear fiscal invoice data
+  caiData.value = null;
+
   // Clear kitchen notes
   kitchenNotes.value = "";
   showKitchenNotes.value = false;
@@ -2183,23 +2211,12 @@ async function applyPromotion(promotion) {
       })),
     );
 
-    console.log("=== PROMOTION APPLICATION DEBUG ===");
-    console.log("Result from promotionStore.applyPromotion:", result);
-    console.log("Discount amount:", result?.discount_amount);
-    console.log("Current saleStore.discount BEFORE:", saleStore.discount);
-
     if (result && result.discount_amount) {
       // Apply discount to cart
       saleStore.discount = result.discount_amount;
       appliedPromotion.value = promotion;
 
-      console.log("Current saleStore.discount AFTER:", saleStore.discount);
-      console.log("Cart totals:", saleStore.getCartTotal());
-
       toast.success(`Promoción "${promotion.name}" aplicada`);
-    } else {
-      console.log("WARNING: No discount_amount in result!");
-      console.log("Result structure:", JSON.stringify(result, null, 2));
     }
   } catch (error) {
     console.error("Error applying promotion:", error);
@@ -2429,10 +2446,42 @@ function getImageUrl(imagePath) {
   return `${backendUrl}${imagePath}`;
 }
 
+function getThumbUrl(imagePath) {
+  if (!imagePath) return "";
+  // If it's a full URL, try to derive thumbnail URL
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    const dotIndex = imagePath.lastIndexOf(".");
+    if (dotIndex > -1) {
+      return (
+        imagePath.slice(0, dotIndex) + "_thumb" + imagePath.slice(dotIndex)
+      );
+    }
+    return imagePath;
+  }
+  // Relative path: insert _thumb before extension
+  const dotIndex = imagePath.lastIndexOf(".");
+  if (dotIndex > -1) {
+    const thumbPath =
+      imagePath.slice(0, dotIndex) + "_thumb" + imagePath.slice(dotIndex);
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    const backendUrl = apiUrl.replace("/api", "");
+    return `${backendUrl}${thumbPath}`;
+  }
+  return getImageUrl(imagePath);
+}
+
 function handleImageError(event) {
-  event.target.src =
+  const img = event.target;
+  const src = img.getAttribute("src") || "";
+  // If thumbnail failed, fallback to original image
+  if (src.includes("_thumb.")) {
+    img.src = src.replace("_thumb.", ".");
+    return;
+  }
+  // Final fallback: SVG placeholder
+  img.src =
     'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2"%3E%3Cpath d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/%3E%3C/svg%3E';
-  event.target.classList.add("bg-gray-200", "p-3");
+  img.classList.add("bg-gray-200", "p-3");
 }
 
 // Transaction reference helper functions

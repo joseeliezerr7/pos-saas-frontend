@@ -56,7 +56,7 @@ export default {
    * @param {String} type - Report type (sales, inventory, financial)
    * @param {Object} filters - Report filters
    */
-  exportPDF(type, filters) {
+  exportPDF(/* type, filters */) {
     // For now, we'll handle PDF generation on the frontend
     // In the future, this could call a backend endpoint
     return Promise.resolve({ success: true });
@@ -67,7 +67,7 @@ export default {
    * @param {String} type - Report type
    * @param {Object} filters - Report filters
    */
-  exportExcel(type, filters) {
+  exportExcel(/* type, filters */) {
     // Placeholder for Excel export functionality
     return Promise.resolve({ success: true });
   },

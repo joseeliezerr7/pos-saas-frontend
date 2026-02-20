@@ -232,6 +232,24 @@
                 >
               </div>
             </label>
+            <label
+              class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg cursor-pointer hover:bg-green-100 transition-colors"
+            >
+              <input
+                type="checkbox"
+                v-model="form.settings.auto_fiscal_invoice"
+                class="w-5 h-5 rounded border-green-300 text-green-600 focus:ring-green-500"
+              />
+              <div>
+                <span class="text-sm font-semibold text-green-800"
+                  >Facturación fiscal automática</span
+                >
+                <span class="text-xs text-green-600 block"
+                  >Genera la factura fiscal (con CAI) automáticamente al
+                  completar cada venta en el POS</span
+                >
+              </div>
+            </label>
           </div>
         </div>
 
@@ -327,6 +345,7 @@ const form = ref({
   address: "",
   settings: {
     enable_order_numbers: false,
+    auto_fiscal_invoice: false,
     enable_kds: false,
     kds_alert_minutes: 15,
     kds_sound: true,
@@ -374,6 +393,7 @@ async function loadSettings() {
       settings: {
         ...s,
         enable_order_numbers: s.enable_order_numbers || false,
+        auto_fiscal_invoice: s.auto_fiscal_invoice || false,
         enable_kds: s.enable_kds || false,
         kds_alert_minutes: s.kds_alert_minutes ?? 15,
         kds_sound: s.kds_sound ?? true,

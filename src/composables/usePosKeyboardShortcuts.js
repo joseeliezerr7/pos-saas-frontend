@@ -23,7 +23,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 export function usePosKeyboardShortcuts(options) {
   const {
     searchQuery,
-    customerSearchQuery,
+    // customerSearchQuery is received but focus is handled via DOM selector
     paymentMethod,
     amountPaid,
     assignOrderNumber,
@@ -136,7 +136,6 @@ export function usePosKeyboardShortcuts(options) {
 
   function handleKeyDown(e) {
     const key = e.key;
-    const code = e.code;
 
     // Never intercept F5, F11, F12 (browser functions)
     if (key === "F5" || key === "F11" || key === "F12") return;

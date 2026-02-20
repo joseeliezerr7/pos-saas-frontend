@@ -96,7 +96,7 @@ export const useSaleStore = defineStore("sale", () => {
       existingItem.quantity += quantity;
     } else {
       // Apply tax only if product is taxed
-      const taxRate = product.tax_type === "exempt" ? 0 : product.tax_rate || 0;
+      const taxRate = product.tax_type === "exempt" ? 0 : (product.tax_rate ?? 0);
 
       // Check if customer has a group with special price for this product
       let finalPrice = product.price;
@@ -173,7 +173,7 @@ export const useSaleStore = defineStore("sale", () => {
       const itemSubtotal = item.quantity * item.price;
       const itemDiscount = item.discount || 0;
       const itemTotal = itemSubtotal - itemDiscount;
-      const itemTax = itemTotal * (item.tax_rate / 100);
+      const itemTax = itemTotal * ((item.tax_rate ?? 0) / 100);
 
       subtotal += itemSubtotal;
       totalDiscount += itemDiscount;

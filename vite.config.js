@@ -11,10 +11,10 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
-        name: "POS SaaS - Sistema de Punto de Venta",
-        short_name: "POS SaaS",
+        name: "VexoPos - Sistema de Punto de Venta",
+        short_name: "VexoPos",
         description:
-          "Sistema de Punto de Venta Multi-tenant con gestión completa de inventario, ventas y facturación",
+          "Sistema de Punto de Venta con gestión completa de inventario, ventas y facturación",
         theme_color: "#3B82F6",
         background_color: "#ffffff",
         display: "standalone",

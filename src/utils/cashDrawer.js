@@ -22,10 +22,13 @@ export function openCashDrawer() {
       return;
     }
 
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    win.document.write(
+      `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Cash Drawer</title>
 <style>@page{size:80mm auto;margin:0;}body{margin:0;padding:0;font-size:0;line-height:0;}</style>
-</head><body>${KICK_PIN2}${KICK_PIN5}<script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<\/script></body></html>`);
+</head><body>${KICK_PIN2}${KICK_PIN5}<script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<` +
+        `/script></body></html>`,
+    );
     win.document.close();
   } catch (e) {
     console.error("Cash drawer: error opening drawer", e);

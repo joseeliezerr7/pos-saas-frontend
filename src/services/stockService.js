@@ -26,7 +26,7 @@ export default {
     // Remove empty parameters
     const cleanParams = Object.fromEntries(
       Object.entries(params).filter(
-        ([_, value]) => value !== "" && value !== null && value !== undefined,
+        ([, value]) => value !== "" && value !== null && value !== undefined,
       ),
     );
     return api.get("/stock/movements", { params: cleanParams });

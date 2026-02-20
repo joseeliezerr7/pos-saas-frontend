@@ -62,6 +62,7 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = responseData.user;
 
       localStorage.setItem("access_token", responseData.access_token);
+      localStorage.setItem("user", JSON.stringify(responseData.user));
 
       toast.success(response.data.message || "Registro exitoso");
       return true;
