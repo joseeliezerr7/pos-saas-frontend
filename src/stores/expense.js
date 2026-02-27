@@ -32,7 +32,7 @@ export const useExpenseStore = defineStore("expense", () => {
         total: data.total,
       };
     } catch (error) {
-      toast.error("Error al cargar gastos");
+      if (!error._toastShown) toast.error("Error al cargar gastos");
       console.error(error);
     } finally {
       loading.value = false;

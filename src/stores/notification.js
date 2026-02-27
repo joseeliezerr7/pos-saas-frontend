@@ -17,7 +17,10 @@ export const useNotificationStore = defineStore("notification", () => {
       notifications.value = data.notifications;
       unreadCount.value = data.unread_count;
     } catch (error) {
-      toast.error("Error al cargar notificaciones");
+      // Silently ignore 403 errors - user may not have notification permissions
+      if (error.response?.status !== 403 && !error._toastShown) {
+        toast.error("Error al cargar notificaciones");
+      }
       console.error(error);
     } finally {
       loading.value = false;

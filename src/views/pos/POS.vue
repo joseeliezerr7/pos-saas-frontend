@@ -2,10 +2,10 @@
   <div class="h-full flex flex-col bg-gray-50">
     <!-- Header -->
     <div
-      class="bg-white shadow-sm px-3 md:px-6 py-3 md:py-5 flex items-center justify-between"
+      class="bg-white shadow-sm px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5 flex items-center justify-between"
     >
       <div class="flex items-center space-x-2 md:space-x-4">
-        <h1 class="text-lg md:text-2xl font-bold text-gray-900">POS</h1>
+        <h1 class="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">POS</h1>
         <span
           v-if="authStore.currentUser"
           class="text-sm md:text-base text-gray-600 hidden sm:inline"
@@ -69,14 +69,14 @@
         :class="{ 'hidden md:flex': mobileView === 'cart' }"
       >
         <!-- Search Bar -->
-        <div class="p-3 md:p-5 bg-white border-b">
+        <div class="p-3 md:p-3 lg:p-4 xl:p-5 bg-white border-b">
           <input
             v-model="searchQuery"
             @input="searchProducts"
             type="text"
             placeholder="Buscar productos... (F2)"
             data-shortcut="search-products"
-            class="w-full px-3 md:px-5 py-3 md:py-4 text-base md:text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            class="w-full px-3 md:px-4 lg:px-5 py-3 md:py-3 lg:py-4 text-base md:text-base lg:text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
             autofocus
           />
         </div>
@@ -84,7 +84,7 @@
         <!-- Categories Bar -->
         <div
           v-if="categoryStore.categories.length > 0"
-          class="bg-white border-b px-3 md:px-5 py-2 md:py-3"
+          class="bg-white border-b px-3 md:px-3 lg:px-4 xl:px-5 py-2 md:py-2 lg:py-3"
         >
           <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             <button
@@ -115,7 +115,7 @@
         </div>
 
         <!-- Product Grid -->
-        <div class="flex-1 overflow-y-auto p-3 md:p-5">
+        <div class="flex-1 overflow-y-auto p-3 md:p-3 lg:p-4 xl:p-5">
           <div v-if="productStore.loading" class="text-center py-12">
             <p class="text-gray-500 text-lg">Cargando productos...</p>
           </div>
@@ -127,17 +127,17 @@
           </div>
           <template v-else>
             <div
-              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 md:gap-3 lg:gap-4"
             >
               <button
                 v-for="product in productStore.products"
                 :key="product.id"
                 @click="addProductToCart(product)"
-                class="bg-white rounded-lg md:rounded-xl shadow-md border-2 border-gray-200 p-2 md:p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-105 transition-all active:scale-95 touch-manipulation"
+                class="bg-white rounded-lg md:rounded-xl shadow-md border-2 border-gray-200 p-2 md:p-3 lg:p-4 xl:p-5 cursor-pointer hover:shadow-lg hover:border-primary-500 hover:scale-[1.02] transition-all active:scale-95 touch-manipulation"
               >
                 <div
                   v-if="product.image"
-                  class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg"
+                  class="h-20 md:h-24 lg:h-32 xl:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg"
                 >
                   <img
                     :src="getThumbUrl(product.image)"
@@ -150,10 +150,10 @@
                 </div>
                 <div
                   v-else
-                  class="h-20 md:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg"
+                  class="h-20 md:h-24 lg:h-32 xl:h-36 mb-2 md:mb-3 flex items-center justify-center bg-gray-100 rounded-lg"
                 >
                   <svg
-                    class="w-10 md:w-20 h-10 md:h-20 text-gray-400"
+                    class="w-10 md:w-14 lg:w-16 xl:w-20 h-10 md:h-14 lg:h-16 xl:h-20 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -167,7 +167,7 @@
                   </svg>
                 </div>
                 <h3
-                  class="font-semibold text-gray-900 text-xs md:text-base mb-1 line-clamp-2 min-h-[2rem] md:min-h-[3rem]"
+                  class="font-semibold text-gray-900 text-xs md:text-sm lg:text-base mb-1 line-clamp-2 min-h-[2rem] md:min-h-[2.5rem] lg:min-h-[3rem]"
                 >
                   {{ product.name }}
                 </h3>
@@ -197,7 +197,7 @@
                     >{{ product.total_stock }}</span
                   >
                 </div>
-                <p class="text-base md:text-2xl font-bold text-primary-600">
+                <p class="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-primary-600">
                   L {{ formatMoney(product.price) }}
                 </p>
               </button>
@@ -248,11 +248,11 @@
 
       <!-- Cart Section -->
       <div
-        class="w-full md:w-[28rem] bg-white border-l flex flex-col"
+        class="w-full md:w-80 lg:w-96 xl:w-[28rem] bg-white border-l flex flex-col"
         :class="{ 'hidden md:flex': mobileView === 'products' }"
       >
         <!-- Customer Selection -->
-        <div class="p-3 md:p-5 border-b">
+        <div class="p-3 md:p-3 lg:p-4 xl:p-5 border-b">
           <label
             class="block text-sm md:text-base font-semibold text-gray-700 mb-2 md:mb-3"
             >Cliente</label
@@ -319,8 +319,8 @@
         </div>
 
         <!-- Coupon / Promotion Section -->
-        <div v-if="can('apply_coupons')" class="p-5 border-b bg-purple-50">
-          <label class="block text-base font-semibold text-gray-700 mb-3">
+        <div v-if="can('apply_coupons')" class="p-3 lg:p-4 xl:p-5 border-b bg-purple-50">
+          <label class="block text-sm lg:text-base font-semibold text-gray-700 mb-2 lg:mb-3">
             🎁 Cupón / Promoción
           </label>
           <div class="flex space-x-2">
@@ -404,8 +404,8 @@
         </div>
 
         <!-- Gift Card Section -->
-        <div v-if="can('redeem_gift_cards')" class="p-5 border-b bg-yellow-50">
-          <label class="block text-base font-semibold text-gray-700 mb-3">
+        <div v-if="can('redeem_gift_cards')" class="p-3 lg:p-4 xl:p-5 border-b bg-yellow-50">
+          <label class="block text-sm lg:text-base font-semibold text-gray-700 mb-2 lg:mb-3">
             🎫 Gift Card
           </label>
           <div class="flex space-x-2">
@@ -469,8 +469,8 @@
         </div>
 
         <!-- Cart Items -->
-        <div class="flex-1 overflow-y-auto p-3 md:p-5">
-          <h3 class="font-bold text-base md:text-lg text-gray-900 mb-3 md:mb-4">
+        <div class="flex-1 overflow-y-auto p-3 md:p-3 lg:p-4 xl:p-5">
+          <h3 class="font-bold text-base md:text-base lg:text-lg text-gray-900 mb-2 md:mb-3 lg:mb-4">
             Carrito ({{ saleStore.cartItems.length }})
           </h3>
 
@@ -501,10 +501,10 @@
             <div
               v-for="(item, index) in saleStore.cartItems"
               :key="index"
-              class="bg-gray-50 rounded-xl p-4 border-2 border-gray-200"
+              class="bg-gray-50 rounded-xl p-3 lg:p-4 border-2 border-gray-200"
             >
-              <div class="flex justify-between items-start mb-3">
-                <h4 class="font-semibold text-base text-gray-900 flex-1 pr-2">
+              <div class="flex justify-between items-start mb-2 lg:mb-3">
+                <h4 class="font-semibold text-sm lg:text-base text-gray-900 flex-1 pr-2">
                   {{ item.product.name }}
                 </h4>
                 <button
@@ -528,14 +528,14 @@
               </div>
 
               <!-- Quantity Controls -->
-              <div class="mb-3">
-                <label class="text-sm font-medium text-gray-600 mb-2 block"
+              <div class="mb-2 lg:mb-3">
+                <label class="text-xs lg:text-sm font-medium text-gray-600 mb-1 lg:mb-2 block"
                   >Cantidad</label
                 >
                 <div class="flex items-center space-x-2">
                   <button
                     @click="decrementQuantity(index)"
-                    class="w-12 h-12 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-xl font-bold touch-manipulation active:scale-95 transition-all"
+                    class="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg text-lg lg:text-xl font-bold touch-manipulation active:scale-95 transition-all"
                   >
                     −
                   </button>
@@ -547,11 +547,11 @@
                     type="number"
                     min="1"
                     step="1"
-                    class="flex-1 text-center px-3 py-3 text-lg font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    class="flex-1 text-center px-2 py-2 lg:px-3 lg:py-3 text-base lg:text-lg font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
                   />
                   <button
                     @click="incrementQuantity(index)"
-                    class="w-12 h-12 flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xl font-bold touch-manipulation active:scale-95 transition-all"
+                    class="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-lg lg:text-xl font-bold touch-manipulation active:scale-95 transition-all"
                   >
                     +
                   </button>
@@ -559,19 +559,19 @@
               </div>
 
               <!-- Price -->
-              <div class="mb-3">
-                <label class="text-sm font-medium text-gray-600 mb-2 block"
+              <div class="mb-2 lg:mb-3">
+                <label class="text-xs lg:text-sm font-medium text-gray-600 mb-1 lg:mb-2 block"
                   >Precio Unitario</label
                 >
                 <div class="flex items-center">
-                  <span class="text-lg font-medium mr-2">L</span>
+                  <span class="text-base lg:text-lg font-medium mr-2">L</span>
                   <input
                     v-model.number="item.price"
                     @change="saleStore.updateCartItemPrice(index, item.price)"
                     type="number"
                     min="0"
                     step="0.01"
-                    class="flex-1 px-3 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
+                    class="flex-1 px-2 py-2 lg:px-3 lg:py-3 text-base lg:text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500"
                   />
                 </div>
               </div>
@@ -592,7 +592,7 @@
                 class="flex justify-between items-center pt-3 border-t-2 border-gray-300"
               >
                 <span class="text-sm font-medium text-gray-600">Subtotal:</span>
-                <span class="font-bold text-lg text-gray-900"
+                <span class="font-bold text-base lg:text-lg text-gray-900"
                   >L {{ formatMoney(item.quantity * item.price) }}</span
                 >
               </div>
@@ -601,7 +601,7 @@
         </div>
 
         <!-- Cart Summary -->
-        <div class="border-t-2 p-3 md:p-5 bg-gray-50">
+        <div class="border-t-2 p-3 md:p-3 lg:p-4 xl:p-5 bg-gray-50">
           <div class="space-y-3 mb-5">
             <div class="flex justify-between text-base">
               <span class="font-medium text-gray-600">Subtotal:</span>
@@ -625,7 +625,7 @@
               >
             </div>
             <div
-              class="flex justify-between text-2xl font-bold border-t-2 pt-3"
+              class="flex justify-between text-xl lg:text-2xl font-bold border-t-2 pt-3"
             >
               <span>Total:</span>
               <span class="text-primary-600"
@@ -636,7 +636,7 @@
 
           <!-- Payment Method -->
           <div class="mb-4">
-            <label class="block text-base font-semibold text-gray-700 mb-3"
+            <label class="block text-sm lg:text-base font-semibold text-gray-700 mb-2 lg:mb-3"
               >Método de Pago</label
             >
             <div class="grid grid-cols-2 gap-2 mb-3">
@@ -645,7 +645,7 @@
                 :key="method.value"
                 @click="paymentMethod = method.value"
                 :class="[
-                  'py-3 px-4 rounded-lg font-medium text-base touch-manipulation active:scale-95 transition-all',
+                  'py-2 px-3 lg:py-3 lg:px-4 rounded-lg font-medium text-sm lg:text-base touch-manipulation active:scale-95 transition-all',
                   paymentMethod === method.value
                     ? 'bg-primary-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-300',
@@ -690,7 +690,7 @@
               step="0.01"
               min="0"
               data-shortcut="amount-paid"
-              class="w-full px-4 py-4 text-xl font-semibold text-center border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              class="w-full px-3 py-3 lg:px-4 lg:py-4 text-lg lg:text-xl font-semibold text-center border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               placeholder="0.00 (F6)"
             />
             <!-- Quick Amount Buttons -->
@@ -957,7 +957,7 @@
           <button
             @click="completeSale"
             :disabled="saleStore.cartItems.length === 0 || saleStore.loading"
-            class="w-full py-5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl font-bold text-xl shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation active:scale-95 transition-all"
+            class="w-full py-4 lg:py-5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl font-bold text-lg lg:text-xl shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation active:scale-95 transition-all"
           >
             <span v-if="saleStore.loading">Procesando...</span>
             <span v-else>Completar Venta (F9)</span>
@@ -1116,6 +1116,7 @@
       :invoice-number="
         completedSale?.invoice_number || completedSale?.sale_number || ''
       "
+      :print-size="branchPrintSize"
       @close="closeInvoiceTicket"
     />
 
@@ -1495,6 +1496,7 @@ const assignOrderNumber = ref(false);
 const showCustomerModal = ref(false);
 const showInvoiceTicket = ref(false);
 const completedSale = ref({});
+const branchPrintSize = computed(() => authStore.currentUser?.branch?.settings?.print_size || '80mm');
 const currentCashOpening = ref(null);
 const loyaltyBadgeRef = ref(null);
 
@@ -1763,6 +1765,12 @@ onUnmounted(() => {
 
 async function checkCashRegister() {
   try {
+    const currentUserId = authStore.currentUser?.id;
+    const isAdmin =
+      authStore.currentUser?.is_super_admin ||
+      authStore.currentUser?.roles?.includes("admin") ||
+      authStore.currentUser?.roles?.includes("super_admin");
+
     // Buscar todas las cajas y filtrar la que esté abierta
     const response = await cashRegisterService.getAll();
     if (response.data.success) {
@@ -1770,7 +1778,7 @@ async function checkCashRegister() {
         ? response.data.data
         : response.data.data.data || [];
 
-      // Buscar si alguna caja tiene una apertura activa
+      // Buscar si alguna caja tiene una apertura activa del usuario actual
       for (const cashRegister of cashRegisters) {
         try {
           const openingResponse = await cashRegisterService.getCurrentOpening(
@@ -1781,17 +1789,20 @@ async function checkCashRegister() {
             openingResponse.data.data &&
             openingResponse.data.data.status === "open"
           ) {
-            currentCashOpening.value = openingResponse.data.data;
-            toast.success(`Caja abierta: ${cashRegister.name}`);
-            return;
+            const opening = openingResponse.data.data;
+            // Solo aceptar si el usuario actual abrió esta caja, o si es admin
+            if (opening.user_id === currentUserId || isAdmin) {
+              currentCashOpening.value = opening;
+              toast.success(`Caja abierta: ${cashRegister.name}`);
+              return;
+            }
           }
         } catch (err) {
-          // Esta caja no tiene apertura activa, continuar con la siguiente
           continue;
         }
       }
 
-      // No se encontró ninguna caja abierta
+      // No se encontró ninguna caja abierta para este usuario
       toast.warning(
         "⚠️ No tienes una caja abierta. Por favor, abre una caja en el módulo de Cajas Registradoras antes de realizar ventas.",
         {

@@ -30,7 +30,7 @@ export const useSaleStore = defineStore("sale", () => {
       pagination.value = response.data.meta;
     } catch (error) {
       console.error(error);
-      toast.error("Error al cargar ventas");
+      if (!error._toastShown) toast.error("Error al cargar ventas");
     } finally {
       loading.value = false;
     }
@@ -44,7 +44,7 @@ export const useSaleStore = defineStore("sale", () => {
       return currentSale.value;
     } catch (error) {
       console.error(error);
-      toast.error("Error al cargar la venta");
+      if (!error._toastShown) toast.error("Error al cargar la venta");
       throw error;
     } finally {
       loading.value = false;

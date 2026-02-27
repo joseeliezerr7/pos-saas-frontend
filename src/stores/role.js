@@ -27,7 +27,7 @@ export const useRoleStore = defineStore("role", () => {
         total: data.total,
       };
     } catch (error) {
-      toast.error("Error al cargar roles");
+      if (!error._toastShown) toast.error("Error al cargar roles");
       console.error(error);
     } finally {
       loading.value = false;
@@ -41,7 +41,7 @@ export const useRoleStore = defineStore("role", () => {
       currentRole.value = response.data.data;
       return response.data.data;
     } catch (error) {
-      toast.error("Error al cargar rol");
+      if (!error._toastShown) toast.error("Error al cargar rol");
       console.error(error);
       return null;
     } finally {
@@ -56,7 +56,7 @@ export const useRoleStore = defineStore("role", () => {
       permissions.value = response.data.data;
       return response.data.data;
     } catch (error) {
-      toast.error("Error al cargar permisos");
+      if (!error._toastShown) toast.error("Error al cargar permisos");
       console.error(error);
       return {};
     } finally {

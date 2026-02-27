@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useTenantStore } from "@/stores/tenant";
+import { toast } from "vue3-toastify";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,17 +43,19 @@ const router = createRouter({
           path: "dashboard",
           name: "dashboard",
           component: () => import("@/views/dashboard/Dashboard.vue"),
+          meta: { permission: "view_dashboard" },
         },
         {
           path: "pos",
           name: "pos",
           component: () => import("@/views/pos/POS.vue"),
-          meta: { title: "Punto de Venta" },
+          meta: { title: "Punto de Venta", permission: "access_pos" },
         },
         {
           path: "products",
           name: "products",
           component: () => import("@/views/products/ProductList.vue"),
+          meta: { permission: "view_products" },
         },
         {
           path: "products/print-labels",
@@ -64,16 +67,19 @@ const router = createRouter({
           path: "products/:id/variants",
           name: "product-variants",
           component: () => import("@/views/products/ProductVariants.vue"),
+          meta: { permission: "view_products" },
         },
         {
           path: "categories",
           name: "categories",
           component: () => import("@/views/categories/CategoryList.vue"),
+          meta: { permission: "view_categories" },
         },
         {
           path: "customers",
           name: "customers",
           component: () => import("@/views/customers/CustomerList.vue"),
+          meta: { permission: "view_customers" },
         },
         {
           path: "customer-groups",
@@ -97,21 +103,25 @@ const router = createRouter({
           path: "sales",
           name: "sales",
           component: () => import("@/views/sales/SalesIndex.vue"),
+          meta: { permission: "view_sales" },
         },
         {
           path: "sales/:id",
           name: "sale-detail",
           component: () => import("@/views/sales/SaleDetail.vue"),
+          meta: { permission: "view_sale_details" },
         },
         {
           path: "invoices",
           name: "invoices",
           component: () => import("@/views/invoices/InvoiceIndex.vue"),
+          meta: { permission: "view_invoices" },
         },
         {
           path: "invoices/:id",
           name: "invoice-detail",
           component: () => import("@/views/invoices/InvoiceDetail.vue"),
+          meta: { permission: "view_invoices" },
         },
         {
           path: "returns",
@@ -129,6 +139,7 @@ const router = createRouter({
           path: "inventory",
           component: () => import("@/views/inventory/index.vue"),
           redirect: "/inventory",
+          meta: { permission: "view_inventory" },
           children: [
             {
               path: "",
@@ -176,26 +187,31 @@ const router = createRouter({
           path: "purchases",
           name: "purchases",
           component: () => import("@/views/purchases/PurchaseIndex.vue"),
+          meta: { permission: "view_purchases" },
         },
         {
           path: "purchases/create",
           name: "purchases-create",
           component: () => import("@/views/purchases/PurchaseCreate.vue"),
+          meta: { permission: "view_purchases" },
         },
         {
           path: "purchases/:id",
           name: "purchase-detail",
           component: () => import("@/views/purchases/PurchaseShow.vue"),
+          meta: { permission: "view_purchases" },
         },
         {
           path: "purchases/:id/edit",
           name: "purchase-edit",
           component: () => import("@/views/purchases/PurchaseCreate.vue"),
+          meta: { permission: "view_purchases" },
         },
         {
           path: "expenses",
           name: "expenses",
           component: () => import("@/views/expenses/ExpenseList.vue"),
+          meta: { permission: "view_expenses" },
         },
         {
           path: "quotations",
@@ -267,18 +283,21 @@ const router = createRouter({
           name: "cash-register",
           component: () =>
             import("@/views/cash-register/CashRegisterIndex.vue"),
+          meta: { permission: "view_cash_registers" },
         },
         {
           path: "cash-register/:id/history",
           name: "cash-register-history",
           component: () =>
             import("@/views/cash-register/CashRegisterHistory.vue"),
+          meta: { permission: "view_cash_registers" },
         },
         {
           path: "cash-register-reports",
           name: "cash-register-reports",
           component: () =>
             import("@/views/cash-register/CashRegisterReports.vue"),
+          meta: { permission: "view_cash_registers" },
         },
         {
           path: "credit",
@@ -346,6 +365,7 @@ const router = createRouter({
           path: "reports",
           component: () => import("@/views/reports/index.vue"),
           redirect: "/reports",
+          meta: { permission: "view_reports" },
           children: [
             {
               path: "",
@@ -411,6 +431,11 @@ const router = createRouter({
               path: "fiscal",
               name: "settings-fiscal",
               component: () => import("@/views/settings/FiscalSettings.vue"),
+            },
+            {
+              path: "print",
+              name: "settings-print",
+              component: () => import("@/views/settings/PrintSettings.vue"),
             },
             {
               path: "subscription",
@@ -553,6 +578,69 @@ const router = createRouter({
   ],
 });
 
+// Permission slug to friendly name mapping for user-friendly messages
+const permissionNames = {
+  view_dashboard: "Ver Dashboard",
+  access_pos: "Acceder al POS",
+  create_sales: "Realizar Ventas",
+  apply_discounts: "Aplicar Descuentos",
+  cancel_sales: "Cancelar Ventas",
+  view_products: "Ver Productos",
+  create_products: "Crear Productos",
+  edit_products: "Editar Productos",
+  delete_products: "Eliminar Productos",
+  view_categories: "Ver Categorías",
+  view_customers: "Ver Clientes",
+  create_customers: "Crear Clientes",
+  edit_customers: "Editar Clientes",
+  view_sales: "Ver Ventas",
+  view_sale_details: "Ver Detalles de Ventas",
+  void_sales: "Anular Ventas",
+  view_invoices: "Ver Facturas",
+  create_invoices: "Crear Facturas",
+  view_inventory: "Ver Inventario",
+  adjust_inventory: "Ajustar Inventario",
+  view_purchases: "Ver Compras",
+  view_expenses: "Ver Gastos",
+  view_cash_registers: "Ver Cajas Registradoras",
+  open_cash_register: "Abrir Caja",
+  close_cash_register: "Cerrar Caja",
+  view_reports: "Ver Reportes",
+  export_reports: "Exportar Reportes",
+  view_users: "Ver Usuarios",
+  view_roles: "Ver Roles",
+  edit_roles: "Editar Roles",
+  create_roles: "Crear Roles",
+  delete_roles: "Eliminar Roles",
+  view_settings: "Ver Configuración",
+  edit_settings: "Editar Configuración",
+  view_returns: "Ver Devoluciones",
+  create_returns: "Crear Devoluciones",
+  view_quotations: "Ver Cotizaciones",
+  create_quotations: "Crear Cotizaciones",
+  edit_quotations: "Editar Cotizaciones",
+  view_suppliers: "Ver Proveedores",
+  view_brands: "Ver Marcas",
+  view_units: "Ver Unidades",
+  view_promotions: "Ver Promociones",
+  apply_coupons: "Aplicar Cupones",
+  view_credit: "Ver Créditos",
+  view_payable: "Ver Cuentas por Pagar",
+  view_loyalty_program: "Ver Programa de Lealtad",
+  view_gift_cards: "Ver Tarjetas de Regalo",
+  access_ecommerce: "Acceder a E-commerce",
+  configure_ecommerce: "Configurar E-commerce",
+  view_ecommerce_orders: "Ver Pedidos E-commerce",
+  view_ecommerce_customers: "Ver Clientes E-commerce",
+  manage_ecommerce_products: "Gestionar Productos E-commerce",
+  view_audit_logs: "Ver Registros de Auditoría",
+  generate_barcodes: "Generar Códigos de Barras",
+  import_products: "Importar Productos",
+  export_data: "Exportar Datos",
+  view_customer_groups: "Ver Grupos de Clientes",
+  view_customer_tags: "Ver Etiquetas de Clientes",
+};
+
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
@@ -682,18 +770,37 @@ router.beforeEach(async (to, from, next) => {
     (to.meta.permission || to.meta.permissions) &&
     authStore.isAuthenticated
   ) {
-    // Handle single permission
+    // Determine fallback route to avoid redirect loops
+    // If user can't access dashboard, send to POS; if can't access POS either, allow through
+    const getFallbackRoute = () => {
+      if (to.name !== "dashboard" && authStore.hasPermission("view_dashboard")) {
+        return { name: "dashboard" };
+      }
+      if (to.name !== "pos" && authStore.hasPermission("access_pos")) {
+        return { name: "pos" };
+      }
+      // Last resort: let them through to avoid infinite loop
+      return null;
+    };
+
+    // Handle single permission - redirect silently
     if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
-      next({ name: "dashboard" });
-      return;
+      const fallback = getFallbackRoute();
+      if (fallback) {
+        next(fallback);
+        return;
+      }
     }
 
-    // Handle multiple permissions (user needs at least one)
+    // Handle multiple permissions (user needs at least one) - redirect silently
     if (to.meta.permissions) {
       const hasPermission = authStore.hasAnyPermission(to.meta.permissions);
       if (!hasPermission) {
-        next({ name: "dashboard" });
-        return;
+        const fallback = getFallbackRoute();
+        if (fallback) {
+          next(fallback);
+          return;
+        }
       }
     }
   }

@@ -518,11 +518,13 @@ import { ref, onMounted } from "vue";
 import { useCustomerStore } from "@/stores/customer";
 import { useCustomerGroupStore } from "@/stores/customerGroup";
 import { useCustomerTagStore } from "@/stores/customerTag";
+import { usePermissions } from "@/composables/usePermissions";
 import CustomerLoyaltyPanel from "@/components/loyalty/CustomerLoyaltyPanel.vue";
 
 const customerStore = useCustomerStore();
 const customerGroupStore = useCustomerGroupStore();
 const tagStore = useCustomerTagStore();
+const { can } = usePermissions();
 
 const searchQuery = ref("");
 const filterStatus = ref("");
@@ -548,8 +550,12 @@ const form = ref({
 
 onMounted(() => {
   loadCustomers();
-  customerGroupStore.fetchGroups();
-  tagStore.fetchTags();
+  if (can("view_customer_groups")) {
+    customerGroupStore.fetchGroups();
+  }
+  if (can("view_customer_tags")) {
+    tagStore.fetchTags();
+  }
 });
 
 function loadCustomers() {

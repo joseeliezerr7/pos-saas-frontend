@@ -26,7 +26,7 @@ export const useProductStore = defineStore("product", () => {
         total: data.total,
       };
     } catch (error) {
-      toast.error("Error al cargar productos");
+      if (!error._toastShown) toast.error("Error al cargar productos");
       console.error(error);
     } finally {
       loading.value = false;
@@ -71,7 +71,7 @@ export const useProductStore = defineStore("product", () => {
       currentProduct.value = response.data.data;
       return response.data.data;
     } catch (error) {
-      toast.error("Error al cargar producto");
+      if (!error._toastShown) toast.error("Error al cargar producto");
       console.error(error);
       return null;
     } finally {
@@ -84,7 +84,6 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.create(data);
       toast.success(response.data.message || "Producto creado exitosamente");
-      await fetchProducts();
       return response.data.data;
     } catch (error) {
       const message =
@@ -110,7 +109,6 @@ export const useProductStore = defineStore("product", () => {
       toast.success(
         response.data.message || "Producto actualizado exitosamente",
       );
-      await fetchProducts();
       return response.data.data;
     } catch (error) {
       const message =
@@ -134,7 +132,6 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.delete(id);
       toast.success(response.data.message || "Producto eliminado exitosamente");
-      await fetchProducts();
       return true;
     } catch (error) {
       const message =

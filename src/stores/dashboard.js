@@ -35,7 +35,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
       stats.value = response.data.data;
     } catch (error) {
       console.error("Error al cargar estadísticas:", error);
-      toast.error("Error al cargar estadísticas");
+      // Don't show extra toast for 403 - already handled by api interceptor
+      if (!error._toastShown && error.response?.status !== 403) {
+        toast.error("Error al cargar estadísticas");
+      }
     }
   }
 

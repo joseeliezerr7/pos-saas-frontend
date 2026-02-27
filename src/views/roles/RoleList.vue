@@ -98,11 +98,11 @@
               </td>
               <td class="px-6 py-4 text-right space-x-2">
                 <button
-                  v-if="can('edit_roles') || role.is_system"
+                  v-if="can('edit_roles')"
                   @click="openEditModal(role)"
                   class="text-blue-600 hover:text-blue-800"
                 >
-                  {{ role.is_system ? "Ver" : "Editar" }}
+                  Editar
                 </button>
                 <button
                   v-if="!role.is_system && can('delete_roles')"
@@ -158,13 +158,7 @@
         class="bg-white rounded-lg max-w-4xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto"
       >
         <h2 class="text-xl font-bold mb-4">
-          {{
-            editingRole
-              ? editingRole.is_system
-                ? "Ver Rol"
-                : "Editar Rol"
-              : "Nuevo Rol"
-          }}
+          {{ editingRole ? "Editar Rol" : "Nuevo Rol" }}
         </h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -181,6 +175,9 @@
               :class="{ 'bg-gray-100': editingRole?.is_system }"
               placeholder="Ej: Cajero, Gerente, etc."
             />
+            <p v-if="editingRole?.is_system" class="text-xs text-gray-500 mt-1">
+              El nombre de roles del sistema no se puede cambiar
+            </p>
           </div>
 
           <div>
@@ -216,7 +213,6 @@
                     :id="`group-${group}`"
                     :checked="isGroupSelected(permissions)"
                     @change="toggleGroup(permissions)"
-                    :disabled="editingRole?.is_system"
                     class="rounded mr-2"
                   />
                   <label
@@ -236,7 +232,6 @@
                       type="checkbox"
                       :value="permission.id"
                       v-model="form.permission_ids"
-                      :disabled="editingRole?.is_system"
                       class="rounded"
                     />
                     <span class="text-sm text-gray-700">{{
@@ -248,7 +243,7 @@
             </div>
           </div>
 
-          <div v-if="!editingRole?.is_system" class="flex gap-2 pt-4 border-t">
+          <div class="flex gap-2 pt-4 border-t">
             <button
               type="submit"
               :disabled="roleStore.loading"
@@ -263,15 +258,6 @@
               class="btn-secondary flex-1"
             >
               Cancelar
-            </button>
-          </div>
-          <div v-else class="flex gap-2 pt-4 border-t">
-            <button
-              type="button"
-              @click="closeModal"
-              class="btn-secondary w-full"
-            >
-              Cerrar
             </button>
           </div>
         </form>

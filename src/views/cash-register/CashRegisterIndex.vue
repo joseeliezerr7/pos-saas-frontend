@@ -316,7 +316,7 @@
           ></div>
 
           <div
-            class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full p-6 z-10 max-h-[90vh] overflow-y-auto"
+            class="relative bg-white rounded-lg shadow-xl max-w-5xl w-full p-6 z-10 max-h-[90vh] overflow-y-auto"
           >
             <h3 class="text-lg font-bold text-gray-900 mb-4">
               Cerrar Caja - Arqueo

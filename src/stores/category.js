@@ -27,7 +27,7 @@ export const useCategoryStore = defineStore("category", () => {
         total: data.total,
       };
     } catch (error) {
-      toast.error("Error al cargar categorías");
+      if (!error._toastShown) toast.error("Error al cargar categorías");
       console.error(error);
     } finally {
       loading.value = false;
@@ -40,7 +40,7 @@ export const useCategoryStore = defineStore("category", () => {
       const response = await categoryService.getTree();
       categoryTree.value = response.data.data;
     } catch (error) {
-      toast.error("Error al cargar árbol de categorías");
+      if (!error._toastShown) toast.error("Error al cargar árbol de categorías");
       console.error(error);
     } finally {
       loading.value = false;
@@ -54,7 +54,7 @@ export const useCategoryStore = defineStore("category", () => {
       currentCategory.value = response.data.data;
       return response.data.data;
     } catch (error) {
-      toast.error("Error al cargar categoría");
+      if (!error._toastShown) toast.error("Error al cargar categoría");
       console.error(error);
       return null;
     } finally {

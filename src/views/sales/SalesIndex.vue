@@ -501,13 +501,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import saleService from "@/services/saleService";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import ModalDialog from "@/components/common/ModalDialog.vue";
 import { toast } from "vue3-toastify";
 import { usePermissions } from "@/composables/usePermissions";
+import { printThermal } from "@/utils/printThermal";
+import { useAuthStore } from "@/stores/auth";
 
+const authStore = useAuthStore();
+const branchPrintSize = computed(() => authStore.currentUser?.branch?.settings?.print_size || '80mm');
 const sales = ref([]);
 const loading = ref(false);
 const showDetailsModal = ref(false);
@@ -567,7 +571,7 @@ async function loadSales() {
   } catch (error) {
     console.error("Error loading sales:", error);
     console.error("Error response:", error.response);
-    toast.error("Error al cargar las ventas");
+    if (!error._toastShown) toast.error("Error al cargar las ventas");
   } finally {
     loading.value = false;
   }
@@ -583,7 +587,7 @@ async function viewSale(sale) {
     }
   } catch (error) {
     console.error("Error loading sale details:", error);
-    toast.error("Error al cargar los detalles de la venta");
+    if (!error._toastShown) toast.error("Error al cargar los detalles de la venta");
   } finally {
     loading.value = false;
   }
@@ -634,13 +638,7 @@ async function printReceipt(sale) {
     const response = await saleService.getReceipt(sale.id);
     if (response.data.success) {
       const data = response.data.data;
-      const printWindow = window.open("", "_blank", "width=400,height=600");
-      printWindow.document.write(buildReceiptHtml(data));
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.onload = () => {
-        printWindow.print();
-      };
+      printThermal(buildReceiptHtml(data), { size: branchPrintSize.value });
     }
   } catch (error) {
     console.error("Error printing receipt:", error);
@@ -718,6 +716,8 @@ function buildReceiptHtml(data) {
   const items = data.items || [];
   const invoice = data.invoice || null;
   const seller = data.seller || {};
+  const cashRegister = data.cash_register || null;
+  const loyalty = data.loyalty || null;
 
   const fm = (v) => parseFloat(v || 0).toFixed(2);
 
@@ -727,6 +727,22 @@ function buildReceiptHtml(data) {
     if (r === 15) return "G - Gravado 15%";
     if (r === 18) return "G - Gravado 18%";
     return "";
+  };
+
+  const getPaymentLabel = (method) => {
+    const labels = { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia', qr: 'Código QR', credit: 'Crédito', check: 'Cheque', other: 'Otro' };
+    return labels[method] || method;
+  };
+
+  const fmtDateTime = (date) => {
+    if (!date) return '';
+    // sold_at viene del backend como dd/mm/yyyy HH:mm:ss, mostrarlo directo
+    return String(date);
+  };
+
+  const fmtDate = (date) => {
+    if (!date) return '';
+    return String(date);
   };
 
   // Tax summary
@@ -747,139 +763,94 @@ function buildReceiptHtml(data) {
 
   // Items HTML
   const itemsHtml = items
-    .map(
-      (item) => `
-    <tr class="item-row">
-      <td class="py1">
+    .map((item) => {
+      const taxLabel = getTaxLabel(item.tax_rate);
+      return `<tr style="border-bottom:1px solid #000;">
+      <td style="padding:2px 0;">
         <div>${item.product_name}</div>
-        ${item.product_sku ? `<div class="text-gray">Código: ${item.product_sku}</div>` : ""}
-        <div class="text-gray">${getTaxLabel(item.tax_rate)}</div>
+        ${item.product_sku ? `<div style="font-size:10px;">Código: ${item.product_sku}</div>` : ""}
+        ${taxLabel ? `<div style="font-size:10px;">${taxLabel}</div>` : ""}
       </td>
-      <td class="py1" style="text-align:center;">${item.quantity}</td>
-      <td class="py1" style="text-align:right;">L ${fm(item.price)}</td>
-      <td class="py1" style="text-align:right;">L ${fm(item.subtotal)}</td>
-    </tr>
-  `,
-    )
+      <td style="text-align:center;padding:2px 0;">${item.quantity}</td>
+      <td style="text-align:right;padding:2px 0;">L${fm(item.price)}</td>
+      <td style="text-align:right;padding:2px 0;">L${fm(item.subtotal)}</td>
+    </tr>`;
+    })
     .join("");
 
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Factura ${sale.sale_number}</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  @page{size:80mm auto;margin:0;}
-  @media print{body{width:80mm;}}
-  body{font-family:'Courier New',monospace;font-size:10px;line-height:1.4;color:#000;background:#fff;width:80mm;padding:5mm;}
-  .ticket{width:100%;}
-  .text-center{text-align:center;}
-  .text-right{text-align:right;}
-  .text-left{text-align:left;}
-  .bold{font-weight:bold;}
-  .semibold{font-weight:600;}
-  .text-sm{font-size:11px;}
-  .text-xs{font-size:9px;}
-  .text-gray{color:#666;font-size:9px;}
-  .sep{border-bottom:1px dashed #999;padding-bottom:8px;margin-bottom:8px;}
-  .sep-solid{border-top:1px solid #999;border-bottom:1px solid #999;padding:8px 0;margin-bottom:8px;}
-  .py1{padding:4px 2px;}
-  .mb1{margin-bottom:4px;}
-  .mt1{margin-top:4px;}
-  .flex{display:flex;justify-content:space-between;}
-  table{width:100%;border-collapse:collapse;}
-  th,td{padding:4px 2px;font-size:10px;}
-  thead tr{border-bottom:1px solid #999;}
-  .item-row{border-bottom:1px solid #ddd;}
-  .reprint-badge{text-align:center;font-weight:bold;font-size:11px;border:1px solid #000;padding:3px;margin-bottom:8px;}
-  .voided-badge{text-align:center;font-weight:bold;border:2px solid red;color:red;padding:4px;margin:6px 0;}
-</style></head><body>
-<div class="ticket">
-  <!-- REIMPRESION -->
-  <div class="reprint-badge">*** REIMPRESION ***</div>
-
-  <!-- 1. ENCABEZADO -->
-  <div class="text-center sep">
-    ${company.logo_url ? `<img src="${company.logo_url}" alt="Logo" style="max-width:120px;max-height:60px;margin:0 auto 6px auto;display:block;" />` : ""}
-    <div class="bold text-sm">${company.legal_name || company.name || "EMPRESA"}</div>
-    ${company.address ? `<div class="text-xs">${company.address}</div>` : ""}
-    <div class="text-xs">Honduras, C.A.</div>
-    ${company.phone ? `<div class="text-xs">Tel: ${company.phone}</div>` : ""}
-    ${company.email ? `<div class="text-xs">Email: ${company.email}</div>` : ""}
-    <div class="text-xs semibold mt1">RTN: ${company.rtn || ""}</div>
-    ${invoice && invoice.cai_number ? `<div class="text-xs">CAI: ${invoice.cai_number}</div>` : ""}
-    ${branch.name ? `<div class="text-xs">Sucursal: ${branch.name}</div>` : ""}
-  </div>
-
-  <!-- 2. DATOS DEL DOCUMENTO -->
-  <div class="text-center sep">
-    <div class="bold text-sm">FACTURA</div>
-    <div class="text-xs">No. ${invoice ? invoice.invoice_number : sale.sale_number}</div>
-    <div class="text-xs">${sale.sold_at || ""}</div>
-    ${seller.name ? `<div class="text-xs">Vendedor: ${seller.name}</div>` : ""}
-  </div>
-
-  <!-- NÚMERO DE ORDEN -->
-  ${
-    sale.order_number
-      ? `<div class="text-center sep">
-    <div class="text-xs" style="color:#666;">ORDEN No.</div>
-    <div class="bold" style="font-size:28px;line-height:1.2;">${sale.order_number}</div>
-  </div>`
-      : ""
+  // Loyalty section
+  let loyaltyHtml = '';
+  if (loyalty && loyalty.points_earned > 0) {
+    loyaltyHtml = `
+    <div style="border-bottom:1px dashed #000;padding-bottom:4px;margin-bottom:4px;background:#eff6ff;padding:8px;border-radius:4px;">
+      <div style="font-size:9px;text-align:center;">
+        <div style="font-weight:bold;color:#1d4ed8;margin-bottom:4px;">PUNTOS DE LEALTAD</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Puntos Ganados:</span><span style="font-weight:600;color:#16a34a;">+${loyalty.points_earned}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>Total de Puntos:</span><span style="font-weight:600;color:#1d4ed8;">${loyalty.new_balance}</span></div>
+      </div>
+    </div>`;
   }
 
-  <!-- 3. DATOS DEL CLIENTE -->
-  <div class="sep">
-    <div class="text-xs"><span class="semibold">Cliente:</span> ${sale.customer_name || "Consumidor Final"}</div>
-    ${sale.customer_rtn ? `<div class="text-xs"><span class="semibold">RTN:</span> ${sale.customer_rtn}</div>` : ""}
-  </div>
-
-  <!-- 4. DETALLE DE PRODUCTOS -->
-  <table style="margin-bottom:8px;">
-    <thead><tr>
-      <th class="text-left py1">Descripción</th>
-      <th class="text-center py1" style="width:12mm;">Cant</th>
-      <th class="text-right py1" style="width:16mm;">Precio</th>
-      <th class="text-right py1" style="width:16mm;">Total</th>
-    </tr></thead>
-    <tbody>${itemsHtml}</tbody>
-  </table>
-
-  <!-- 5. RESUMEN DE IMPUESTOS -->
-  <div class="sep-solid">
-    <div class="flex mb1"><span>Importe Exento:</span><span>L ${fm(exempt)}</span></div>
-    <div class="flex mb1"><span>Importe Gravado 15%:</span><span>L ${fm(taxable15)}</span></div>
-    <div class="flex mb1"><span>Subtotal:</span><span>L ${fm(sale.subtotal)}</span></div>
-    <div class="flex mb1"><span>ISV 15%:</span><span>L ${fm(sale.tax)}</span></div>
-    ${parseFloat(sale.discount) > 0 ? `<div class="flex mb1"><span>Descuento:</span><span>- L ${fm(sale.discount)}</span></div>` : ""}
-  </div>
-
-  <!-- 6. TOTALES DE PAGO -->
-  <div class="sep">
-    <div class="flex bold text-sm" style="margin-bottom:8px;"><span>TOTAL A PAGAR:</span><span>L ${fm(sale.total)}</span></div>
-    <div class="flex mb1 text-xs"><span>Forma de Pago:</span><span style="text-transform:uppercase;">${sale.payment_method_label || sale.payment_method}</span></div>
-    ${sale.transaction_reference ? `<div class="flex mb1 text-xs"><span>Ref. Transacción:</span><span>${sale.transaction_reference}</span></div>` : ""}
-    <div class="flex mb1 text-xs"><span>Monto Pagado:</span><span>L ${fm(sale.amount_paid)}</span></div>
-    ${parseFloat(sale.amount_change) > 0 ? `<div class="flex mb1 text-xs"><span>Cambio:</span><span>L ${fm(sale.amount_change)}</span></div>` : ""}
-  </div>
-
-  ${sale.status === "voided" ? '<div class="voided-badge">*** ANULADA ***</div>' : ""}
-
-  <!-- 7. INFORMACIÓN LEGAL -->
-  <div class="text-center text-xs" style="margin-bottom:8px;">
-    <div class="semibold mb1">${totalWords}</div>
-    <div class="text-gray mb1">G = Gravado (15%) | E = Exento</div>
-    ${invoice && invoice.range_authorized ? `<div class="text-gray">Rango Autorizado: ${invoice.range_authorized}</div>` : ""}
-    ${invoice && invoice.cai_expiration_date ? `<div class="text-gray">Fecha Límite: ${invoice.cai_expiration_date}</div>` : ""}
-  </div>
-
-  <!-- Footer -->
-  <div class="text-center text-xs sep" style="border-top:1px dashed #999;padding-top:8px;border-bottom:none;">
-    <div>¡Gracias por su compra!</div>
-    <div class="mt1">${company.name || ""}</div>
-    <div class="text-gray mt1">Reimpreso: ${new Date().toLocaleString("es-HN")}</div>
-  </div>
+  return `<div class="badge">*** REIMPRESION ***</div>
+<div class="c sep">
+${company.logo_url ? `<img src="${company.logo_url}" style="max-width:50%;max-height:60px;margin:0 auto 4px;display:block;">` : ""}
+<div class="big">${company.legal_name || company.name || "EMPRESA"}</div>
+${company.address ? `<div>${company.address}</div>` : ""}
+<div>${company.city || "Honduras"}, C.A.</div>
+${company.phone ? `<div>Tel: ${company.phone}</div>` : ""}
+${company.email ? `<div>Email: ${company.email}</div>` : ""}
+<div class="b9">RTN: ${company.rtn || ""}</div>
+${invoice && invoice.cai_number ? `<div>CAI: ${invoice.cai_number}</div>` : ""}
+${branch.name ? `<div>Sucursal: ${branch.name}</div>` : ""}
 </div>
-<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};};<\/script>
-</body></html>`;
+<div class="c sep">
+<div class="big">FACTURA</div>
+<div>No. ${invoice ? invoice.invoice_number : sale.sale_number}</div>
+<div>${fmtDateTime(sale.sold_at)}</div>
+${cashRegister ? `<div>Caja: ${typeof cashRegister === 'object' ? cashRegister.name : cashRegister}</div>` : ""}
+${seller.name ? `<div>Vendedor: ${seller.name}</div>` : ""}
+</div>
+${sale.order_number ? `<div class="c sep"><div>ORDEN No.</div><div style="font-size:26px;font-weight:900;line-height:1.2;">${sale.order_number}</div></div>` : ""}
+<div class="sep">
+<div><span class="b9">Cliente:</span> ${sale.customer_name || "Consumidor Final"}</div>
+${sale.customer_rtn ? `<div><span class="b9">RTN:</span> ${sale.customer_rtn}</div>` : ""}
+</div>
+<table style="margin-bottom:4px;">
+<thead><tr style="border-bottom:1px solid #000;">
+<th style="text-align:left;">Desc</th>
+<th style="text-align:center;width:13%;">Cant</th>
+<th style="text-align:right;width:20%;">Precio</th>
+<th style="text-align:right;width:20%;">Total</th>
+</tr></thead>
+<tbody>${itemsHtml}</tbody>
+</table>
+<div class="seps">
+<div class="r"><span>Exento:</span><span>L${fm(exempt)}</span></div>
+<div class="r"><span>Gravado 15%:</span><span>L${fm(taxable15)}</span></div>
+<div class="r"><span>Subtotal:</span><span>L${fm(sale.subtotal)}</span></div>
+<div class="r"><span>ISV 15%:</span><span>L${fm(sale.tax)}</span></div>
+${parseFloat(sale.discount) > 0 ? `<div class="r"><span>Descuento:</span><span>-L${fm(sale.discount)}</span></div>` : ""}
+</div>
+<div class="sep">
+<div class="r big"><span>TOTAL:</span><span>L${fm(sale.total)}</span></div>
+<div class="r"><span>Pago:</span><span style="text-transform:uppercase;">${getPaymentLabel(sale.payment_method)}</span></div>
+${sale.transaction_reference ? `<div class="r"><span>Ref:</span><span>${sale.transaction_reference}</span></div>` : ""}
+<div class="r"><span>Pagado:</span><span>L${fm(sale.amount_paid)}</span></div>
+${parseFloat(sale.amount_change) > 0 ? `<div class="r"><span>Cambio:</span><span>L${fm(sale.amount_change)}</span></div>` : ""}
+</div>
+${sale.status === "voided" ? '<div class="voided">*** ANULADA ***</div>' : ""}
+${loyaltyHtml}
+<div class="c" style="margin-bottom:4px;">
+<div class="b9">${totalWords}</div>
+<div>G=Gravado(15%) | E=Exento</div>
+${invoice && invoice.range_authorized ? `<div>Rango: ${invoice.range_authorized}</div>` : ""}
+${invoice && invoice.cai_expiration_date ? `<div>Límite: ${fmtDate(invoice.cai_expiration_date)}</div>` : ""}
+</div>
+<div class="c" style="border-top:1px dashed #000;padding-top:4px;">
+<div class="b9">Gracias por su compra!</div>
+<div>${company.name || ""}</div>
+<div style="margin-top:4px;font-size:10px;">Reimpreso: ${new Date().toLocaleString("es-HN")}</div>
+</div>`;
 }
 
 function changePage(page) {

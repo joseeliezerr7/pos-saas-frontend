@@ -115,20 +115,33 @@ export const useAuthStore = defineStore("auth", () => {
     toast.info("Sesión cerrada");
   }
 
+  function isAdminUser() {
+    if (!user.value) return false;
+    if (user.value.is_super_admin) return true;
+    const r = user.value.roles || [];
+    return r.includes("super_admin") || r.includes("admin");
+  }
+
   function hasPermission(permission) {
-    if (!user.value || !user.value.permissions) return false;
+    if (!user.value) return false;
+    if (isAdminUser()) return true;
+    if (!user.value.permissions) return false;
     return user.value.permissions.includes(permission);
   }
 
   function hasAnyPermission(permissionArray) {
-    if (!user.value || !user.value.permissions) return false;
+    if (!user.value) return false;
+    if (isAdminUser()) return true;
+    if (!user.value.permissions) return false;
     return permissionArray.some((permission) =>
       user.value.permissions.includes(permission),
     );
   }
 
   function hasAllPermissions(permissionArray) {
-    if (!user.value || !user.value.permissions) return false;
+    if (!user.value) return false;
+    if (isAdminUser()) return true;
+    if (!user.value.permissions) return false;
     return permissionArray.every((permission) =>
       user.value.permissions.includes(permission),
     );

@@ -26,7 +26,7 @@ export const useCustomerStore = defineStore("customer", () => {
         total: data.total,
       };
     } catch (error) {
-      toast.error("Error al cargar clientes");
+      if (!error._toastShown) toast.error("Error al cargar clientes");
       console.error(error);
     } finally {
       loading.value = false;
@@ -51,7 +51,7 @@ export const useCustomerStore = defineStore("customer", () => {
       currentCustomer.value = response.data.data;
       return response.data.data;
     } catch (error) {
-      toast.error("Error al cargar cliente");
+      if (!error._toastShown) toast.error("Error al cargar cliente");
       console.error(error);
       return null;
     } finally {

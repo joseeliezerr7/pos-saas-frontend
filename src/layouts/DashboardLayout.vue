@@ -159,7 +159,7 @@
         </a>
 
         <!-- Catálogo Section -->
-        <div class="mt-4">
+        <div v-if="canAny(['view_products', 'view_categories', 'view_customers', 'view_customer_groups', 'view_customer_tags', 'view_brands', 'view_suppliers', 'view_units'])" class="mt-4">
           <button
             @click="toggleSection('catalogo')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -214,7 +214,7 @@
                 Productos
               </router-link>
               <router-link
-                v-if="can('view_products')"
+                v-if="can('print_labels')"
                 to="/products/print-labels"
                 class="sidebar-sublink"
               >
@@ -222,7 +222,7 @@
                 Imprimir Etiquetas
               </router-link>
               <router-link
-                v-if="can('view_products')"
+                v-if="can('view_brands')"
                 to="/brands"
                 class="sidebar-sublink"
               >
@@ -262,7 +262,7 @@
                 Tags de Clientes
               </router-link>
               <router-link
-                v-if="can('view_products')"
+                v-if="can('view_suppliers')"
                 to="/suppliers"
                 class="sidebar-sublink"
               >
@@ -270,7 +270,7 @@
                 Proveedores
               </router-link>
               <router-link
-                v-if="can('view_products')"
+                v-if="can('view_units')"
                 to="/units"
                 class="sidebar-sublink"
               >
@@ -282,7 +282,7 @@
         </div>
 
         <!-- Ventas Section -->
-        <div class="mt-2">
+        <div v-if="canAny(['view_sales', 'view_invoices', 'view_quotations', 'view_returns', 'view_promotions', 'view_loyalty_program', 'view_gift_cards'])" class="mt-2">
           <button
             @click="toggleSection('ventas')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -335,7 +335,7 @@
                 Ventas
               </router-link>
               <router-link
-                v-if="can('view_sales')"
+                v-if="can('view_quotations')"
                 to="/quotations"
                 class="sidebar-sublink"
               >
@@ -351,7 +351,7 @@
                 Facturas
               </router-link>
               <router-link
-                v-if="can('view_sales')"
+                v-if="can('view_returns')"
                 to="/returns"
                 class="sidebar-sublink"
               >
@@ -359,7 +359,7 @@
                 Devoluciones
               </router-link>
               <router-link
-                v-if="can('view_products')"
+                v-if="can('view_promotions')"
                 to="/promotions"
                 class="sidebar-sublink"
               >
@@ -375,7 +375,7 @@
                 Programa de Lealtad
               </router-link>
               <router-link
-                v-if="can('view_sales')"
+                v-if="can('view_gift_cards')"
                 to="/gift-cards"
                 class="sidebar-sublink"
               >
@@ -387,7 +387,7 @@
         </div>
 
         <!-- Crédito Section -->
-        <div class="mt-2">
+        <div v-if="can('view_credit')" class="mt-2">
           <button
             @click="toggleSection('credito')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -468,7 +468,7 @@
         </div>
 
         <!-- Cuentas por Pagar Section -->
-        <div class="mt-2">
+        <div v-if="canAny(['view_payable', 'view_purchases'])" class="mt-2">
           <button
             @click="toggleSection('cuentasPorPagar')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -552,7 +552,7 @@
         </div>
 
         <!-- Inventario Section -->
-        <div class="mt-2">
+        <div v-if="canAny(['view_inventory', 'view_purchases'])" class="mt-2">
           <button
             @click="toggleSection('inventario')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -619,7 +619,7 @@
         </div>
 
         <!-- Caja Section -->
-        <div class="mt-2">
+        <div v-if="canAny(['view_cash_registers', 'view_expenses'])" class="mt-2">
           <button
             @click="toggleSection('caja')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -663,7 +663,7 @@
               v-if="expandedSections.caja && (sidebarOpen || mobileMenuOpen)"
               class="ml-4 space-y-1"
             >
-              <router-link to="/cash-register" class="sidebar-sublink">
+              <router-link v-if="can('view_cash_registers')" to="/cash-register" class="sidebar-sublink">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
                 Cajas Registradoras
               </router-link>
@@ -767,7 +767,7 @@
         </div>
 
         <!-- Administración Section -->
-        <div class="mt-2">
+        <div v-if="canAny(['view_users', 'view_roles', 'view_audit_logs', 'view_reports', 'view_settings', 'create_products', 'export_reports'])" class="mt-2">
           <button
             @click="toggleSection('administracion')"
             class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors duration-150 mb-1"
@@ -836,7 +836,7 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
                 Roles
               </router-link>
-              <router-link to="/audit-logs" class="sidebar-sublink">
+              <router-link v-if="can('view_audit_logs')" to="/audit-logs" class="sidebar-sublink">
                 <span class="w-1.5 h-1.5 rounded-full bg-gray-500 mr-3"></span>
                 Auditoría
               </router-link>
@@ -1079,7 +1079,7 @@
 <script setup>
 import InstallPWA from "@/components/InstallPWA.vue";
 import TenantSelector from "@/components/common/TenantSelector.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -1092,11 +1092,18 @@ const route = useRoute();
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const settingsStore = useSettingsStore();
-const { can } = usePermissions();
+const { can, canAny } = usePermissions();
 const { unreadCount } = storeToRefs(notificationStore);
 
-const sidebarOpen = ref(true);
+const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1280;
+const sidebarOpen = ref(!isTablet());
 const mobileMenuOpen = ref(false);
+
+const handleResize = () => {
+  if (isTablet()) {
+    sidebarOpen.value = false;
+  }
+};
 const expandedSections = ref({
   catalogo: false,
   ventas: false,
@@ -1144,15 +1151,26 @@ const isKdsEnabled = computed(() => {
 });
 
 // Refresh user data and notifications on mount
+let notificationInterval = null;
 onMounted(() => {
   authStore.fetchUser();
-  notificationStore.fetchNotifications();
-  settingsStore.fetchCompanySettings();
 
-  // Refresh notifications every 30 seconds
-  setInterval(() => {
-    notificationStore.fetchNotifications();
+  // Fetch notifications silently - if user lacks permission, just skip
+  notificationStore.fetchNotifications().catch(() => {});
+  notificationInterval = setInterval(() => {
+    notificationStore.fetchNotifications().catch(() => {});
   }, 30000);
+
+  // Fetch company settings silently - may fail for restricted users
+  settingsStore.fetchCompanySettings().catch(() => {});
+
+  // Auto-collapse sidebar on tablet
+  window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+  if (notificationInterval) clearInterval(notificationInterval);
+  window.removeEventListener('resize', handleResize);
 });
 
 const toggleSection = (section) => {

@@ -31,7 +31,9 @@ export const useCustomerTagStore = defineStore("customerTag", () => {
         tags.value = response.data;
       }
     } catch (error) {
-      toast.error("Error al cargar tags");
+      if (!error._toastShown) {
+        toast.error("Error al cargar tags");
+      }
       console.error(error);
     } finally {
       loading.value = false;

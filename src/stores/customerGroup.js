@@ -33,7 +33,9 @@ export const useCustomerGroupStore = defineStore("customerGroup", () => {
         groups.value = response.data;
       }
     } catch (error) {
-      toast.error("Error al cargar grupos de clientes");
+      if (!error._toastShown) {
+        toast.error("Error al cargar grupos de clientes");
+      }
       console.error(error);
     } finally {
       loading.value = false;

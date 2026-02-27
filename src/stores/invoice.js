@@ -22,7 +22,7 @@ export const useInvoiceStore = defineStore("invoice", () => {
       pagination.value = response.data.meta;
     } catch (error) {
       console.error(error);
-      toast.error("Error al cargar facturas");
+      if (!error._toastShown) toast.error("Error al cargar facturas");
     } finally {
       loading.value = false;
     }
@@ -36,7 +36,7 @@ export const useInvoiceStore = defineStore("invoice", () => {
       return currentInvoice.value;
     } catch (error) {
       console.error(error);
-      toast.error("Error al cargar la factura");
+      if (!error._toastShown) toast.error("Error al cargar la factura");
       throw error;
     } finally {
       loading.value = false;

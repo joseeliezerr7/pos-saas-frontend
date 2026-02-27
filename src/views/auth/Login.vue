@@ -238,8 +238,11 @@ async function handleLogin() {
         tenantStore.setTenant(authStore.user.company);
       }
 
-      // Redirect to dashboard - using window.location for clean reload
-      window.location.href = "/dashboard";
+      // Redirect based on user permissions
+      // Cashiers and users without dashboard access go to POS
+      const hasViewDashboard = authStore.hasPermission("view_dashboard");
+      const redirectPath = hasViewDashboard ? "/dashboard" : "/pos";
+      window.location.href = redirectPath;
     } else {
       errorMessage.value =
         "Credenciales incorrectas. Por favor, verifica tu usuario y contraseña.";

@@ -53,6 +53,7 @@ api.interceptors.request.use(
 let isRefreshing = false;
 let failedQueue = [];
 
+
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -130,17 +131,25 @@ api.interceptors.response.use(
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
       const errorData = error.response?.data?.error;
+      const topMessage = error.response?.data?.message;
+
+      // Mark error as handled to prevent stores from showing duplicate toasts
+      error._toastShown = true;
 
       if (errorData?.code === "SUBSCRIPTION_INACTIVE") {
         toast.error("Su suscripción está inactiva");
         router.push({ name: "settings-subscription" });
       } else if (errorData?.code === "NO_ACTIVE_CAI") {
         toast.error("No hay CAI vigente para facturar");
-      } else {
-        toast.error(
-          errorData?.message || "No tienes permisos para realizar esta acción",
+      } else if (errorData?.code === "CASH_NOT_YOURS") {
+        toast.warning(
+          topMessage ||
+            errorData?.message ||
+            "Esta caja fue abierta por otro usuario.",
         );
       }
+      // Permission denied errors are handled silently - no toast needed
+      // The UI already hides menu items the user can't access
     }
 
     // Handle 404 Not Found

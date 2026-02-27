@@ -37,7 +37,7 @@ export const useGiftCardStore = defineStore("giftCard", () => {
       }
     } catch (error) {
       console.error("Error fetching gift cards:", error);
-      toast.error("Error al cargar gift cards");
+      if (!error._toastShown) toast.error("Error al cargar gift cards");
       giftCards.value = [];
     } finally {
       loading.value = false;
@@ -75,7 +75,7 @@ export const useGiftCardStore = defineStore("giftCard", () => {
       }
     } catch (error) {
       console.error("Error fetching gift card:", error);
-      toast.error("Error al cargar gift card");
+      if (!error._toastShown) toast.error("Error al cargar gift card");
       throw error;
     } finally {
       loading.value = false;
