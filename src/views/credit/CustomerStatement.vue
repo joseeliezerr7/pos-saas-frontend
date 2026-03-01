@@ -824,11 +824,10 @@ const companyData = computed(() => ({
   name: authStore.currentUser?.company?.name || "Mi Empresa",
   legal_name:
     authStore.currentUser?.company?.legal_name || "Mi Empresa S.A. de C.V.",
-  rtn: authStore.currentUser?.company?.rtn || "0000000000000",
-  address: authStore.currentUser?.company?.address || "Tegucigalpa, Honduras",
-  city: authStore.currentUser?.company?.city || "Tegucigalpa",
-  phone: authStore.currentUser?.company?.phone || "+504 0000-0000",
-  email: authStore.currentUser?.company?.email || "info@empresa.hn",
+  rtn: authStore.currentUser?.company?.rtn || "",
+  address: authStore.currentUser?.company?.address || "",
+  phone: authStore.currentUser?.company?.phone || "",
+  email: authStore.currentUser?.company?.email || "",
 }));
 
 const statementData = computed(() => creditStore.customerStatement || {});

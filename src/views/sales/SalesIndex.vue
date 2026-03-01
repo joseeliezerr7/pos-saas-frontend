@@ -508,6 +508,7 @@ import ModalDialog from "@/components/common/ModalDialog.vue";
 import { toast } from "vue3-toastify";
 import { usePermissions } from "@/composables/usePermissions";
 import { printThermal } from "@/utils/printThermal";
+import * as usbPrinter from "@/utils/usbPrinter";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
@@ -520,6 +521,7 @@ const showVoidModal = ref(false);
 const selectedSale = ref(null);
 const saleToVoid = ref(null);
 const voidReason = ref("");
+const usbPrinterConnected = ref(false);
 
 const filters = ref({
   date_from: "",
@@ -535,7 +537,7 @@ const pagination = ref({
   total: 0,
 });
 
-onMounted(() => {
+onMounted(async () => {
   // Set default dates (last 30 days)
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
@@ -545,6 +547,16 @@ onMounted(() => {
   filters.value.date_from = thirtyDaysAgo.toISOString().split("T")[0];
 
   loadSales();
+
+  // Auto-reconnect USB printer
+  if (usbPrinter.isSupported()) {
+    try {
+      await usbPrinter.autoReconnect();
+      usbPrinterConnected.value = usbPrinter.isConnected();
+    } catch (e) {
+      // Silently fail
+    }
+  }
 });
 
 async function loadSales() {
@@ -638,6 +650,63 @@ async function printReceipt(sale) {
     const response = await saleService.getReceipt(sale.id);
     if (response.data.success) {
       const data = response.data.data;
+
+      // Si hay impresora USB conectada, imprimir directo
+      if (usbPrinterConnected.value && usbPrinter.isConnected()) {
+        try {
+          const company = data.company || {};
+          const s = data.sale || {};
+          const items = data.items || [];
+          const invoice = data.invoice || null;
+
+          const pSize = branchPrintSize.value === 'letter' ? '80mm' : branchPrintSize.value;
+
+          await usbPrinter.printReceipt({
+            company: {
+              name: company.legal_name || company.name || '',
+              rtn: company.rtn || '',
+              address: company.address || '',
+              phone: company.phone || '',
+            },
+            sale: {
+              sale_number: s.sale_number || '',
+              invoice_number: invoice ? invoice.invoice_number : '',
+              date: s.sold_at || '',
+              customer_name: s.customer_name || 'Consumidor Final',
+              customer_rtn: s.customer_rtn || '',
+              details: items.map(item => ({
+                product_name: item.product_name || '',
+                product_sku: item.product_sku || '',
+                quantity: item.quantity,
+                price: item.price,
+                tax_rate: item.tax_rate,
+                subtotal: item.subtotal,
+              })),
+              subtotal: s.subtotal,
+              discount: s.discount,
+              tax: s.tax,
+              total: s.total,
+              payment_method: s.payment_method,
+              amount_paid: s.amount_paid,
+              amount_change: s.amount_change,
+              notes: s.notes,
+            },
+            cai: invoice && invoice.cai_number ? {
+              cai: invoice.cai_number,
+              range_from: invoice.range_authorized ? invoice.range_authorized.split(' - ')[0] : '',
+              range_to: invoice.range_authorized ? invoice.range_authorized.split(' - ')[1] : '',
+              due_date: invoice.cai_expiration_date || '',
+            } : null,
+            printSize: pSize,
+          }, { openDrawer: false });
+          toast.success("Reimpreso correctamente");
+          return;
+        } catch (e) {
+          console.error('USB print failed, falling back to browser:', e);
+          toast.warning("Error USB, usando impresión del navegador");
+        }
+      }
+
       printThermal(buildReceiptHtml(data), { size: branchPrintSize.value });
     }
   } catch (error) {
@@ -795,9 +864,8 @@ function buildReceiptHtml(data) {
 <div class="c sep">
 ${company.logo_url ? `<img src="${company.logo_url}" style="max-width:50%;max-height:60px;margin:0 auto 4px;display:block;">` : ""}
 <div class="big">${company.legal_name || company.name || "EMPRESA"}</div>
-${company.address ? `<div>${company.address}</div>` : ""}
-<div>${company.city || "Honduras"}, C.A.</div>
-${company.phone ? `<div>Tel: ${company.phone}</div>` : ""}
+${branch.address || company.address ? `<div>${branch.address || company.address}</div>` : ""}
+${branch.phone || company.phone ? `<div>Tel: ${branch.phone || company.phone}</div>` : ""}
 ${company.email ? `<div>Email: ${company.email}</div>` : ""}
 <div class="b9">RTN: ${company.rtn || ""}</div>
 ${invoice && invoice.cai_number ? `<div>CAI: ${invoice.cai_number}</div>` : ""}

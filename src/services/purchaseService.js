@@ -24,4 +24,8 @@ export default {
   receive(id, data) {
     return api.post(`/purchases/${id}/receive`, data);
   },
+
+  updatePaymentStatus(id, data) {
+    return api.patch(`/purchases/${id}/payment-status`, data);
+  },
 };

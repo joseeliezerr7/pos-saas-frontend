@@ -55,11 +55,8 @@
                 <div class="font-bold text-sm">
                   {{ company.legal_name || company.name }}
                 </div>
-                <div class="text-xs">{{ company.address }}</div>
-                <div class="text-xs">
-                  {{ company.city || "Honduras" }}, C.A.
-                </div>
-                <div class="text-xs">Tel: {{ company.phone }}</div>
+                <div class="text-xs">{{ branchAddress || company.address }}</div>
+                <div class="text-xs">Tel: {{ branchPhone || company.phone }}</div>
                 <div class="text-xs">Email: {{ company.email }}</div>
                 <div class="text-xs font-semibold mt-1">
                   RTN: {{ company.rtn }}
@@ -259,33 +256,50 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex space-x-3 mt-6">
-              <button
-                @click="printTicket"
-                data-shortcut="print-invoice"
-                class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div class="flex flex-col space-y-2 mt-6">
+              <div class="flex space-x-3">
+                <button
+                  @click="printTicket"
+                  data-shortcut="print-invoice"
+                  class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center justify-center"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                  />
-                </svg>
-                Imprimir
-              </button>
+                  <svg
+                    class="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                    />
+                  </svg>
+                  {{ usbPrinterConnected ? 'Imprimir' : 'Imprimir (navegador)' }}
+                </button>
+                <button
+                  @click="$emit('close')"
+                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  Cerrar
+                </button>
+              </div>
+              <!-- USB Printer connection -->
               <button
-                @click="$emit('close')"
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                v-if="usbSupported && !usbPrinterConnected"
+                @click="connectUsb"
+                class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center text-sm"
               >
-                Cerrar
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Conectar Impresora USB (impresión directa)
               </button>
+              <div v-if="usbPrinterConnected" class="flex items-center justify-between text-xs text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
+                <span>Impresora USB conectada (impresión directa)</span>
+                <button @click="disconnectUsb" class="text-red-500 hover:text-red-700 underline">Desconectar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -295,9 +309,46 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { getCashDrawerKickCommand } from "@/utils/cashDrawer";
 import { printThermal } from "@/utils/printThermal";
+import * as usbPrinter from "@/utils/usbPrinter";
+import { toast } from "vue3-toastify";
+
+const usbSupported = ref(false);
+const usbPrinterConnected = ref(false);
+
+onMounted(async () => {
+  usbSupported.value = usbPrinter.isSupported();
+  if (usbSupported.value) {
+    try {
+      await usbPrinter.autoReconnect();
+      usbPrinterConnected.value = usbPrinter.isConnected();
+    } catch (e) {
+      // Silently fail
+    }
+  }
+});
+
+const connectUsb = async () => {
+  try {
+    await usbPrinter.connectPrinter();
+    usbPrinterConnected.value = true;
+    toast.success("Impresora USB conectada");
+  } catch (e) {
+    toast.error(e.message || "Error al conectar impresora USB");
+  }
+};
+
+const disconnectUsb = async () => {
+  try {
+    await usbPrinter.disconnectPrinter();
+    usbPrinterConnected.value = false;
+    toast.info("Impresora USB desconectada");
+  } catch (e) {
+    // ignore
+  }
+};
 
 const props = defineProps({
   show: {
@@ -337,6 +388,10 @@ const ticketClass = computed(() => {
 });
 
 const emit = defineEmits(["close"]);
+
+// Branch-specific data for the invoice header
+const branchAddress = computed(() => props.sale.branch?.address || props.company.branch_address || null);
+const branchPhone = computed(() => props.sale.branch?.phone || props.company.branch_phone || null);
 
 // Helper to normalize tax_rate to integer for comparison
 const normalizeTaxRate = (rate) => Math.round(parseFloat(rate) || 0);
@@ -508,7 +563,7 @@ const numberToWords = (num) => {
 };
 
 // Generate self-contained print HTML from data (not innerHTML copy)
-const printTicket = () => {
+const printTicket = async () => {
   const s = props.sale;
   const c = props.company;
   const caiInfo = props.cai;
@@ -554,13 +609,16 @@ const printTicket = () => {
     </div>`;
   }
 
+  // Use branch data when available for address/phone
+  const printAddress = s.branch?.address || c.address || "";
+  const printPhone = s.branch?.phone || c.phone || "";
+
   // Build receipt HTML
   const receiptHtml = `<div class="c sep">
 ${c.logo_url ? `<img src="${c.logo_url}" style="max-width:50%;max-height:60px;margin:0 auto 4px;display:block;">` : ""}
 <div class="big">${c.legal_name || c.name}</div>
-<div>${c.address || ""}</div>
-<div>${c.city || "Honduras"}, C.A.</div>
-<div>Tel: ${c.phone || ""}</div>
+<div>${printAddress}</div>
+<div>Tel: ${printPhone}</div>
 <div>Email: ${c.email || ""}</div>
 <div class="b9">RTN: ${c.rtn || ""}</div>
 ${caiInfo ? `<div>CAI: ${caiInfo.cai_number}</div>` : ""}
@@ -612,6 +670,55 @@ ${caiInfo ? `<div>Rango: ${caiInfo.range_from} - ${caiInfo.range_to}</div><div>L
 <div>${c.name}</div>
 </div>`;
 
+  // Si hay impresora USB conectada, imprimir directo sin diálogo
+  if (usbPrinterConnected.value && usbPrinter.isConnected()) {
+    try {
+      await usbPrinter.printReceipt({
+        company: c,
+        sale: {
+          sale_number: s.sale_number || props.invoiceNumber,
+          invoice_number: s.invoice_number || props.invoiceNumber,
+          date: s.sold_at || new Date(),
+          customer_name: s.customer_name || 'Consumidor Final',
+          customer_rtn: s.customer_rtn,
+          details: (s.details || []).map(item => ({
+            product_name: item.product?.name || item.product_name || '',
+            product_sku: item.product?.sku || item.product_sku || '',
+            quantity: item.quantity,
+            price: item.price || item.unit_price,
+            tax_rate: item.tax_rate,
+            subtotal: item.subtotal,
+          })),
+          subtotal: s.subtotal,
+          discount: s.discount,
+          tax: s.tax,
+          total: s.total,
+          payment_method: s.payment_method,
+          amount_paid: s.amount_paid,
+          amount_change: s.amount_change,
+          notes: s.notes,
+          order_number: s.order_number,
+          user_name: s.user?.name,
+          branch_name: s.branch?.name,
+          cash_register_name: s.cash_opening?.cash_register?.name,
+        },
+        cai: caiInfo ? {
+          cai: caiInfo.cai_number,
+          range_from: caiInfo.range_from,
+          range_to: caiInfo.range_to,
+          due_date: caiInfo.expiry_date,
+        } : null,
+        printSize: props.printSize === 'letter' ? '80mm' : props.printSize,
+      }, { openDrawer: true });
+      toast.success("Impreso correctamente");
+      return;
+    } catch (e) {
+      console.error('USB print failed, falling back to browser:', e);
+      toast.warning("Error USB, usando impresión del navegador");
+    }
+  }
+
+  // Fallback: impresión por navegador
   printThermal(receiptHtml, { size: props.printSize });
 };
 </script>

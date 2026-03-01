@@ -133,6 +133,22 @@ export const usePurchaseStore = defineStore("purchase", () => {
     }
   }
 
+  async function updatePaymentStatus(id, data) {
+    loading.value = true;
+    try {
+      const response = await purchaseService.updatePaymentStatus(id, data);
+      toast.success(response.data.message || "Estado de pago actualizado");
+      return response.data.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Error al actualizar estado de pago";
+      toast.error(message);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     purchases,
     currentPurchase,
@@ -144,5 +160,6 @@ export const usePurchaseStore = defineStore("purchase", () => {
     updatePurchase,
     deletePurchase,
     receivePurchase,
+    updatePaymentStatus,
   };
 });

@@ -29,7 +29,26 @@
         </div>
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex gap-3 items-center">
+        <!-- USB Printer Connection -->
+        <button
+          v-if="usbSupported && !usbPrinterConnected"
+          @click="connectUsb"
+          class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-1 text-sm"
+          title="Conectar impresora USB para impresión directa"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          USB
+        </button>
+        <div v-if="usbPrinterConnected" class="flex items-center gap-1 text-xs text-green-700 bg-green-50 px-2 py-1.5 rounded-lg">
+          <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+          <span>USB</span>
+          <button @click="disconnectUsb" class="text-red-500 hover:text-red-700 ml-1" title="Desconectar">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
         <button
           @click="printReceipt"
           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2"
@@ -47,7 +66,7 @@
               d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
             />
           </svg>
-          Reimprimir
+          {{ usbPrinterConnected ? 'Reimprimir' : 'Reimprimir (navegador)' }}
         </button>
         <button
           v-if="!sale?.has_invoice"
@@ -327,6 +346,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "vue3-toastify";
 import { printThermal } from "@/utils/printThermal";
+import * as usbPrinter from "@/utils/usbPrinter";
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
@@ -339,9 +359,41 @@ const branchPrintSize = computed(() => authStore.currentUser?.branch?.settings?.
 const sale = computed(() => saleStore.currentSale);
 const loading = computed(() => saleStore.loading);
 
-onMounted(() => {
+const usbSupported = ref(false);
+const usbPrinterConnected = ref(false);
+
+onMounted(async () => {
   loadSale();
+  usbSupported.value = usbPrinter.isSupported();
+  if (usbSupported.value) {
+    try {
+      await usbPrinter.autoReconnect();
+      usbPrinterConnected.value = usbPrinter.isConnected();
+    } catch (e) {
+      // Silently fail
+    }
+  }
 });
+
+async function connectUsb() {
+  try {
+    await usbPrinter.connectPrinter();
+    usbPrinterConnected.value = true;
+    toast.success("Impresora USB conectada");
+  } catch (e) {
+    toast.error(e.message || "Error al conectar impresora USB");
+  }
+}
+
+async function disconnectUsb() {
+  try {
+    await usbPrinter.disconnectPrinter();
+    usbPrinterConnected.value = false;
+    toast.info("Impresora USB desconectada");
+  } catch (e) {
+    // ignore
+  }
+}
 
 async function loadSale() {
   const id = route.params.id;
@@ -355,6 +407,66 @@ async function printReceipt() {
     const response = await saleService.getReceipt(sale.value.id);
     if (response.data.success) {
       const data = response.data.data;
+
+      // Si hay impresora USB conectada, imprimir directo
+      if (usbPrinterConnected.value && usbPrinter.isConnected()) {
+        try {
+          const company = data.company || {};
+          const s = data.sale || {};
+          const items = data.items || [];
+          const invoice = data.invoice || null;
+          const seller = data.seller || {};
+          const cashRegister = data.cash_register || null;
+
+          const pSize = branchPrintSize.value === 'letter' ? '80mm' : branchPrintSize.value;
+
+          const branch = data.branch || {};
+          await usbPrinter.printReceipt({
+            company: {
+              name: company.legal_name || company.name || '',
+              rtn: company.rtn || '',
+              address: branch.address || company.address || '',
+              phone: branch.phone || company.phone || '',
+            },
+            sale: {
+              sale_number: s.sale_number || '',
+              invoice_number: invoice ? invoice.invoice_number : '',
+              date: s.sold_at || '',
+              customer_name: s.customer_name || 'Consumidor Final',
+              customer_rtn: s.customer_rtn || '',
+              details: items.map(item => ({
+                product_name: item.product_name || '',
+                product_sku: item.product_sku || '',
+                quantity: item.quantity,
+                price: item.price,
+                tax_rate: item.tax_rate,
+                subtotal: item.subtotal,
+              })),
+              subtotal: s.subtotal,
+              discount: s.discount,
+              tax: s.tax,
+              total: s.total,
+              payment_method: s.payment_method,
+              amount_paid: s.amount_paid,
+              amount_change: s.amount_change,
+              notes: s.notes,
+            },
+            cai: invoice && invoice.cai_number ? {
+              cai: invoice.cai_number,
+              range_from: invoice.range_authorized ? invoice.range_authorized.split(' - ')[0] : '',
+              range_to: invoice.range_authorized ? invoice.range_authorized.split(' - ')[1] : '',
+              due_date: invoice.cai_expiration_date || '',
+            } : null,
+            printSize: pSize,
+          }, { openDrawer: false });
+          toast.success("Reimpreso correctamente");
+          return;
+        } catch (e) {
+          console.error('USB print failed, falling back to browser:', e);
+          toast.warning("Error USB, usando impresión del navegador");
+        }
+      }
+
       printThermal(buildReceiptHtml(data), { size: branchPrintSize.value });
     }
   } catch (error) {
@@ -508,13 +620,16 @@ function buildReceiptHtml(data) {
     </div>`;
   }
 
+  // Use branch data when available for address/phone
+  const printAddress = branch.address || company.address || "";
+  const printPhone = branch.phone || company.phone || "";
+
   return `<div class="badge">*** REIMPRESION ***</div>
 <div class="c sep">
 ${company.logo_url ? `<img src="${company.logo_url}" style="max-width:50%;max-height:60px;margin:0 auto 4px;display:block;">` : ""}
 <div class="big">${company.legal_name || company.name || "EMPRESA"}</div>
-${company.address ? `<div>${company.address}</div>` : ""}
-<div>${company.city || "Honduras"}, C.A.</div>
-${company.phone ? `<div>Tel: ${company.phone}</div>` : ""}
+${printAddress ? `<div>${printAddress}</div>` : ""}
+${printPhone ? `<div>Tel: ${printPhone}</div>` : ""}
 ${company.email ? `<div>Email: ${company.email}</div>` : ""}
 <div class="b9">RTN: ${company.rtn || ""}</div>
 ${invoice && invoice.cai_number ? `<div>CAI: ${invoice.cai_number}</div>` : ""}

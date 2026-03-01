@@ -24,6 +24,16 @@
         >
           Recibir Productos
         </button>
+        <button
+          v-if="
+            can('edit_purchases') &&
+            purchase?.payment_status !== 'paid'
+          "
+          @click="openPaymentModal"
+          class="btn-success"
+        >
+          Registrar Pago
+        </button>
         <router-link to="/purchases" class="btn-secondary">
           Volver
         </router-link>
@@ -288,6 +298,73 @@
         </form>
       </div>
     </div>
+
+    <!-- Payment Modal -->
+    <div
+      v-if="showPaymentModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <h2 class="text-xl font-bold mb-4">Registrar Pago</h2>
+
+        <form @submit.prevent="handlePayment">
+          <div class="space-y-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Total de la Compra</label>
+              <p class="text-lg font-bold text-gray-900">L {{ formatMoney(purchase?.total) }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Estado de Pago *</label>
+              <select v-model="paymentForm.payment_status" required class="input w-full">
+                <option value="paid">Pagada</option>
+                <option value="partial">Pago Parcial</option>
+                <option value="pending">Pendiente</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
+              <select v-model="paymentForm.payment_method" class="input w-full">
+                <option value="">Seleccionar...</option>
+                <option value="cash">Efectivo</option>
+                <option value="transfer">Transferencia</option>
+                <option value="check">Cheque</option>
+                <option value="card">Tarjeta</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Referencia</label>
+              <input
+                v-model="paymentForm.payment_reference"
+                type="text"
+                class="input w-full"
+                placeholder="Número de transferencia, cheque, etc."
+              />
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              type="submit"
+              :disabled="purchaseStore.loading"
+              class="btn-primary flex-1"
+            >
+              <span v-if="purchaseStore.loading">Guardando...</span>
+              <span v-else>Guardar Pago</span>
+            </button>
+            <button
+              type="button"
+              @click="closePaymentModal"
+              class="btn-secondary flex-1"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -306,6 +383,12 @@ const purchase = ref(null);
 const showReceiveModal = ref(false);
 const receiveForm = reactive({
   items: [],
+});
+const showPaymentModal = ref(false);
+const paymentForm = reactive({
+  payment_status: 'paid',
+  payment_method: '',
+  payment_reference: '',
 });
 
 onMounted(async () => {
@@ -337,7 +420,7 @@ function closeReceiveModal() {
 
 async function handleReceive() {
   const data = {
-    items: receiveForm.items
+    details: receiveForm.items
       .filter((item) => item.receiving_quantity > 0)
       .map((item) => ({
         detail_id: item.id,
@@ -345,13 +428,38 @@ async function handleReceive() {
       })),
   };
 
-  if (data.items.length === 0) {
+  if (data.details.length === 0) {
     return;
   }
 
   try {
     await purchaseStore.receivePurchase(route.params.id, data);
     closeReceiveModal();
+    await loadPurchase();
+  } catch (error) {
+    // Error already handled in store
+  }
+}
+
+function openPaymentModal() {
+  paymentForm.payment_status = 'paid';
+  paymentForm.payment_method = '';
+  paymentForm.payment_reference = '';
+  showPaymentModal.value = true;
+}
+
+function closePaymentModal() {
+  showPaymentModal.value = false;
+}
+
+async function handlePayment() {
+  try {
+    await purchaseStore.updatePaymentStatus(route.params.id, {
+      payment_status: paymentForm.payment_status,
+      payment_method: paymentForm.payment_method || undefined,
+      payment_reference: paymentForm.payment_reference || undefined,
+    });
+    closePaymentModal();
     await loadPurchase();
   } catch (error) {
     // Error already handled in store
@@ -422,6 +530,10 @@ function getPaymentStatusBadge(status) {
 
 .btn-primary {
   @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-success {
+  @apply px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-secondary {

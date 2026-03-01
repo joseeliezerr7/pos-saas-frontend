@@ -328,11 +328,13 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useSettingsStore } from "@/stores/settings";
+import { useAuthStore } from "@/stores/auth";
 import { toast } from "vue3-toastify";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import AlertMessage from "@/components/common/AlertMessage.vue";
 
 const settingsStore = useSettingsStore();
+const authStore = useAuthStore();
 const successMessage = ref("");
 
 const form = ref({
@@ -407,6 +409,8 @@ async function loadSettings() {
 async function saveSettings() {
   try {
     await settingsStore.updateCompanySettings(form.value);
+    // Refresh auth user data so company changes are reflected everywhere (POS, invoices, etc.)
+    await authStore.fetchUser().catch(() => {});
     successMessage.value = "Configuración actualizada exitosamente";
     toast.success("Configuración guardada");
   } catch (error) {

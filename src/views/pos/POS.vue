@@ -1531,24 +1531,30 @@ const newCustomerForm = ref({
   email: "",
 });
 
-// Company and CAI data
+// Company and CAI data - prefer fresh settingsStore data, then authStore fallback
 const companyData = computed(() => {
-  const company = authStore.currentUser?.company;
+  const freshCompany = settingsStore.companySettings;
+  const authCompany = authStore.currentUser?.company;
+  const company = freshCompany || authCompany;
+  const branch = authStore.currentUser?.branch;
+
   let logoUrl = company?.logo_url || null;
   if (!logoUrl && company?.logo) {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
     const backendUrl = apiUrl.replace("/api", "");
     logoUrl = `${backendUrl}/storage/${company.logo}`;
   }
+
+  // Branch data overrides company data for address and phone
   return {
     name: company?.name || "Mi Empresa",
     legal_name: company?.legal_name || "Mi Empresa S.A. de C.V.",
-    rtn: company?.rtn || "0000000000000",
-    address: company?.address || "Tegucigalpa, Honduras",
-    city: company?.city || "Tegucigalpa",
-    phone: company?.phone || "+504 0000-0000",
-    email: company?.email || "info@empresa.hn",
+    rtn: company?.rtn || "",
+    address: branch?.address || company?.address || "",
+    phone: branch?.phone || company?.phone || "",
+    email: company?.email || "",
     logo_url: logoUrl,
+    branch_name: branch?.name || null,
   };
 });
 
@@ -1735,7 +1741,11 @@ watch(
 );
 
 onMounted(async () => {
-  await settingsStore.fetchCompanySettings().catch(() => {});
+  // Refresh user data (company/branch) and company settings in parallel
+  await Promise.all([
+    authStore.fetchUser().catch(() => {}),
+    settingsStore.fetchCompanySettings().catch(() => {}),
+  ]);
   await checkCashRegister();
   loadCategories();
   loadProducts();
